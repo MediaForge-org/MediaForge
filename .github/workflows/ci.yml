@@ -1,0 +1,91 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend (Pint · PHPStan · Pest)
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: pgvector/pgvector:pg17
+        env:
+          POSTGRES_DB: mediaforge_test
+          POSTGRES_USER: mediaforge
+          POSTGRES_PASSWORD: mediaforge
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U mediaforge"
+          --health-interval 10s --health-timeout 5s --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s --health-timeout 5s --health-retries 5
+
+    env:
+      DB_CONNECTION: pgsql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 5432
+      DB_DATABASE: mediaforge_test
+      DB_USERNAME: mediaforge
+      DB_PASSWORD: mediaforge
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP 8.4
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo_pgsql, redis, intl, zip, bcmath, pcntl, gd
+          coverage: none
+          tools: composer:v2
+
+      - name: Enable Postgres extensions
+        run: |
+          PGPASSWORD=mediaforge psql -h 127.0.0.1 -U mediaforge -d mediaforge_test \
+            -c "CREATE EXTENSION IF NOT EXISTS pg_trgm; CREATE EXTENSION IF NOT EXISTS btree_gist; CREATE EXTENSION IF NOT EXISTS vector;"
+
+      - name: Cache Composer
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: composer-${{ hashFiles('composer.lock') }}
+
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      - run: cp .env.example .env && php artisan key:generate
+
+      - name: Pint (style)
+        run: vendor/bin/pint --test
+
+      - name: PHPStan (static analysis)
+        run: vendor/bin/phpstan analyse --memory-limit=512M --no-progress
+
+      - name: Pest (tests)
+        run: vendor/bin/pest
+
+  frontend:
+    name: Frontend (build · type-check)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run type-check
+      - run: npm run build
+
+  # Docker image build & multi-arch publish (GHCR / Docker Hub) is added as a
+  # separate release workflow later — the Dockerfile is already buildx-ready.

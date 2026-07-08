@@ -1,0 +1,136 @@
+# =============================================================================
+# MediaForge — DEV compose (deploy/dev). Same topology as production plus dev
+# comfort (source bind-mount, Vite HMR, Mailpit) and bundled, isolated Jellyfin
+# + Audiobookshelf instances on free ports. Run from the repo root:
+#
+#   make setup      # first run
+#   make up / make down
+#
+# Ports avoid the host's existing 8080 (SABnzbd) / 8096 (Jellyfin) / 13378 (ABS).
+# =============================================================================
+
+x-app-build: &app-build
+  build:
+    context: ../..
+    dockerfile: Dockerfile
+  image: mediaforge/app:dev
+  env_file: [../../.env]
+  environment:
+    MEDIAFORGE_SKIP_OPTIMIZE: "1" # never cache config in dev
+  volumes:
+    - ../..:/var/www/html
+    # Overlay the writable runtime dirs with named volumes so the non-root
+    # container can write them (the bind-mounted host dirs are root-owned).
+    - app_storage:/var/www/html/storage
+    - app_bootstrap_cache:/var/www/html/bootstrap/cache
+  depends_on:
+    postgres: { condition: service_healthy }
+    redis: { condition: service_healthy }
+  networks: [mediaforge]
+  restart: unless-stopped
+
+services:
+  app:
+    <<: *app-build
+    ports:
+      - "8100:8080"
+    extra_hosts:
+      - "host.docker.internal:host-gateway" # reach the real Jellyfin/ABS on the host
+
+  vite:
+    image: node:22-alpine
+    working_dir: /var/www/html
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0 --port 5273"
+    volumes:
+      - ../..:/var/www/html
+    ports:
+      - "5273:5273"
+    networks: [mediaforge]
+
+  horizon:
+    <<: *app-build
+    command: php artisan horizon
+    ports: []
+
+  worker:
+    <<: *app-build
+    command: php artisan queue:work --queue=default,connector,scan,analyze --tries=3
+    ports: []
+
+  scheduler:
+    <<: *app-build
+    command: php artisan schedule:work
+    ports: []
+
+  postgres:
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_DB: mediaforge
+      POSTGRES_USER: mediaforge
+      POSTGRES_PASSWORD: mediaforge
+    ports:
+      - "5440:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init-db.sh:/docker-entrypoint-initdb.d/10-init-db.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mediaforge"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks: [mediaforge]
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    ports:
+      - "6390:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks: [mediaforge]
+
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "8126:8025" # web UI
+      - "1126:1025" # SMTP
+    networks: [mediaforge]
+
+  jellyfin-dev:
+    image: jellyfin/jellyfin:latest
+    ports:
+      - "8110:8096"
+    volumes:
+      - jellyfin_config:/config
+      - jellyfin_cache:/cache
+    networks: [mediaforge]
+    restart: unless-stopped
+
+  audiobookshelf-dev:
+    image: ghcr.io/advplyr/audiobookshelf:latest
+    ports:
+      - "13380:80"
+    volumes:
+      - abs_config:/config
+      - abs_metadata:/metadata
+    networks: [mediaforge]
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  redisdata:
+  app_storage:
+  app_bootstrap_cache:
+  jellyfin_config:
+  jellyfin_cache:
+  abs_config:
+  abs_metadata:
+
+networks:
+  mediaforge:
+    driver: bridge

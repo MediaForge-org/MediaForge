@@ -1,0 +1,144 @@
+# =============================================================================
+# MediaForge — production compose (shipped topology, architecture/deployment.md)
+#
+#   docker compose up -d
+#
+# All PHP services share one image and differ only by command. Config comes from
+# ./config/.env (copy config/.env.example → config/.env and fill it in). The app
+# binds to localhost only; put TLS on your own reverse proxy (deploy/examples/).
+# Media libraries are always mounted read-only (ADR-0005).
+# =============================================================================
+
+x-mediaforge-image: &mf-image
+  image: ${MEDIAFORGE_IMAGE:-ghcr.io/mediaforge/mediaforge}:${MEDIAFORGE_VERSION:-latest}
+
+x-mediaforge-env: &mf-env
+  env_file: [./config/.env]
+  restart: unless-stopped
+  depends_on:
+    postgres: { condition: service_healthy }
+    redis: { condition: service_healthy }
+  networks: [mediaforge]
+
+services:
+  app:
+    <<: [*mf-image, *mf-env]
+    ports:
+      - "127.0.0.1:8080:8080" # localhost only; TLS via your reverse proxy
+    volumes:
+      - ./config/.env:/var/www/html/.env:ro
+      - storage:/var/www/html/storage
+      # Media libraries (optional in V1) — always read-only:
+      # - ${MEDIA_MOVIES_PATH:-./media/movies}:/media/movies:ro
+      # - ${MEDIA_AUDIOBOOKS_PATH:-./media/audiobooks}:/media/audiobooks:ro
+
+  worker-default:
+    <<: [*mf-image, *mf-env]
+    command: php artisan queue:work --queue=default,connector --tries=3 --max-time=3600
+    volumes:
+      - ./config/.env:/var/www/html/.env:ro
+      - storage:/var/www/html/storage
+
+  worker-scan:
+    <<: [*mf-image, *mf-env]
+    command: php artisan queue:work --queue=scan,assemble --tries=3 --max-time=3600
+    volumes:
+      - ./config/.env:/var/www/html/.env:ro
+      - storage:/var/www/html/storage
+
+  worker-analyze:
+    <<: [*mf-image, *mf-env]
+    command: php artisan queue:work --queue=analyze --tries=3 --max-time=3600
+    volumes:
+      - ./config/.env:/var/www/html/.env:ro
+      - storage:/var/www/html/storage
+
+  scheduler:
+    <<: [*mf-image, *mf-env]
+    command: php artisan schedule:work
+    volumes:
+      - ./config/.env:/var/www/html/.env:ro
+      - storage:/var/www/html/storage
+
+  horizon:
+    <<: [*mf-image, *mf-env]
+    command: php artisan horizon
+    volumes:
+      - ./config/.env:/var/www/html/.env:ro
+      - storage:/var/www/html/storage
+
+  postgres:
+    image: pgvector/pgvector:pg17
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-mediaforge}
+      POSTGRES_USER: ${DB_USERNAME:-mediaforge}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-change_me}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-mediaforge}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks: [mediaforge]
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks: [mediaforge]
+
+  # --- Optional bundled media servers (all-in-one install) -------------------
+  # MediaForge is an enhancement layer beside Jellyfin/Audiobookshelf, not a
+  # replacement — so these are OFF by default. If you do NOT already run them,
+  # enable an all-in-one stack with:  docker compose --profile media-servers up -d
+  # Then add connector instances in MediaForge pointing at http://jellyfin:8096
+  # and http://audiobookshelf:80 (compose DNS names on the shared network).
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    profiles: ["media-servers"]
+    restart: unless-stopped
+    ports:
+      - "${JELLYFIN_PORT:-8096}:8096"
+    volumes:
+      - jellyfin_config:/config
+      - jellyfin_cache:/cache
+      # - ${MEDIA_MOVIES_PATH:-./media/movies}:/media/movies:ro
+    networks: [mediaforge]
+
+  audiobookshelf:
+    image: ghcr.io/advplyr/audiobookshelf:latest
+    profiles: ["media-servers"]
+    restart: unless-stopped
+    ports:
+      - "${AUDIOBOOKSHELF_PORT:-13378}:80"
+    volumes:
+      - abs_config:/config
+      - abs_metadata:/metadata
+      # - ${MEDIA_AUDIOBOOKS_PATH:-./media/audiobooks}:/media/audiobooks
+    networks: [mediaforge]
+
+  # media-tools (disc/audio analysis) and ai-worker (embeddings/upscaling) join
+  # the topology in V2/V3 under the `media` / `ai` profiles — no-egress internal
+  # network. Documented in docs/MediaForge/architecture/deployment.md.
+
+volumes:
+  pgdata:
+  redisdata:
+  storage:
+  jellyfin_config:
+  jellyfin_cache:
+  abs_config:
+  abs_metadata:
+
+networks:
+  mediaforge:
+    driver: bridge
