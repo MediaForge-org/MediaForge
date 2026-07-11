@@ -1,6 +1,6 @@
 # Hörbuch-Assembler: API-, UI- und Test-Referenz
 
-Vertiefung zu [modules/audiobook-assembler.md](../audiobook-assembler.md), Abschnitte „API-Endpunkte", „Vue-/Inertia-Komponenten" und „Tests". Struktur analog zu [Disc-Engine-API](../disc-engine/api-reference.md)/[-UI](../disc-engine/ui-reference.md)/[-Tests](../disc-engine/test-catalog.md); die [API-Konventionen](../../api/conventions.md) gelten unverändert.
+Vertiefung zu [modules/audiobook-assembler.md](../audiobook-assembler.md), Abschnitte „API-Endpunkte", „React-/Inertia-Komponenten" und „Tests". Struktur analog zu [Disc-Engine-API](../disc-engine/api-reference.md)/[-UI](../disc-engine/ui-reference.md)/[-Tests](../disc-engine/test-catalog.md); die [API-Konventionen](../../api/conventions.md) gelten unverändert.
 
 ## API-Referenz
 

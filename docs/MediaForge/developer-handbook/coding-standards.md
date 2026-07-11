@@ -67,9 +67,9 @@ PHPDoc nur, wo die Signatur selbst nicht genügt: Invarianten (`@throws` bei Fac
 private const GAP_PLAYLIST_PENALTY = -0.15;
 ```
 
-## Vue/TypeScript: Konventionen
+## React/TypeScript: Konventionen
 
-`<script setup lang="ts">` durchgängig, keine Options-API-Komponenten (Konsistenz, keine zwei Schreibstile im selben Frontend). Reines JavaScript ist neuem Frontend-Code nur bei zwingendem technischem Grund erlaubt (z. B. eine Drittbibliothek ohne Typdefinitionen), nie aus Bequemlichkeit — TypeScript ist verbindlicher Teil des Stacks, kein Stilvorschlag ([ADR-0001](../adr/0001-technology-stack.md)). **Props-Verträge als exportierte Interfaces je Seite** — exakt die Interfaces, die die Modulkapitel unter „Props-Vertrag" zeigen, sind reale TypeScript-Dateien (`resources/js/types/disc-engine.ts` exportiert `DiscDetailProps`), keine Dokumentations-Fiktion. Ein Modulkapitel-Props-Beispiel, das vom tatsächlichen Interface abweicht, ist ein Doku-Bug (`spec-drift`-Issue, [getting-started.md](getting-started.md)).
+Typisierte `.tsx`-Funktionskomponenten sind der einheitliche Schreibstil. Reines JavaScript ist neuem Frontend-Code nur bei zwingendem technischem Grund erlaubt, nie aus Bequemlichkeit — TypeScript ist verbindlicher Teil des Stacks ([ADR-0013](../adr/0013-react-inertia-typescript-and-roadmap-governance.md)). **Props-Verträge als exportierte Interfaces je Seite** — exakt die Interfaces, die die Modulkapitel unter „Props-Vertrag" zeigen, sind reale TypeScript-Verträge, keine Dokumentations-Fiktion. Ein Modulkapitel-Props-Beispiel, das vom tatsächlichen Interface abweicht, ist ein Doku-Bug (`spec-drift`-Issue, [getting-started.md](getting-started.md)).
 
 ```ts
 // resources/js/types/disc-engine.ts — 1:1 der Vertrag aus modules/disc-engine/ui-reference.md
@@ -84,7 +84,7 @@ export interface DiscDetailProps {
 
 **Keine Fach-Berechnung im Frontend** (Architekturregel 2, hier auf Code-Ebene): Eine Komponente, die eine Confidence-Zone selbst aus Schwellwerten berechnet, statt die vom Server gelieferte Zone/Farbe zu übernehmen, verstößt gegen die Regel — Ausnahme ist reine Anzeige-Arithmetik ohne Fachurteil (z. B. die Segment-Editor-Vorschau des Disc-Engine-Kapitels: „dieselbe Formel wie serverseitig, `position − start`" ist explizit als Anzeige-Spiegelung einer bereits servergültigen Formel erlaubt, nicht als eigenständige Entscheidung).
 
-**Komponenten-Bibliothek**: `resources/js/components/base/` ist die einzige gemeinsame Basis (Design-System-Primitive, [ui/design-system.md](../ui/design-system.md)); ein zusätzliches UI-Framework (Vuetify, PrimeVue, …) wird nicht eingeführt — Erweiterungen der Basis sind Review-pflichtig mit Nachweis „kein bestehendes Token/Muster passt" (Design-System-Governance-Regel wörtlich übertragen).
+**Komponenten-Bibliothek**: `resources/js/components/base/` ist die einzige spätere gemeinsame Basis (Design-System-Primitive, [ui/design-system.md](../ui/design-system.md)); ein zusätzliches UI-Framework wird nicht eingeführt. V0 enthält bewusst noch keine leere Dummy-Komponentenbibliothek.
 
 ## Fehlerbehandlung: Fachfehler vs. Infrastrukturfehler
 
@@ -134,7 +134,7 @@ Diese verteilten Prüflisten sind bewusst nicht hier dupliziert (Duplizierung w�
 | Facade-Verbot in Fachlogik | Pest-Arch-Test (`App\Modules\*\Actions`/`Services` `->not->toUse(Facade-Klassen)`) |
 | Props-Interface = Modulkapitel-Beispiel | manueller Review + `spec-drift`-Issue-Pflicht bei Fund (kein automatischer Diff-Test — Markdown-Codeblock-Extraktion wäre fragiler als der Nutzen) |
 | Einheiten-Suffix bei Zeit/Größe | Schema-Reviewer-Checkliste (nicht automatisiert — Spaltennamen sind kein Lint-Ziel ohne hohen False-Positive-Preis) |
-| Keine Fach-Berechnung im Frontend | Review + die Architektur-Test-Erweiterung „Komponenten importieren keine Fachlogik-Module" (grobkörnige Heuristik: Vue-Dateien dürfen `app/Modules/*/Services` nicht referenzieren — gilt nur für den seltenen Fall gemeinsamer Build-Artefakte, meist reicht Review) |
+| Keine Fach-Berechnung im Frontend | Review + die Architektur-Test-Erweiterung „Komponenten importieren keine Fachlogik-Module" (grobkörnige Heuristik: TSX-Dateien dürfen `app/Modules/*/Services` nicht referenzieren — gilt nur für den seltenen Fall gemeinsamer Build-Artefakte, meist reicht Review) |
 
 ## Tests dieses Kapitels
 

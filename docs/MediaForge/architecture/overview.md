@@ -5,7 +5,7 @@ MediaForge ist in dieser Spezifikation ein lokaler Enhancement Layer: ein lokale
 ```mermaid
 flowchart LR
     subgraph Local["Lokales Netzwerk / Docker Compose"]
-        U["MediaForge Laravel + Vue"]
+        U["MediaForge Laravel + React"]
         PG["PostgreSQL"]
         RD["Redis"]
         MT["media-tools"]

@@ -214,7 +214,7 @@ Namespace `App\Modules\AudiobookAssembler`:
 | `POST /api/v1/audiobooks/{ulid}/assembly/ai-proposal` | KI-Vorschlag anfordern | manager |
 | `POST /api/v1/audiobooks/{ulid}/assembly/build?targets=m4b,cue,abs` | Artefakt-Builds anstoßen (Job-Referenzen) | manager |
 
-## Vue-/Inertia-Komponenten und UI-Flows
+## React-/Inertia-Komponenten und UI-Flows
 
 **`Audiobooks/Assembly`** — die Werkbank, drei Zonen: (1) **Sequenz-Editor**: Trackliste mit Evidenz-Spalten (Tag-Nr., Dateiname, CD-Ordner), Konfliktmarkierung, Drag-and-Drop, Konsens-Anzeige; (2) **Kapitel-Vergleich**: Sets als parallele Spuren auf einer gemeinsamen Zeitachsen-Visualisierung (Kapitelgrenzen als Marken, Titel als Labels; KI-Sets mit dauerhaft sichtbarem „KI-Vorschlag — nicht offiziell"-Band), Aktivierungs-Buttons mit serverseitiger Regelprüfung, Detail-Diff zweier Sets (Grenzen-Abweichungen in Sekunden, Titelvergleich); (3) **Artefakt-Panel**: gebaute Artefakte mit Status/Signatur/Alter, Build-Buttons, Staleness-Warnung wenn aktives Set jünger als Artefakt. Der Kapitel-Editor bietet Audio-Vorschau an Grenzen (±5 s Ausschnitt, serverseitig via signierter Range-URL aus der Quelldatei gestreamt — lesend, versteht sich).
 

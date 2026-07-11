@@ -10,15 +10,15 @@ Verbindlicher Einstieg (die Reihenfolge aus der Masterdatei, hier mit Auftrag): 
 
 ## Entwicklungsumgebung
 
-Ein Setup-Weg, keine Varianten-Matrix: **Docker-Compose-Dev-Stack** (`deploy/dev/docker-compose.yml`) — dieselbe Topologie wie Produktion ([deployment](../architecture/deployment.md)) plus Dev-Komfort: Quellcode-Bind-Mount mit Hot-Reload (Vite für Vue, PHP-FPM-Neustart-frei), Mailpit, Xdebug (opt-in via Env), Fixture-Medienbaum (generiert, [testing.md](testing.md)) als `media_*`-Mounts. `make setup` orchestriert: Container, Composer/NPM-Install, Migrationen, Katalog-Seeder, Test-User (admin/manager/member). Ziel: **Clone bis lauffähiges System < 15 Minuten** — dieselbe Messlatte wie die Endbenutzer-Installation; der Dev-Stack ist Teil des Compose-Integrationstests, damit er nicht verrottet.
+Ein Setup-Weg, keine Varianten-Matrix: **Docker-Compose-Dev-Stack** (`deploy/dev/docker-compose.yml`) — dieselbe Grundtopologie wie Produktion ([deployment](../architecture/deployment.md)) plus Quellcode-Bind-Mount, Vite-Hot-Reload für React, Mailpit und isolierte Jellyfin-/Audiobookshelf-Dev-Dienste. `make setup` orchestriert Container, Composer-/NPM-Installation, Migrationen und die V0-Entwicklungsseeds. Ziel: **Clone bis lauffähiges System < 15 Minuten**; der reproduzierbare Fresh-Clone-Nachweis ist Teil des V0-Gates.
 
-IDE-Grundausstattung (dokumentiert, nicht erzwungen): PHPStan/Pint/Vue-TSC-Integration; die `.editorconfig` und Git-Hooks (`pre-commit`: Pint + betroffene Architektur-Tests) liegen im Repo.
+IDE-Grundausstattung (dokumentiert, nicht erzwungen): PHPStan-, Pint- und TypeScript-Integration; die `.editorconfig` liegt im Repo. Git-Hooks sind derzeit nicht Teil der V0-Baseline.
 
 ## Code-Standards
 
 **PHP**: PHP 8.4, `declare(strict_types=1)` überall; Pint mit Laravel-Preset (die Formatierungsfrage ist damit beendet); PHPStan auf maximalem Level ohne Baseline-Wachstum (neue Fehler = Build-Bruch; die Baseline schrumpft nur). Namenskonventionen aus den Fundament-Kapiteln sind verbindlich: Actions `VerbObjekt` (`ConfirmDiscEpisodeMapping`), Jobs `VerbObjektJob`, Events `ObjektPartizip` (`DiscImageAnalyzed`), DTOs `final readonly`, Enums backed. Konstruktor-Injektion ausschließlich; Facades nur in dünnen Randschichten (Controller, Kommandos) — Services und Actions sind facade-frei (Testbarkeit).
 
-**Vue/TypeScript**: `<script setup lang="ts">` durchgängig; Props-Verträge als exportierte Interfaces je Seite (die in den Modulkapiteln spezifizierten Props-Verträge sind diese Interfaces); keine Fach-Berechnung im Frontend (Regel 2 — wenn eine Komponente rechnet, gehört das Ergebnis in die Props); Komponenten-Bibliothek: die schmale MediaForge-eigene Basis (`resources/js/components/base/`) — kein UI-Framework-Wildwuchs, Erweiterungen der Basis sind Review-pflichtig.
+**React/TypeScript**: typisierte `.tsx`-Funktionskomponenten durchgängig; Props-Verträge als exportierte Interfaces je Seite; keine Fach-Berechnung im Frontend (Regel 2 — wenn eine Komponente fachlich rechnet, gehört das Ergebnis in die Props). Gemeinsame Design-System-Komponenten dürfen später ausschließlich in `resources/js/components/base/` entstehen; V0 erzeugt dafür noch keine Dummy-Struktur.
 
 **Dokumentationspflicht im Code**: PHPDoc nur, wo Signaturen nicht genügen (Invarianten, Einheiten — `position_ms`!, Nebenwirkungen); der wichtigste Kommentar ist der Verweis aufs Modulkapitel bei nicht offensichtlichen Fachentscheidungen (`// Siehe docs/MediaForge/modules/disc-engine.md, Confidence-Zonen`). Änderungen an spezifiziertem Verhalten ändern **zuerst** die Spezifikation (Doku-PR-Anteil ist Merge-Bedingung bei fachlichen Änderungen).
 

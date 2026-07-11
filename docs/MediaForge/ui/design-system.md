@@ -1,6 +1,6 @@
 # UI-Design-System
 
-Zurück zur [Masterdatei](../MediaForge_Master_Engineering.md). Abhängigkeiten: [architecture/overview.md](../architecture/overview.md) (Architekturregel 2: Komponenten treffen keine fachlichen Entscheidungen), [api/conventions.md](../api/conventions.md) (Inertia/REST-Trennung). Dieses Kapitel ist normativ für **jede** Vue-/Inertia-Komponente aller Module; die Modulkapitel (z. B. [Disc-Engine-UI-Referenz](../modules/disc-engine/ui-reference.md), [Assembler-API/UI/Tests](../modules/audiobook-assembler/api-ui-tests.md)) verweisen hierher für alles, was nicht modulspezifisch ist, und definieren nur ihre eigenen Komponenten und Flows.
+Zurück zur [Masterdatei](../MediaForge_Master_Engineering.md). Abhängigkeiten: [architecture/overview.md](../architecture/overview.md) (Architekturregel 2: Komponenten treffen keine fachlichen Entscheidungen), [api/conventions.md](../api/conventions.md) (Inertia/REST-Trennung). Dieses Kapitel ist normativ für **jede** React-/Inertia-Komponente aller Module; die Modulkapitel (z. B. [Disc-Engine-UI-Referenz](../modules/disc-engine/ui-reference.md), [Assembler-API/UI/Tests](../modules/audiobook-assembler/api-ui-tests.md)) verweisen hierher für alles, was nicht modulspezifisch ist, und definieren nur ihre eigenen Komponenten und Flows.
 
 **Vertiefung**: [Seiten- und Komponenten-Gesamtkatalog](page-catalog.md)
 
@@ -50,7 +50,7 @@ Zwei Radius-Stufen (`radius-sm` für Chips/Badges, `radius-md` für Karten/Panel
 
 ## Wiederverwendbare Komponenten-Kategorien
 
-Diese Kategorien sind **Muster**, keine konkreten Vue-Komponenten — jedes Modul implementiert seine eigene Instanz (z. B. `ConfidenceBadge` der Disc-Engine, `ConfidenceBadge` des Assemblers), aber alle folgen demselben Vertrag:
+Diese Kategorien sind **Muster**, keine konkreten React-Komponenten — jedes Modul implementiert seine eigene Instanz (z. B. `ConfidenceBadge` der Disc-Engine, `ConfidenceBadge` des Assemblers), aber alle folgen demselben Vertrag:
 
 ### Confidence-Badge
 

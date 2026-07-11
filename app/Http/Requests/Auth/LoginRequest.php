@@ -39,7 +39,7 @@ final class LoginRequest extends FormRequest
 
         $remember = $this->boolean('remember');
 
-        if (! Auth::attempt(
+        if (!Auth::attempt(
             ['email' => $this->string('email')->toString(), 'password' => $this->string('password')->toString()],
             $remember,
         )) {
@@ -55,7 +55,7 @@ final class LoginRequest extends FormRequest
 
     private function ensureIsNotRateLimited(): void
     {
-        if (! RateLimiter::tooManyAttempts($this->throttleKey(), maxAttempts: 5)) {
+        if (!RateLimiter::tooManyAttempts($this->throttleKey(), maxAttempts: 5)) {
             return;
         }
 

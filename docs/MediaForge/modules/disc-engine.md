@@ -522,7 +522,7 @@ Inertia-Routen (eigenes UI) sind hier ausgelassen; REST (`/api/v1`, Token-Auth, 
 
 Das Player-Protokoll (letzte drei Routen) ist der normative Vertrag für alle External-Player-Integrationen: Events kommen gebatcht (max. 100/Request, mit Client-`event_id`-ULIDs für Dedup), `occurred_at` stammt vom Player, Server-Empfangszeit wird getrennt erfasst. Ein Player-Token ist ein benutzergebundenes API-Token mit einziger Fähigkeit `playback:report` — ein kompromittierter Player kann Fortschritt melden, aber nichts lesen und nichts verwalten.
 
-## Vue-/Inertia-Komponenten und UI-Flows
+## React-/Inertia-Komponenten und UI-Flows
 
 ### Seiten
 

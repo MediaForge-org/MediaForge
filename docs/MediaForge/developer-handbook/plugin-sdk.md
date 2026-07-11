@@ -102,4 +102,4 @@ Contracts-Paket mit eigener Testbasis, die Plugin-Autoren erben (`PluginTestCase
 
 * **Contracts-Erstumfang**: die Tabelle oben ist der Zielkatalog; welcher Teil zum Release stabil genug ist, entscheidet die Implementierungserfahrung der First-Party-Module (die dieselben Registries nutzen — der beste Stabilitätstest).
 * **Plugin-Verzeichnis/Kuratierung**: bewusst nach Version 1.
-* **Frontend-Erweiterungspunkte** (eigene Vue-Seiten): schwierig (Build-Integration); Version 1 bietet nur Dashboard-Cards und Settings-Formulare aus Schemas.
+* **Frontend-Erweiterungspunkte** (eigene React-Seiten): schwierig (Build-Integration); die erste freigegebene Plugin-Phase bietet nur klar begrenzte Dashboard-Cards und Settings-Formulare aus Schemas.

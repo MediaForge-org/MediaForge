@@ -53,7 +53,7 @@ Alles andere gehört den liefernden Modulen (der Kern der Architekturentscheidun
 
 ## API und UI
 
-Das Dashboard ist Inertia-only (eigene UI-Fläche — die API-Konvention „kein UI-Unterbau" gilt; externe Statusabfragen nutzen `GET /api/v1/health` und die Modul-Routen). Vue-Komponenten: `Dashboard/Index` (Card-Grid mit Drag-Anordnung), `DashboardCard` (generischer Rahmen: Titel, Zustand-Badge, Kennzahl, Sparkline aus Metrik-Key, Aktions-Link), `Reviews/Inbox`. Kern-Flow morgendlicher Check: Zustandszeile grün? → Arbeitsvorrat: „7 Disc-Mappings warten" → Klick → Mapping-Review → zurück → „Backup 6 h alt, Probe vor 12 Tagen" — drei Minuten, vollständiges Bild.
+Das Dashboard ist Inertia-only (eigene UI-Fläche — die API-Konvention „kein UI-Unterbau" gilt; externe Statusabfragen nutzen `GET /api/v1/health` und die Modul-Routen). React-Komponenten: `Dashboard/Index` (Card-Grid mit Drag-Anordnung), `DashboardCard` (generischer Rahmen: Titel, Zustand-Badge, Kennzahl, Sparkline aus Metrik-Key, Aktions-Link), `Reviews/Inbox`. Kern-Flow morgendlicher Check: Zustandszeile grün? → Arbeitsvorrat: „7 Disc-Mappings warten" → Klick → Mapping-Review → zurück → „Backup 6 h alt, Probe vor 12 Tagen" — drei Minuten, vollständiges Bild.
 
 ## Edge Cases
 

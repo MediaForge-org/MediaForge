@@ -63,7 +63,7 @@ lint pint: ## Fix code style (Pint)
 analyse stan: ## Static analysis (PHPStan)
 	$(APP) php vendor/bin/phpstan analyse --memory-limit=512M
 
-types: ## Type-check the frontend (vue-tsc)
+types: ## Type-check the React frontend (TypeScript)
 	$(COMPOSE) run --rm vite npm run type-check
 
 ci: ## Run the full local gate (style, static analysis, tests)

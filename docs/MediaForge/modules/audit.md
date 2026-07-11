@@ -114,7 +114,7 @@ Lesend, `manager`-Rolle (eigene Watch-State-Historie: jeder Benutzer für sich):
 
 Schreibende Audit-APIs existieren nicht — das Audit-Log ist ausschließlich Nebenwirkung von Actions.
 
-## Vue-/Inertia-Komponenten
+## React-/Inertia-Komponenten
 
 Zwei UI-Bausteine, beide wiederverwendet statt pro Modul neu gebaut: **`AuditTimeline`** (Props: `subjectType`, `subjectId`) zeigt die Historie einer Entität als Zeitleiste mit Actor-Badges (User-Avatar, Job-Zahnrad, Connector-Logo, AI-Kennzeichnung samt Modell@Version — die dauerhafte Sichtbarkeit der KI-Herkunft aus Regel 5 endet nicht in der Datenbank, sie muss im UI ankommen) und aufklappbaren Feld-Diffs. Eingebettet in jede Detailseite (Medium, Disc, Hörbuch, Einstellungen). **`AuditExplorer`** (Admin-Bereich) ist die Recherche-Sicht: Filter nach Actor, Zeitraum, Action-Klasse, Freitext; Sprung von jeder Operation zur Kausalkette und zu den Subjekten.
 

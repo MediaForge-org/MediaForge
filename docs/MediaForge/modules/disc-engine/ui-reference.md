@@ -1,6 +1,6 @@
 # Disc-Engine: UI-Referenz
 
-Vertiefung zu [modules/disc-engine.md](../disc-engine.md), Abschnitt „Vue-/Inertia-Komponenten und UI-Flows". Vollständige Spezifikation der Seiten, Props-Verträge, Komponenten und Interaktionen. Gestaltungs-Grundlagen (Tokens, Grid, Zustandsmuster) definiert das [UI-Design-System](../../ui/design-system.md); dieses Dokument spezifiziert nur Disc-spezifisches. Architekturregel 2 gilt durchgängig: Komponenten treffen keine fachlichen Entscheidungen — jeder angezeigte Zustand kommt vorgerechnet vom Server, jede Mutation ist ein Action-Roundtrip.
+Vertiefung zu [modules/disc-engine.md](../disc-engine.md), Abschnitt „React-/Inertia-Komponenten und UI-Flows". Vollständige Spezifikation der Seiten, Props-Verträge, Komponenten und Interaktionen. Gestaltungs-Grundlagen (Tokens, Grid, Zustandsmuster) definiert das [UI-Design-System](../../ui/design-system.md); dieses Dokument spezifiziert nur Disc-spezifisches. Architekturregel 2 gilt durchgängig: Komponenten treffen keine fachlichen Entscheidungen — jeder angezeigte Zustand kommt vorgerechnet vom Server, jede Mutation ist ein Action-Roundtrip.
 
 ## Seitenkatalog
 

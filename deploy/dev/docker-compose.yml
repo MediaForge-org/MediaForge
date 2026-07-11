@@ -19,6 +19,7 @@ x-app-build: &app-build
     MEDIAFORGE_SKIP_OPTIMIZE: "1" # never cache config in dev
   volumes:
     - ../..:/var/www/html
+    - ./php-dev.ini:/usr/local/etc/php/conf.d/zz-mediaforge-dev.ini:ro
     # Overlay the writable runtime dirs with named volumes so the non-root
     # container can write them (the bind-mounted host dirs are root-owned).
     - app_storage:/var/www/html/storage
@@ -33,7 +34,7 @@ services:
   app:
     <<: *app-build
     ports:
-      - "8100:8080"
+      - "${MEDIAFORGE_PORT:-8100}:8080"
     extra_hosts:
       - "host.docker.internal:host-gateway" # reach the real Jellyfin/ABS on the host
 
@@ -104,7 +105,7 @@ services:
   jellyfin-dev:
     image: jellyfin/jellyfin:latest
     ports:
-      - "8110:8096"
+      - "${JELLYFIN_PORT:-8110}:8096"
     volumes:
       - jellyfin_config:/config
       - jellyfin_cache:/cache
@@ -114,7 +115,7 @@ services:
   audiobookshelf-dev:
     image: ghcr.io/advplyr/audiobookshelf:latest
     ports:
-      - "13380:80"
+      - "${AUDIOBOOKSHELF_PORT:-13380}:80"
     volumes:
       - abs_config:/config
       - abs_metadata:/metadata

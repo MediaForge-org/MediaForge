@@ -1,59 +1,99 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# MediaForge
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+MediaForge is an open-source, local media enhancement suite for existing Jellyfin and Audiobookshelf installations. It runs beside those services; it does not replace their playback, streaming, transcoding, or library cores.
 
-## About Laravel
+## Project status
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+MediaForge is in **V0 — repository, foundation, and developer baseline**. V0 is not a usable product release and V1 has not started. The current work is limited to a reproducible Laravel 12, React, Inertia.js, TypeScript, PostgreSQL, Redis, and Docker Compose foundation.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+The internal V0–V34 engineering roadmap is governed by [ADR-0013](docs/MediaForge/adr/0013-react-inertia-typescript-and-roadmap-governance.md). V1 may begin only after every V0 validation gate is green.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Technology baseline
 
-## Learning Laravel
+- PHP 8.4 and Laravel 12
+- React, TypeScript, Inertia.js, Vite, and Tailwind CSS
+- PostgreSQL 17 with pg_trgm, btree_gist, and pgvector
+- Redis 7 for queues and cache
+- Docker Compose for the supported development environment
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## Development setup
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Requirements: Docker with Compose support and, for the shortest workflow, GNU Make.
 
-## Laravel Sponsors
+```bash
+git clone https://github.com/MediaForge-org/MediaForge.git
+cd MediaForge
+make setup
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+`make setup` creates a local `.env` from `.env.example`, builds the development image, installs Composer and NPM dependencies, generates the application key, starts the stack, migrates PostgreSQL, and runs the development seeder.
 
-### Premium Partners
+Without Make, run the equivalent commands from the repository root:
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+```bash
+cp .env.example .env
+docker compose -f deploy/dev/docker-compose.yml build
+docker compose -f deploy/dev/docker-compose.yml up -d postgres redis
+docker compose -f deploy/dev/docker-compose.yml run --rm app composer install
+docker compose -f deploy/dev/docker-compose.yml run --rm app php artisan key:generate --force
+docker compose -f deploy/dev/docker-compose.yml up -d
+docker compose -f deploy/dev/docker-compose.yml exec -T app php artisan migrate --force
+docker compose -f deploy/dev/docker-compose.yml exec -T app php artisan db:seed --force
+```
 
-## Contributing
+On Windows PowerShell, use `Copy-Item .env.example .env` instead of `cp` when Make is unavailable.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+The root `docker-compose.yml` describes the packaged-image topology. During V0, the development stack is the supported contributor workflow; no stable MediaForge image or release is claimed yet.
 
-## Code of Conduct
+## Local ports
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+| Service | Default host port | Notes |
+|---|---:|---|
+| MediaForge | 8100 | Configurable with `MEDIAFORGE_PORT` |
+| Jellyfin dev/bundled | 8110 | Configurable with `JELLYFIN_PORT`; avoids an existing Jellyfin on 8096 |
+| Audiobookshelf dev/bundled | 13380 | Configurable with `AUDIOBOOKSHELF_PORT`; avoids an existing ABS on 13378 |
+| Vite HMR | 5273 | Development only |
+| PostgreSQL | 5440 | Development only |
+| Redis | 6390 | Development only |
+| Mailpit web / SMTP | 8126 / 1126 | Development only |
 
-## Security Vulnerabilities
+The defaults intentionally leave SABnzbd on 8080, Jellyfin on 8096, and Audiobookshelf on 13378 untouched. Existing external services can be reached from the app container via `host.docker.internal` or their LAN address.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Media paths
+
+Media libraries do not have to live in Docker. Direct media mounts are optional and are not required for the V0 foundation or later connector-only operation. When mounts are introduced for direct analysis, they must be explicitly configured and read-only by default.
+
+## Validation
+
+The local backend gate is:
+
+```bash
+make ci
+```
+
+Frontend checks run in the Node 22 development container:
+
+```bash
+docker compose -f deploy/dev/docker-compose.yml run --rm vite npm install
+docker compose -f deploy/dev/docker-compose.yml run --rm vite npm run type-check
+docker compose -f deploy/dev/docker-compose.yml run --rm vite npm run build
+```
+
+Both Compose files must also parse successfully:
+
+```bash
+docker compose config
+docker compose -f deploy/dev/docker-compose.yml config
+```
+
+## Repository hygiene
+
+Never commit `.env`, `vendor/`, `node_modules/`, `public/build/`, or `public/hot`. The large `.ai/` master-prompt workspace is intentionally local unless the maintainers explicitly decide otherwise. Connector credentials and real service tokens must never be committed.
+
+## Documentation
+
+Start with [MediaForge Master Engineering](docs/MediaForge/MediaForge_Master_Engineering.md), [ADR-0013](docs/MediaForge/adr/0013-react-inertia-typescript-and-roadmap-governance.md), and the [current roadmap](docs/MediaForge/roadmap.md). Detailed feature documents describe later engineering phases unless their implementation status explicitly says otherwise.
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+MediaForge is licensed under the [GNU Affero General Public License v3.0 or later](LICENSE) (`AGPL-3.0-or-later`).

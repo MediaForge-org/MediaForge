@@ -161,7 +161,7 @@ Namespace `App\Modules\AudioUpscaler`:
 | `GET /api/v1/upscale/runs/{ulid}/comparison` | A/B-Daten: Ausschnitt-URLs (signiert), Spektrogramme, Metrik-Diff | member |
 | `GET /api/v1/editions/{ulid}/processing-history` | Run-Kette der Edition (Processing History) | member |
 
-## Vue-/Inertia-Komponenten und UI-Flows
+## React-/Inertia-Komponenten und UI-Flows
 
 **`Upscaler/RunDetail`** — Statusseite eines Laufs: Chunk-Fortschrittsleiste (aus `job_progress`), Warnbanner bei `domain_warning`, Metrik-Tabelle vorher/nachher mit Delta-Hervorhebung, Fehlerdetails. **`Upscaler/Comparison`** — der A/B-Vergleich: synchronisierte Spektrogramm-Ansicht (Original oben, Rekonstruktion unten, gemeinsamer Zeitcursor), drei kuratierte Vergleichsausschnitte mit umschaltbarem A/B-Player (blind-Modus: Zuordnung erst nach dem Anhören aufgedeckt — das ehrlichste UI gegen Placebo-Urteile), Übernahme-Buttons („Edition behalten" / „Run verwerfen": verwerfen löscht Artefakt + Edition über die Housekeeping-Karenz, der Run selbst bleibt als History). **Edition-Badge** — überall, wo Editionen erscheinen (Katalog-Detail, Export-Dialoge), trägt die Upscale-Edition dauerhaft das „Rekonstruiert"-Badge mit Modell-Tooltip; das Badge ist Bestandteil der Edition-Props des Fundaments, nicht pro Seite nachgebaut (Architekturregel 2).
 

@@ -193,7 +193,7 @@ Der Audit-Actor ist während Ingest/Egress automatisch `connector:<key>:<instanz
 | `GET /api/v1/connector-instances/{ulid}/activity` | Sync-States, Outbox-Rückstau, Ingest-Log-Auszug | manager |
 | `POST /api/v1/webhooks/{key}/{instanz-ulid}/{signatur}` | Webhook-Eingang (signierter Pfad, öffentlich erreichbar) | signiert |
 
-## Vue-/Inertia-Komponenten und UI-Flows
+## React-/Inertia-Komponenten und UI-Flows
 
 **`Connectors/Index`** — Instanz-Karten mit Health-Ampel, letztem Sync, Outbox-Rückstau; „Instanz hinzufügen"-Flow rendert das Settings-Schema des Manifests generisch (Feldtypen, Secret-Felder maskiert, Pflichtprüfung serverseitig) und schließt mit dem Diagnostics-Testlauf ab (Erfolg zeigt Gegenstellen-Version und erkannte Rechte). **`Connectors/Activity`** — Betriebs-Sicht einer Instanz: Stream-Tabelle (Cursor-Alter, Fehlerserie, Backoff), Outbox-Liste mit manueller Zustell-Wiederholung, Ingest-Log-Browser mit Outcome-Filter (`unmatched`-Einträge verlinken direkt in den Matching-Review). Konflikt-Reviews erscheinen in der Fundament-Review-Inbox mit Gegenüberstellung beider Zustände und Ein-Klick-Anwendung einer Seite.
 

@@ -7,9 +7,9 @@ All notable changes to MediaForge are documented here. The format is based on
 
 ## [Unreleased]
 
-### Added — V1 foundation (in progress)
+### Added — V0 foundation (in progress)
 
-- Laravel 12 / Vue 3 + Inertia + TypeScript + Tailwind v4 application skeleton.
+- Laravel 12 / React + Inertia + TypeScript + Tailwind v4 application skeleton.
 - Modular-monolith structure (`app/{Core,Modules,Connectors,Http}`) with
   architecture boundary tests.
 - Docker: multi-stage production image, dev + production Compose stacks, Makefile.

@@ -4,9 +4,11 @@ Dieses Deployment beschreibt eine lokale Enhancement Suite neben Jellyfin und Au
 
 Zurück zur [Masterdatei](../MediaForge_Master_Engineering.md). Abhängigkeiten: [architecture/overview.md](overview.md) (Container-Topologie), [database/migrations.md](../database/migrations.md) (Upgrade-Ablauf). Normativ für die ausgelieferten Compose-Dateien und die Betriebsdokumentation.
 
+> **Implementierungsstatus V0:** Aktuell ausgeliefert sind der Laravel-App-Container, Queue-/Scheduler-Rollen, PostgreSQL, Redis und der Dev-Stack. `media-tools`, `ai-worker`, geführtes Web-Setup, Release-Images und die später beschriebenen Betriebsprofile sind Roadmap, nicht V0-Implementierung.
+
 ## Motivation
 
-Die Zielgruppe betreibt MediaForge neben Jellyfin, *arr und Immich auf einem Heimserver — Docker-Compose-Kompetenz ist vorhanden, Kubernetes-Kompetenz nicht vorauszusetzen ([ADR-0001](../adr/0001-technology-stack.md)). Das Deployment muss drei Versprechen einlösen: **Erstinstallation unter 15 Minuten** (Compose-Datei, `.env`-Vorlage, ein `up -d`, geführtes Web-Setup), **Upgrades als Einzeiler** (`compose pull && up -d` mit eingebauten Schutzmechanismen — Pre-Flight aus dem Migrationskapitel), **kein Datenverlust durch Bedienfehler** (read-only-Mounts, getrennte Volumes, dokumentierte Backup-Punkte).
+Die Zielgruppe betreibt MediaForge neben Jellyfin und Audiobookshelf auf einem Heimserver — Docker-Compose-Kompetenz ist vorhanden, Kubernetes-Kompetenz nicht vorauszusetzen ([ADR-0001](../adr/0001-technology-stack.md)). Das langfristige Deployment-Ziel sind Erstinstallation unter 15 Minuten, einfache abgesicherte Upgrades und Schutz vor Datenverlust. V0 belegt davon ausschließlich das reproduzierbare Entwickler-Setup, gültige Compose-Topologien, getrennte Persistenz und sichere Port-/Environment-Defaults; Web-Setup und Release-Upgrades folgen erst in den dafür freigegebenen Phasen.
 
 ## Compose-Topologie
 
@@ -19,12 +21,12 @@ services:
     image: mediaforge/app:${MEDIAFORGE_VERSION:-latest}
     depends_on: {postgres: {condition: service_healthy}, redis: {condition: service_healthy}}
     volumes:
-      - ./config/.env:/app/.env:ro
+      - ./.env:/var/www/html/.env:ro
       - media_movies:/media/movies:ro          # Medien IMMER :ro (ADR-0005)
       - media_audiobooks:/media/audiobooks:ro
       - artifacts:/artifacts
       - inbox:/inbox                           # einziger rw-Medienbereich (optional)
-    ports: ["127.0.0.1:8080:80"]               # nur localhost; TLS macht der Reverse Proxy
+    ports: ["127.0.0.1:${MEDIAFORGE_PORT:-8100}:8080"] # nur localhost
   worker-default: {image: mediaforge/app, command: "php artisan queue:work --queue=default,connector", volumes: …}
   worker-scan:    {command: "… --queue=scan,assemble"}
   worker-analyze: {command: "… --queue=analyze"}
@@ -49,7 +51,7 @@ services:
     deploy: {resources: {reservations: {devices: [{driver: nvidia, count: 1, capabilities: [gpu]}]}}}
 ```
 
-Verbindliche Eigenschaften: **Medien-Volumes ausnahmslos `:ro`** in allen Diensten (die physische Durchsetzung von Regel 4 — eine Compose-Datei mit rw-Medien-Mount gilt als fehlerhaft konfiguriert und wird vom Setup-Check moniert); `app` bindet nur an localhost (TLS-Terminierung und Exposition sind Sache des Betreiber-Reverse-Proxys — Traefik/Caddy/nginx-Beispiele liegen in `deploy/examples/`); `media-tools` und `ai-worker` hängen in einem internen Netz ohne Default-Route (No-Egress technisch, nicht nur konventionell); der `ai`-Profil-Mechanismus macht die AI-Schicht als Ganzes optional (Availability-Gates der Module greifen, [AI Engine](../modules/ai-engine.md)); alle MediaForge-Images tragen denselben Versions-Tag (`MEDIAFORGE_VERSION`) — Mischversionen zwischen app/media-tools/ai-worker sind nicht unterstützt und werden beim Start geprüft (Versions-Handshake der Dienste).
+Verbindliche Eigenschaften: **Direkte Medien-Mounts sind optional und standardmäßig `:ro`**; `app` bindet nur an localhost, und TLS-Terminierung bzw. Exposition sind Sache des Betreibers. `media-tools`, `ai-worker`, No-Egress-Netze, Versions-Handshake und Reverse-Proxy-Beispiele sind spätere Roadmap-Bausteine und derzeit nicht als funktionsfähig ausgeliefert.
 
 FrankenPHP vs. FPM+Nginx (offener Punkt aus [architecture/overview.md](overview.md)) — Entscheidung: **FPM+Nginx im selben `app`-Container** für Version 1. Begründung: Octane/FrankenPHP-Langlebigkeit bringt Latenzgewinne, die ein Verwaltungs-UI nicht braucht, und kauft Memory-Leak-Wachsamkeit über alle Module ein; die Worker sind ohnehin eigene Prozesse. Revidierbar, wenn Latenz-Messungen es begründen; als Nachtrag im Architektur-Kapitel vermerkt.
 
@@ -63,13 +65,13 @@ FrankenPHP vs. FPM+Nginx (offener Punkt aus [architecture/overview.md](overview.
 | `models` | AI-Gewichte | verzichtbar — neu beschaffbar per Registry-Doku |
 | `media_*` | Bibliotheken | extern verwaltet (NAS-Mounts/Bind-Mounts), nicht MediaForge' Sicherungsgegenstand |
 | `inbox` | Import-Eingang | flüchtig per Definition |
-| `./config` | `.env`, Compose-Overrides | **kritisch**, winzig — gehört in jedes Backup |
+| `./.env` | lokale Konfiguration und Secrets | **kritisch**, winzig — gehört in jedes Betreiber-Backup, nie ins Git-Repository |
 
-Medien werden als benannte Volumes mit Bind-/NFS-Treibern eingebunden (Beispiele je NAS-Typ in `deploy/examples/`); die Bibliotheks-Marker-Datei (`.mediaforge-library`, Fundament) schützt gegen Mount-Verwechslungen zusätzlich zur Compose-Ebene.
+Medienpfade bleiben optional und können später als explizite Bind-/NFS-Mounts eingebunden werden. V0 verlangt keine Medien-Volumes und implementiert noch keine Bibliotheks-Marker- oder Schreiboperationen.
 
 ## Erstinstallation
 
-Ablauf (normativ für die Setup-Doku): (1) Release-Archiv entpacken (`docker-compose.yml`, `.env.example`, `deploy/examples/`); (2) `.env` ausfüllen (DB-Passwort, `APP_KEY` via mitgeliefertem Generator-Einzeiler, Medienpfade); (3) `docker compose up -d`; (4) Web-Setup unter `http://host:8080`: Admin-Konto, Bibliotheken anlegen (schreibt Marker-Dateien), optional erste Connector-Instanz — das Setup ist idempotent und wiederaufnehmbar (halbe Setups hinterlassen keinen kaputten Zustand). Der Setup-Check validiert die Umgebung sichtbar: Medien-Mounts erreichbar und read-only? Postgres-Version/Extensions? Artefakt-Volume beschreibbar? Zeitzone konsistent? — jede Prüfung mit konkreter Abhilfe-Anleitung statt kryptischem Fehler.
+V0-Entwicklungsablauf: (1) `.env.example` nach `.env` kopieren; (2) `make setup` ausführen oder die gleichwertigen Compose-Befehle aus dem Root-README verwenden; (3) Compose-, Migrations-, Test- und HTTP-Gates prüfen; (4) MediaForge unter `http://localhost:${MEDIAFORGE_PORT:-8100}` öffnen. Ein geführtes Web-Setup, produktive Release-Images und Connector-Konfiguration gehören nicht zum V0-Funktionsumfang.
 
 ## Upgrades
 

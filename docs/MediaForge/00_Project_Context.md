@@ -46,7 +46,7 @@ Stash ist kein Pflichtsystem. Stash darf als optionale Inspirationsquelle, optio
 
 - Laravel 12
 - PHP 8.4
-- Vue 3
+- React
 - TypeScript
 - Inertia.js
 - Tailwind CSS

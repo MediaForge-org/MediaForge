@@ -18,7 +18,7 @@
         </script>
 
         @routes
-        @vite(['resources/css/app.css', 'resources/js/app.ts'])
+        @vite(['resources/css/app.css', 'resources/js/app.tsx'])
         @inertiaHead
     </head>
     <body class="min-h-screen bg-surface text-fg antialiased">

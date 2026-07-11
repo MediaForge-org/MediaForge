@@ -33,10 +33,10 @@ port map and connector setup.
   **PHPStan at max level** must be clean.
 - **Pest** for tests, incl. architecture boundary tests. PostgreSQL only — no SQLite.
 - Layering: Controller → Action (`AuditableAction`) → Service → Model. No business
-  logic in controllers or Vue components. DTOs are `final readonly`, not arrays.
+  logic in controllers or React components. DTOs are `final readonly`, not arrays.
 - Module boundaries are test-enforced (`tests/Arch`). A module whose boundaries
   aren't testable is cut wrong.
-- Vue: `<script setup lang="ts">`, per-page prop interfaces in `resources/js/types/`.
+- React: typed function components in `.tsx` files, with per-page prop interfaces.
   Base components only in `resources/js/components/base/`.
 
 ## Commits & pull requests

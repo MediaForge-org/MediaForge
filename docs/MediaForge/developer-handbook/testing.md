@@ -47,7 +47,7 @@ Eine kleine Menge Tests ist als **Invarianten-Suite** markiert und kann von kein
 
 ## CI-Pipeline
 
-Stufen (jede bricht den Build): Lint/Static (Pint, PHPStan Level max, Vue-TSC) → Architektur → Unit → Integration (parallelisiert über Testcontainer-Pool) → Contract (inkl. OpenAPI-Drift, [api/conventions.md](../api/conventions.md)) → Invarianten-Suite (redundant enthalten, separat berichtet). Release-Kandidaten zusätzlich: E2E-Compose (inkl. Upgrade-Pfad-Test mit Vorversions-Snapshot, [migrations](../database/migrations.md)), Browser-Flows, Migrations-Laufzeitbudget. Coverage wird gemessen und berichtet, aber nicht als Gate erzwungen (Coverage-Gates züchten Assertion-freie Tests); stattdessen: neue Module ohne Tests zu ihren spezifizierten Testfällen fallen im Review.
+Stufen (jede bricht den Build): Lint/Static (Pint, PHPStan Level max, `tsc --noEmit`) → Architektur → Unit → Integration (parallelisiert über Testcontainer-Pool) → Contract (inkl. OpenAPI-Drift, [api/conventions.md](../api/conventions.md)) → Invarianten-Suite (redundant enthalten, separat berichtet). Release-Kandidaten zusätzlich: E2E-Compose (inkl. Upgrade-Pfad-Test mit Vorversions-Snapshot, [migrations](../database/migrations.md)), Browser-Flows, Migrations-Laufzeitbudget. Coverage wird gemessen und berichtet, aber nicht als Gate erzwungen (Coverage-Gates züchten Assertion-freie Tests); stattdessen: neue Module ohne Tests zu ihren spezifizierten Testfällen fallen im Review.
 
 ## Edge Cases der Teststrategie selbst
 

@@ -107,5 +107,5 @@ Keine bestehenden Features wurden absichtlich entfernt. Disc-/Blu-ray-/DVD-Logik
 
 1. README ergänzen, sobald ein Projekt-Root-README existiert.
 2. Deep-pass über alle Moduldateien, um restliche alte Begrifflichkeit in einzelnen Sätzen zu harmonisieren.
-3. UI-/UX-Flows für konkrete Vue/Inertia-Seiten aus den neuen UI-/UX-Zielen ableiten.
+3. UI-/UX-Flows für konkrete React-/Inertia-Seiten aus den neuen UI-/UX-Zielen ableiten.
 4. Compatibility-Matrix für konkrete Jellyfin- und Audiobookshelf-Versionen befüllen, sobald Zielversionen feststehen.

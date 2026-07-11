@@ -1,6 +1,6 @@
 # ADR-0001: Technologie-Stack
 
-Status: accepted · Bezug: [Masterdatei — Technologie-Stack](../MediaForge_Master_Engineering.md)
+Status: superseded by [ADR-0013](0013-react-inertia-typescript-and-roadmap-governance.md) · Bezug: [Masterdatei — Technologie-Stack](../MediaForge_Master_Engineering.md)
 
 ## Kontext
 

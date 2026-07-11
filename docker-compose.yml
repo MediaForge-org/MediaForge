@@ -4,7 +4,7 @@
 #   docker compose up -d
 #
 # All PHP services share one image and differ only by command. Config comes from
-# ./config/.env (copy config/.env.example → config/.env and fill it in). The app
+# ./.env (copy .env.example → .env and fill it in). The app
 # binds to localhost only; put TLS on your own reverse proxy (deploy/examples/).
 # Media libraries are always mounted read-only (ADR-0005).
 # =============================================================================
@@ -13,7 +13,7 @@ x-mediaforge-image: &mf-image
   image: ${MEDIAFORGE_IMAGE:-ghcr.io/mediaforge/mediaforge}:${MEDIAFORGE_VERSION:-latest}
 
 x-mediaforge-env: &mf-env
-  env_file: [./config/.env]
+  env_file: [./.env]
   restart: unless-stopped
   depends_on:
     postgres: { condition: service_healthy }
@@ -24,9 +24,9 @@ services:
   app:
     <<: [*mf-image, *mf-env]
     ports:
-      - "127.0.0.1:8080:8080" # localhost only; TLS via your reverse proxy
+      - "127.0.0.1:${MEDIAFORGE_PORT:-8100}:8080" # localhost only; TLS via your reverse proxy
     volumes:
-      - ./config/.env:/var/www/html/.env:ro
+      - ./.env:/var/www/html/.env:ro
       - storage:/var/www/html/storage
       # Media libraries (optional in V1) — always read-only:
       # - ${MEDIA_MOVIES_PATH:-./media/movies}:/media/movies:ro
@@ -36,35 +36,35 @@ services:
     <<: [*mf-image, *mf-env]
     command: php artisan queue:work --queue=default,connector --tries=3 --max-time=3600
     volumes:
-      - ./config/.env:/var/www/html/.env:ro
+      - ./.env:/var/www/html/.env:ro
       - storage:/var/www/html/storage
 
   worker-scan:
     <<: [*mf-image, *mf-env]
     command: php artisan queue:work --queue=scan,assemble --tries=3 --max-time=3600
     volumes:
-      - ./config/.env:/var/www/html/.env:ro
+      - ./.env:/var/www/html/.env:ro
       - storage:/var/www/html/storage
 
   worker-analyze:
     <<: [*mf-image, *mf-env]
     command: php artisan queue:work --queue=analyze --tries=3 --max-time=3600
     volumes:
-      - ./config/.env:/var/www/html/.env:ro
+      - ./.env:/var/www/html/.env:ro
       - storage:/var/www/html/storage
 
   scheduler:
     <<: [*mf-image, *mf-env]
     command: php artisan schedule:work
     volumes:
-      - ./config/.env:/var/www/html/.env:ro
+      - ./.env:/var/www/html/.env:ro
       - storage:/var/www/html/storage
 
   horizon:
     <<: [*mf-image, *mf-env]
     command: php artisan horizon
     volumes:
-      - ./config/.env:/var/www/html/.env:ro
+      - ./.env:/var/www/html/.env:ro
       - storage:/var/www/html/storage
 
   postgres:
@@ -107,7 +107,7 @@ services:
     profiles: ["media-servers"]
     restart: unless-stopped
     ports:
-      - "${JELLYFIN_PORT:-8096}:8096"
+      - "${JELLYFIN_PORT:-8110}:8096"
     volumes:
       - jellyfin_config:/config
       - jellyfin_cache:/cache
@@ -119,7 +119,7 @@ services:
     profiles: ["media-servers"]
     restart: unless-stopped
     ports:
-      - "${AUDIOBOOKSHELF_PORT:-13378}:80"
+      - "${AUDIOBOOKSHELF_PORT:-13380}:80"
     volumes:
       - abs_config:/config
       - abs_metadata:/metadata

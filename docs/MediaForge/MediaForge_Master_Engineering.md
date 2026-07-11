@@ -76,7 +76,7 @@ Normativ formuliert ist MediaForge ein **Enhancement Layer**. MediaForge besitzt
 
 Zu den verbindlichen Enhancement-Bereichen gehören Unified Dashboard, Unified Search, Unified Metadata Engine, UI-/UX-Enhancements für Jellyfin und Audiobookshelf, Adult Enhancement, Health Center, Storage Analytics, AI Engine, Rule Engine, Workflow Engine, Backup Center, Developer Center sowie Plugin SDK und Extension SDK.
 
-MediaForge ist eine lokal betreibbare Web-Anwendung auf Basis von Laravel 12, Vue 3 mit TypeScript, Inertia.js und Tailwind CSS, mit PostgreSQL als primärem lokalen Persistenzspeicher, Redis für Queues und Caching, und Docker Compose als Deployment-Einheit. Funktional umfasst der Produktumfang:
+MediaForge ist eine lokal betreibbare Web-Anwendung auf Basis von Laravel 12, React mit TypeScript, Inertia.js und Tailwind CSS, mit PostgreSQL als primärem lokalen Persistenzspeicher, Redis für Queues und Caching, und Docker Compose als Deployment-Einheit. Funktional umfasst der Produktumfang:
 
 * **Lokaler Enhancement-Katalog als Koordinations- und Referenzschicht**: ein kanonisches Datenmodell für lokale Referenzen, Filme, Serien, Episoden, Hörbücher, Musik, Fotos, Comics und E-Books, mit Editions-/Versions-Modell, Provider-ID-Mapping und vollständigem Audit-Trail.
 * **Blu-ray/DVD/UHD-Engine**: Modellierung von Disc-Images (ISO, BDMV, VIDEO_TS) bis auf Playlist-, Clip- und Segment-Ebene, Episoden-Mapping mit Confidence-Modell und Review-Workflow, Watch-State und Resume-Position pro Episode innerhalb einer Disc, Disc-Menü-Playback über externe Player.
@@ -125,17 +125,17 @@ Erwogene Alternativen: **Symfony** bietet vergleichbare Reife, aber weniger inte
 
 Die schwerfälligste Konsequenz der PHP-Wahl — CPU-intensive Medienverarbeitung ist in PHP unpraktisch — wird architektonisch gelöst, nicht bekämpft: FFmpeg, Disc-Struktur-Parser und KI-Modelle laufen als externe Prozesse bzw. dedizierte Worker-Container, orchestriert von Laravel-Jobs. PHP orchestriert; native Werkzeuge rechnen. Dieses Muster ist in [architecture/overview.md](architecture/overview.md) verbindlich beschrieben.
 
-### Vue 3 mit TypeScript, Inertia.js und Tailwind CSS als Frontend
+### React mit TypeScript, Inertia.js und Tailwind CSS als Frontend
 
 Inertia.js eliminiert die API-Doppelbuchführung zwischen Backend und SPA: Controller geben direkt Inertia-Responses mit typisierten Props zurück, Routing bleibt serverseitig in Laravel, und trotzdem fühlt sich das UI wie eine SPA an. Für ein Admin- und Verwaltungs-UI mit Dutzenden Formularen, Tabellen und Review-Flows ist das der produktivste Schnitt: kein separates API-Gateway für das eigene Frontend, keine doppelte Validierung, keine Client-State-Synchronisationsprobleme.
 
 Die REST-API existiert trotzdem — aber ausschließlich für externe Konsumenten (Connectoren anderer Systeme, Automatisierung, CLI), nicht als Unterbau des eigenen UI. Diese Trennung ist verbindlich: Inertia für das eigene Frontend, REST für Dritte. Sie verhindert, dass API-Versionierung das eigene UI bremst oder UI-Bedürfnisse die öffentliche API verunreinigen.
 
-**TypeScript ist verbindlicher, nicht optionaler Teil des Frontend-Stacks.** Jede Vue-Komponente verwendet durchgängig `<script setup lang="ts">` ([developer-handbook/coding-standards.md](developer-handbook/coding-standards.md)); reines JavaScript ist neuem Frontend-Code nur bei zwingendem technischem Grund erlaubt (z. B. eine Drittbibliothek ohne Typdefinitionen), nie aus Bequemlichkeit. Der Grund ist strukturell, nicht stilistisch: Jedes Modulkapitel definiert Props-Verträge für seine Seiten als Teil des verbindlichen Modul-Templates (Dokumentkonventionen, Punkt 10 „Vue-/Inertia-Komponenten"). Ohne Typprüfung wären diese Verträge reine Prosa, deren Einhaltung nur manueller Review sichert; mit TypeScript-Interfaces sind sie zur Kompilierzeit erzwingbar — bei Dutzenden Modulen mit je eigenen Seiten der einzige Weg, der nicht mit der Zahl der Module linear an Zuverlässigkeit verliert.
+**TypeScript ist verbindlicher, nicht optionaler Teil des Frontend-Stacks.** Jede React-Komponente wird als typisierte `.tsx`-Funktionskomponente umgesetzt ([developer-handbook/coding-standards.md](developer-handbook/coding-standards.md)); reines JavaScript ist neuem Frontend-Code nur bei zwingendem technischem Grund erlaubt, nie aus Bequemlichkeit. Jedes Modulkapitel definiert Props-Verträge für seine Seiten als Teil des verbindlichen Modul-Templates (Dokumentkonventionen, Punkt 10 „React-/Inertia-Komponenten"). TypeScript-Interfaces machen diese Verträge zur Kompilierzeit prüfbar.
 
 Tailwind CSS trägt das Design-System als Utility-Layer ([ui/design-system.md](ui/design-system.md)): Die semantischen Farb-Tokens (`color-confidence-*`, `color-status-*`, `color-origin-*`) sind als Tailwind-Theme-Erweiterung definiert, nicht als separates CSS-System. Tailwind ersetzt kein Komponenten-Framework — `resources/js/components/base/` bleibt die einzige gemeinsame MediaForge-eigene Komponentenbasis; Tailwind liefert nur die Utility-Klassen, mit denen diese Basis und jede Modul-Komponente gestylt wird.
 
-Erwogene Alternativen: **Livewire** wäre noch backend-zentrischer, skaliert aber schlecht für die interaktiven UIs, die MediaForge braucht (Disc-Mapping-Review mit Drag-and-Drop, Audio-Wellenform-Vergleich, Kapitel-Editor). **Vue-SPA + REST** oder **React-SPA + REST** erzeugen genau die Doppelbuchführung, die Inertia vermeidet. **Blade + Alpine** reicht für die komplexen Editoren nicht. **Vue 3 mit reinem JavaScript** (ohne TypeScript) wurde erwogen und verworfen: Der Einrichtungsaufwand ist geringer, aber die Props-Vertrag-Disziplin des Modul-Templates verlangt gerade die Kompilierzeit-Prüfung, die nur TypeScript liefert — bei diesem Umfang ein schlechter Tausch.
+Erwogene Alternativen: **Livewire** wäre noch backend-zentrischer, skaliert aber schlecht für die interaktiven UIs, die MediaForge braucht. **React-SPA + REST** erzeugt genau die Doppelbuchführung, die Inertia vermeidet. **Blade + Alpine** reicht für die komplexen Editoren nicht. **React mit reinem JavaScript** wurde verworfen, weil die Props-Verträge des Modul-Templates die Kompilierzeit-Prüfung durch TypeScript brauchen. Die frühere Vue-Entscheidung ist historisch in ADR-0001 dokumentiert und durch [ADR-0013](adr/0013-react-inertia-typescript-and-roadmap-governance.md) abgelöst.
 
 ### PostgreSQL als primärer lokaler Persistenzspeicher
 
@@ -198,13 +198,13 @@ HTTP-Controller / Inertia-Controller / API-Controller   ← dünn: validieren, d
      Jobs / Events / Listeners                          ← asynchrone Ausführung, Entkopplung
 ```
 
-Controller enthalten keine Businesslogik — sie validieren (Form Requests), rufen genau eine Action auf und formen die Antwort. Actions sind die Einheit fachlicher Nachvollziehbarkeit: `ConfirmDiscEpisodeMapping`, `AssembleAudiobookChapters`, `MarkEpisodeWatched`. Services kapseln wiederverwendbare Logik und alle Aufrufe externer Werkzeuge. Vue-Komponenten enthalten ebenfalls keine Businesslogik: Sie rendern Props, sammeln Eingaben und senden sie an Controller; jede fachliche Entscheidung fällt serverseitig.
+Controller enthalten keine Businesslogik — sie validieren (Form Requests), rufen genau eine Action auf und formen die Antwort. Actions sind die Einheit fachlicher Nachvollziehbarkeit: `ConfirmDiscEpisodeMapping`, `AssembleAudiobookChapters`, `MarkEpisodeWatched`. Services kapseln wiederverwendbare Logik und alle Aufrufe externer Werkzeuge. React-Komponenten enthalten ebenfalls keine Businesslogik: Sie rendern Props, sammeln Eingaben und senden sie an Controller; jede fachliche Entscheidung fällt serverseitig.
 
 ### Modulkarte
 
 ```mermaid
 flowchart TB
-    subgraph UI["Frontend (Vue 3 + TypeScript + Inertia)"]
+    subgraph UI["Frontend (React + TypeScript + Inertia)"]
         WEB[Web-UI]
     end
     subgraph CORE["Core-Domäne"]
@@ -282,7 +282,7 @@ Diese Regeln gelten in jedem Modul und jedem Kapitel dieses Handbuchs. Sie sind 
 
 **Regel 1 — Keine Businesslogik in Controllern.** Controller validieren über Form Requests, rufen genau eine Action auf und formen die Antwort. Enthält ein Controller eine fachliche Verzweigung, gehört sie in eine Action. *Durchsetzung:* Architektur-Tests (Pest Arch) verbieten Eloquent-Query-Builder-Aufrufe und Transaktionen in `app/Http`.
 
-**Regel 2 — Keine Businesslogik in Vue-Komponenten.** Komponenten rendern Props und senden Formulare. Berechnungen, die fachliche Bedeutung haben (z. B. „darf diese Disc als gesehen gelten?"), finden serverseitig statt und kommen als Props an. *Durchsetzung:* Code-Review-Checkliste; Props-Verträge sind pro Seite im jeweiligen Modulkapitel spezifiziert.
+**Regel 2 — Keine Businesslogik in React-Komponenten.** Komponenten rendern Props und senden Formulare. Berechnungen, die fachliche Bedeutung haben (z. B. „darf diese Disc als gesehen gelten?"), finden serverseitig statt und kommen als Props an. *Durchsetzung:* Code-Review-Checkliste; Props-Verträge sind pro Seite im jeweiligen Modulkapitel spezifiziert.
 
 **Regel 3 — Connectoren enthalten keine Core-Geschäftslogik.** Ein Connector übersetzt zwischen Fremdsystem-Semantik und kanonischen Core-Operationen. Entscheidungen wie Konfliktauflösung, Statusableitung oder Mapping-Confidence trifft der Core. *Durchsetzung:* Connectoren dürfen nur das Connector SDK und die publizierten Core-Verträge importieren; Architektur-Tests prüfen die Import-Grenzen.
 
@@ -379,7 +379,7 @@ Jedes große Modulkapitel folgt verbindlich dieser Gliederung, in dieser Reihenf
 7. **SQL-Schema** — vollständige PostgreSQL-DDL mit Indizes und Constraints
 8. **Laravel-Klassen** — Models, Interfaces, Services, Actions, Jobs, Events mit Signaturen
 9. **API-Endpunkte** — REST-Routen mit Request/Response-Verträgen
-10. **Vue-/Inertia-Komponenten** — Seiten, Komponenten, Props-Verträge
+10. **React-/Inertia-Komponenten** — Seiten, Komponenten, Props-Verträge
 11. **UI-Flows** — Benutzerabläufe Schritt für Schritt
 12. **Edge Cases** — die unangenehmen Fälle, einzeln durchgespielt
 13. **Performance** — Mengengerüste, Indizes, Batching, Caching
@@ -556,7 +556,7 @@ Dieses Inhaltsverzeichnis ist der verbindliche Bauplan des Handbuchs über alle 
 
 | ADR | Titel | Status |
 |---|---|---|
-| [0001](adr/0001-technology-stack.md) | Technologie-Stack: Laravel 12, Vue 3 + TypeScript, Inertia, Tailwind CSS, PostgreSQL, Redis, Docker Compose | accepted |
+| [0001](adr/0001-technology-stack.md) | Technologie-Stack: Laravel 12, Vue 3 + TypeScript, Inertia, Tailwind CSS, PostgreSQL, Redis, Docker Compose | superseded in frontend/roadmap by ADR-0013 |
 | [0002](adr/0002-modular-monolith.md) | Modularer Monolith statt Microservices | accepted |
 | [0003](adr/0003-provider-id-mapping.md) | Provider-IDs ausschließlich als Mapping-Tabellen | accepted |
 | [0004](adr/0004-episode-granular-watch-state.md) | Watch-State auf Episoden-Granularität, Disc-Status nur abgeleitet | accepted |
@@ -568,5 +568,6 @@ Dieses Inhaltsverzeichnis ist der verbindliche Bauplan des Handbuchs über alle 
 | [0010](adr/0010-postgres-hybrid-search.md) | Hybride Suche in PostgreSQL statt externem Suchserver | accepted |
 | [0011](adr/0011-relational-knowledge-graph.md) | Knowledge Graph relational in PostgreSQL | accepted |
 | [0012](adr/0012-plugin-trust-model.md) | Plugin-Vertrauensmodell: informierte In-Process-Verträge statt Sandbox-Illusion | accepted |
+| [0013](adr/0013-react-inertia-typescript-and-roadmap-governance.md) | React + Inertia + TypeScript und V0–V34-Roadmap-Governance | accepted |
 
 Weitere ADRs entstehen mit den jeweiligen Modulen und werden hier ergänzt.
