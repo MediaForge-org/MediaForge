@@ -13,8 +13,6 @@ interface SharedPageProps {
 
 export default function Welcome({ version }: WelcomeProps) {
     const { auth } = usePage<SharedPageProps>().props;
-    const destination = auth?.user ? '/dashboard' : '/login';
-    const destinationLabel = auth?.user ? 'Open dashboard' : 'Sign in';
 
     return (
         <>
@@ -36,12 +34,29 @@ export default function Welcome({ version }: WelcomeProps) {
                     {version}
                 </span>
 
-                <Link
-                    className="rounded-[--radius-sm] bg-accent px-4 py-2 font-medium text-on-accent"
-                    href={destination}
-                >
-                    {destinationLabel}
-                </Link>
+                {auth?.user ? (
+                    <Link
+                        className="rounded-[--radius-sm] bg-accent px-4 py-2 font-medium text-on-accent"
+                        href="/dashboard"
+                    >
+                        Open dashboard
+                    </Link>
+                ) : (
+                    <div className="flex gap-3">
+                        <Link
+                            className="rounded-[--radius-sm] bg-accent px-4 py-2 font-medium text-on-accent"
+                            href="/login"
+                        >
+                            Sign in
+                        </Link>
+                        <Link
+                            className="rounded-[--radius-sm] border border-line bg-surface-raised px-4 py-2 font-medium"
+                            href="/register"
+                        >
+                            Create account
+                        </Link>
+                    </div>
+                )}
             </main>
         </>
     );

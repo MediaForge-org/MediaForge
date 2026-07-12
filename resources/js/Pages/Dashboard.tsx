@@ -1,8 +1,19 @@
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import type { FormEvent } from 'react';
+
+interface DashboardPageProps {
+    [key: string]: unknown;
+    auth?: {
+        user?: {
+            name: string;
+            email: string;
+        } | null;
+    };
+}
 
 export default function Dashboard() {
     const form = useForm<Record<string, never>>({});
+    const { auth } = usePage<DashboardPageProps>().props;
 
     function logout(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
@@ -17,6 +28,11 @@ export default function Dashboard() {
                 <div>
                     <h1 className="text-3xl font-semibold tracking-tight">MediaForge Dashboard</h1>
                     <p className="mt-2 text-fg-muted">Your local MediaForge session is active.</p>
+                    {auth?.user && (
+                        <p className="mt-4 text-sm text-fg-muted">
+                            Signed in as {auth.user.name} ({auth.user.email})
+                        </p>
+                    )}
                 </div>
 
                 <form onSubmit={logout}>
