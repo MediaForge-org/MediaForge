@@ -1,10 +1,21 @@
-import { Head } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 
 interface WelcomeProps {
     version: string;
 }
 
+interface SharedPageProps {
+    [key: string]: unknown;
+    auth?: {
+        user?: { id: string } | null;
+    };
+}
+
 export default function Welcome({ version }: WelcomeProps) {
+    const { auth } = usePage<SharedPageProps>().props;
+    const destination = auth?.user ? '/dashboard' : '/login';
+    const destinationLabel = auth?.user ? 'Open dashboard' : 'Sign in';
+
     return (
         <>
             <Head title="Welcome" />
@@ -24,6 +35,13 @@ export default function Welcome({ version }: WelcomeProps) {
                 <span className="rounded-[--radius-sm] border border-line bg-surface-raised px-3 py-1 font-mono text-sm text-fg-muted">
                     {version}
                 </span>
+
+                <Link
+                    className="rounded-[--radius-sm] bg-accent px-4 py-2 font-medium text-on-accent"
+                    href={destination}
+                >
+                    {destinationLabel}
+                </Link>
             </main>
         </>
     );

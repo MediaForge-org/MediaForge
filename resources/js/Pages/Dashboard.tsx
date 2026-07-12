@@ -1,4 +1,4 @@
-import { Head, useForm } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import type { FormEvent } from 'react';
 
 export default function Dashboard() {
@@ -28,6 +28,10 @@ export default function Dashboard() {
                         Sign out
                     </button>
                 </form>
+
+                <Link className="text-sm text-fg-muted hover:text-fg" href="/">
+                    Back to home
+                </Link>
             </main>
         </>
     );

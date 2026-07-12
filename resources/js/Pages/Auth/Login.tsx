@@ -1,4 +1,4 @@
-import { Head, useForm } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import type { FormEvent } from 'react';
 
 export default function Login() {
@@ -63,6 +63,10 @@ export default function Login() {
                     >
                         Sign in
                     </button>
+
+                    <Link className="block text-center text-sm text-fg-muted hover:text-fg" href="/">
+                        Back to home
+                    </Link>
                 </form>
             </main>
         </>
