@@ -13,11 +13,14 @@ use Symfony\Component\HttpFoundation\Response;
 final class RedirectIfAuthenticated
 {
     /**
-     * @param  array<int, string>  $guards
+     * @param  Closure(Request): Response  $next
      */
     public function handle(Request $request, Closure $next, string ...$guards): Response
     {
-        foreach ($guards === [] ? [null] : $guards as $guard) {
+        /** @var list<string|null> $checkedGuards */
+        $checkedGuards = $guards === [] ? [null] : $guards;
+
+        foreach ($checkedGuards as $guard) {
             if (Auth::guard($guard)->check()) {
                 return new RedirectResponse('/dashboard');
             }
