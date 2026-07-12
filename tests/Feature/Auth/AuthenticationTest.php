@@ -24,7 +24,8 @@ test('users can authenticate with valid credentials', function () {
     $this->post('/login', [
         'email' => $user->email,
         'password' => 'password',
-    ])->assertRedirect('/dashboard');
+    ])->assertRedirect('/dashboard')
+        ->assertHeader('Location', '/dashboard');
 
     $this->assertAuthenticatedAs($user);
 });
@@ -37,7 +38,8 @@ test('users are redirected to their intended dashboard after login', function ()
     $this->post('/login', [
         'email' => $user->email,
         'password' => 'password',
-    ])->assertRedirect('/dashboard');
+    ])->assertRedirect('/dashboard')
+        ->assertHeader('Location', '/dashboard');
 });
 
 test('users cannot authenticate with invalid credentials', function () {
@@ -55,19 +57,23 @@ test('users cannot authenticate with invalid credentials', function () {
 });
 
 test('guests are redirected from dashboard to login', function () {
-    $this->get('/dashboard')->assertRedirect('/login');
+    $this->get('/dashboard')
+        ->assertRedirect('/login')
+        ->assertHeader('Location', '/login');
 });
 
 test('authenticated users are redirected away from login', function () {
     $this->actingAs(User::factory()->create())
         ->get('/login')
-        ->assertRedirect('/dashboard');
+        ->assertRedirect('/dashboard')
+        ->assertHeader('Location', '/dashboard');
 });
 
 test('authenticated users can logout', function () {
     $this->actingAs(User::factory()->create())
         ->post('/logout')
-        ->assertRedirect('/login');
+        ->assertRedirect('/login')
+        ->assertHeader('Location', '/login');
 
     $this->assertGuest();
 });
