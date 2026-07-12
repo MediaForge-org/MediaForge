@@ -13,7 +13,7 @@ beforeEach(function (): void {
 test('guests can view the login page', function () {
     $this->withoutVite();
 
-    $this->get(route('login'))
+    $this->get('/login')
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page->component('Auth/Login'));
 });
@@ -21,10 +21,10 @@ test('guests can view the login page', function () {
 test('users can authenticate with valid credentials', function () {
     $user = User::factory()->create();
 
-    $this->post(route('login.store'), [
+    $this->post('/login', [
         'email' => $user->email,
         'password' => 'password',
-    ])->assertRedirect(route('dashboard'));
+    ])->assertRedirect('/dashboard');
 
     $this->assertAuthenticatedAs($user);
 });
@@ -32,42 +32,42 @@ test('users can authenticate with valid credentials', function () {
 test('users are redirected to their intended dashboard after login', function () {
     $user = User::factory()->create();
 
-    $this->get(route('dashboard'))->assertRedirect(route('login'));
+    $this->get('/dashboard')->assertRedirect('/login');
 
-    $this->post(route('login.store'), [
+    $this->post('/login', [
         'email' => $user->email,
         'password' => 'password',
-    ])->assertRedirect(route('dashboard'));
+    ])->assertRedirect('/dashboard');
 });
 
 test('users cannot authenticate with invalid credentials', function () {
     $user = User::factory()->create();
 
-    $this->from(route('login'))
-        ->post(route('login.store'), [
+    $this->from('/login')
+        ->post('/login', [
             'email' => $user->email,
             'password' => 'incorrect-password',
         ])
-        ->assertRedirect(route('login'))
+        ->assertRedirect('/login')
         ->assertSessionHasErrors('email');
 
     $this->assertGuest();
 });
 
 test('guests are redirected from dashboard to login', function () {
-    $this->get(route('dashboard'))->assertRedirect(route('login'));
+    $this->get('/dashboard')->assertRedirect('/login');
 });
 
 test('authenticated users are redirected away from login', function () {
     $this->actingAs(User::factory()->create())
-        ->get(route('login'))
-        ->assertRedirect(route('dashboard'));
+        ->get('/login')
+        ->assertRedirect('/dashboard');
 });
 
 test('authenticated users can logout', function () {
     $this->actingAs(User::factory()->create())
-        ->post(route('logout'))
-        ->assertRedirect(route('login'));
+        ->post('/logout')
+        ->assertRedirect('/login');
 
     $this->assertGuest();
 });

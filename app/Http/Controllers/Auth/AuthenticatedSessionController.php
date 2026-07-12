@@ -25,7 +25,7 @@ final class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard'));
+        return redirect()->intended('/dashboard');
     }
 
     public function destroy(Request $request): RedirectResponse
@@ -35,6 +35,6 @@ final class AuthenticatedSessionController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return to_route('login');
+        return redirect('/login');
     }
 }
