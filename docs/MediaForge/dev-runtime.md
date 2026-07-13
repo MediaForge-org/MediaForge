@@ -71,6 +71,31 @@ docker compose -f deploy/dev/docker-compose.yml restart vite
 
 Wait until the Vite logs report that the server is ready, then hard-reload the browser. If the dev server still blocks module requests on a Windows bind mount, return to production-build mode with `make runtime-reset`.
 
+## Running the test suite locally
+
+Always run tests with `make test` (or `make ci`). The dev container injects `.env`
+(`APP_ENV=local`, `DB_DATABASE=mediaforge`, redis cache/queue) as real process env vars
+that **shadow** `phpunit.xml`'s `<env>`. Running `php vendor/bin/pest` directly would
+therefore execute as `local` against the **dev database** — CSRF would not be skipped
+(POST feature tests fail with 419) and `RefreshDatabase` would wipe your dev data.
+
+`make test` injects the hermetic environment explicitly (see `TEST_ENV` in the `Makefile`):
+
+```powershell
+make test        # testing env, mediaforge_test DB, array cache/session, sync queue
+```
+
+To run a subset directly, pass the same overrides:
+
+```powershell
+docker compose -f deploy/dev/docker-compose.yml exec -T `
+  -e APP_ENV=testing -e DB_DATABASE=mediaforge_test -e SESSION_DRIVER=array `
+  -e CACHE_STORE=array -e QUEUE_CONNECTION=sync -e BCRYPT_ROUNDS=4 -e MAIL_MAILER=array `
+  app php vendor/bin/pest --filter=Connector
+```
+
+On GitHub CI (Linux) there is no such shadowing, so `phpunit.xml` applies as-is and this is a no-op.
+
 ## Clear Laravel caches
 
 ```powershell
