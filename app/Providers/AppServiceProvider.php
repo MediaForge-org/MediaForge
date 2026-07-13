@@ -27,9 +27,9 @@ class AppServiceProvider extends ServiceProvider
         // production-build mode that makes @vite and Ziggy emit asset/route URLs
         // on the wrong port, leaving the browser with a blank page. Pin every
         // generated URL to the 12-factor APP_URL instead of the mangled request.
-        $appUrl = (string) config('app.url');
+        $appUrl = config('app.url');
 
-        if ($appUrl !== '') {
+        if (is_string($appUrl) && $appUrl !== '') {
             URL::forceRootUrl($appUrl);
 
             if (str_starts_with($appUrl, 'https://')) {
