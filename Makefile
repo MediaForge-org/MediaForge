@@ -6,7 +6,8 @@ APP := $(COMPOSE) exec -T app
 
 .DEFAULT_GOAL := help
 .PHONY: help setup up down restart build logs shell \
-        migrate fresh seed test lint analyse types stan pint ci
+        migrate fresh seed test lint analyse types stan pint ci \
+        assets runtime-reset hmr
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | \
@@ -70,3 +71,12 @@ ci: ## Run the full local gate (style, static analysis, tests)
 	$(APP) php vendor/bin/pint --test
 	$(APP) php vendor/bin/phpstan analyse --memory-limit=512M
 	$(APP) php vendor/bin/pest
+
+assets: ## Build frontend assets in a clean one-off node container (not the HMR service)
+	$(COMPOSE) run --rm --no-deps vite npm run build
+
+runtime-reset: ## Force stable production-build mode (remove public/hot, clear caches)
+	$(APP) php artisan mediaforge:runtime:reset
+
+hmr: ## Start optional Vite HMR (Windows: fall back to `make assets` if it stalls)
+	$(COMPOSE) --profile hmr up -d vite
