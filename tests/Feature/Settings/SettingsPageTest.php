@@ -5,6 +5,10 @@ declare(strict_types=1);
 use App\Models\User;
 use Inertia\Testing\AssertableInertia as Assert;
 
+beforeEach(function () {
+    $this->withoutVite();
+});
+
 test('guests are redirected from settings to login', function () {
     $this->get('/settings')
         ->assertRedirect('/login')

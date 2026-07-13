@@ -6,6 +6,10 @@ use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use Inertia\Testing\AssertableInertia as Assert;
 
+beforeEach(function () {
+    $this->withoutVite();
+});
+
 test('guests are redirected from dashboard to login', function () {
     $this->get('/dashboard')
         ->assertRedirect('/login')
