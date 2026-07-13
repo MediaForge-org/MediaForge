@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Connectors\Sdk\Contracts;
 
+use App\Connectors\Sdk\Diagnostics\LibraryDiscoveryRequest;
+use App\Connectors\Sdk\Diagnostics\LibraryDiscoveryResult;
 use App\Connectors\Sdk\Diagnostics\TestConnectionRequest;
 use App\Connectors\Sdk\Diagnostics\TestConnectionResult;
 
@@ -26,4 +28,12 @@ interface ConnectorProvider
      * and never leaks the secret.
      */
     public function testConnection(TestConnectionRequest $request): TestConnectionResult;
+
+    /**
+     * Discover the libraries the server exposes (library-level only — no media
+     * items). Like testConnection it MUST NOT throw for network/HTTP failures; it
+     * returns a LibraryDiscoveryResult with a sanitized message and never leaks
+     * the secret. Uses a short timeout with redirects disabled.
+     */
+    public function discoverLibraries(LibraryDiscoveryRequest $request): LibraryDiscoveryResult;
 }
