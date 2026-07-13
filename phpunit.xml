@@ -21,21 +21,25 @@
         </include>
     </source>
     <php>
-        <env name="APP_ENV" value="testing"/>
-        <env name="APP_MAINTENANCE_DRIVER" value="file"/>
-        <env name="BCRYPT_ROUNDS" value="4"/>
-        <env name="BROADCAST_CONNECTION" value="null"/>
-        <env name="CACHE_STORE" value="array"/>
+        <!-- force="true" so these override the dev container's real env vars
+             (APP_ENV=local, DB_DATABASE=mediaforge). Without it the suite would run
+             as `local` (CSRF enforced) against the dev database. On GitHub CI there
+             is no shadowing, so forcing is a no-op there. -->
+        <env name="APP_ENV" value="testing" force="true"/>
+        <env name="APP_MAINTENANCE_DRIVER" value="file" force="true"/>
+        <env name="BCRYPT_ROUNDS" value="4" force="true"/>
+        <env name="BROADCAST_CONNECTION" value="null" force="true"/>
+        <env name="CACHE_STORE" value="array" force="true"/>
         <!-- PostgreSQL is part of the contract — no SQLite. Points at the compose
              `postgres` service; override DB_HOST when running outside the network. -->
-        <env name="DB_CONNECTION" value="pgsql"/>
-        <env name="DB_HOST" value="postgres"/>
-        <env name="DB_PORT" value="5432"/>
-        <env name="DB_DATABASE" value="mediaforge_test"/>
-        <env name="DB_USERNAME" value="mediaforge"/>
-        <env name="DB_PASSWORD" value="mediaforge"/>
-        <env name="MAIL_MAILER" value="array"/>
-        <env name="QUEUE_CONNECTION" value="sync"/>
-        <env name="SESSION_DRIVER" value="array"/>
+        <env name="DB_CONNECTION" value="pgsql" force="true"/>
+        <env name="DB_HOST" value="postgres" force="true"/>
+        <env name="DB_PORT" value="5432" force="true"/>
+        <env name="DB_DATABASE" value="mediaforge_test" force="true"/>
+        <env name="DB_USERNAME" value="mediaforge" force="true"/>
+        <env name="DB_PASSWORD" value="mediaforge" force="true"/>
+        <env name="MAIL_MAILER" value="array" force="true"/>
+        <env name="QUEUE_CONNECTION" value="sync" force="true"/>
+        <env name="SESSION_DRIVER" value="array" force="true"/>
     </php>
 </phpunit>

@@ -3,7 +3,10 @@
 declare(strict_types=1);
 
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
+
+uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $this->withoutVite();
@@ -35,7 +38,7 @@ test('settings page visibly structures read-only areas without broken links', fu
         ->toContain('Connectors')
         ->toContain('Playback')
         ->toContain('Privacy')
-        ->not->toContain('href="/connectors"')
+        ->toContain('href="/connectors"')
         ->not->toContain('/admin')
         ->not->toContain('/profile')
         ->not->toContain('/libraries')

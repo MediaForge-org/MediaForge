@@ -4,6 +4,17 @@
 COMPOSE := docker compose -f deploy/dev/docker-compose.yml
 APP := $(COMPOSE) exec -T app
 
+# The dev container injects .env (APP_ENV=local, DB=mediaforge, redis, ...) as real
+# process env vars that shadow phpunit.xml's <env>. Inject the hermetic test
+# environment explicitly so the suite always runs as `testing` against
+# mediaforge_test (never the dev database/redis) — this is also what lets Laravel
+# skip CSRF for POST feature tests. On GitHub CI (no shadowing) it is a harmless
+# no-op. See docs/MediaForge/dev-runtime.md.
+TEST_ENV := -e APP_ENV=testing -e DB_DATABASE=mediaforge_test \
+            -e SESSION_DRIVER=array -e CACHE_STORE=array -e QUEUE_CONNECTION=sync \
+            -e BCRYPT_ROUNDS=4 -e MAIL_MAILER=array
+PEST := $(COMPOSE) exec -T $(TEST_ENV) app php vendor/bin/pest
+
 .DEFAULT_GOAL := help
 .PHONY: help setup up down restart build logs shell \
         migrate fresh seed test lint analyse types stan pint ci \
@@ -54,9 +65,8 @@ fresh: ## Drop + re-migrate + seed
 seed: ## Run seeders
 	$(APP) php artisan db:seed
 
-test: ## Run the Pest suite
-	$(APP) php artisan config:clear
-	$(APP) php vendor/bin/pest
+test: ## Run the Pest suite (hermetic: testing env, mediaforge_test DB)
+	$(PEST)
 
 lint pint: ## Fix code style (Pint)
 	$(APP) php vendor/bin/pint
@@ -70,7 +80,7 @@ types: ## Type-check the React frontend (TypeScript)
 ci: ## Run the full local gate (style, static analysis, tests)
 	$(APP) php vendor/bin/pint --test
 	$(APP) php vendor/bin/phpstan analyse --memory-limit=512M
-	$(APP) php vendor/bin/pest
+	$(PEST)
 
 assets: ## Build frontend assets in a clean one-off node container (not the HMR service)
 	$(COMPOSE) run --rm --no-deps vite npm run build

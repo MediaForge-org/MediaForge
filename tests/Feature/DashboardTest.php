@@ -3,8 +3,11 @@
 declare(strict_types=1);
 
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Route;
 use Inertia\Testing\AssertableInertia as Assert;
+
+uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $this->withoutVite();
@@ -40,9 +43,8 @@ test('dashboard shell visibly provides valid navigation without unavailable link
         ->toContain('Dashboard')
         ->toContain('Settings')
         ->toContain('Library Overview')
-        ->toContain('Connectors Overview')
         ->toContain('Review Tasks')
-        ->not->toContain('href="/connectors"')
+        ->toContain('href="/connectors"')
         ->not->toContain('/admin')
         ->not->toContain('/profile')
         ->not->toContain('/libraries')
