@@ -49,6 +49,9 @@ export default function AuthenticatedLayout({ children }: AuthenticatedLayoutPro
                             <NavLink active={url.startsWith('/dashboard')} href="/dashboard">
                                 Dashboard
                             </NavLink>
+                            <NavLink active={url.startsWith('/connectors')} href="/connectors">
+                                Connectors
+                            </NavLink>
                             <NavLink active={url.startsWith('/settings')} href="/settings">
                                 Settings
                             </NavLink>
@@ -58,7 +61,7 @@ export default function AuthenticatedLayout({ children }: AuthenticatedLayoutPro
                     <div>
                         <p className="px-3 text-xs font-semibold uppercase tracking-[0.16em] text-fg-muted">Coming soon</p>
                         <div className="mt-2 grid gap-1" aria-label="Planned MediaForge areas">
-                            {['Library Overview', 'Connectors Overview', 'Review Tasks'].map((label) => (
+                            {['Library Overview', 'Review Tasks'].map((label) => (
                                 <span
                                     aria-disabled="true"
                                     className="flex cursor-not-allowed items-center justify-between rounded-[--radius-sm] px-3 py-2 text-sm text-fg-muted opacity-70"
@@ -116,6 +119,9 @@ export default function AuthenticatedLayout({ children }: AuthenticatedLayoutPro
                         <nav aria-label="Primary navigation" className="flex gap-1 overflow-x-auto">
                             <NavLink active={url.startsWith('/dashboard')} href="/dashboard">
                                 Dashboard
+                            </NavLink>
+                            <NavLink active={url.startsWith('/connectors')} href="/connectors">
+                                Connectors
                             </NavLink>
                             <NavLink active={url.startsWith('/settings')} href="/settings">
                                 Settings

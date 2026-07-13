@@ -1,21 +1,25 @@
-import { Head, usePage } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import {
+    type ConnectorSummary,
+    formatCheckedAt,
+    StatusBadge,
+} from '@/Components/Connectors/ConnectorStatus';
 
 interface DashboardPageProps {
     [key: string]: unknown;
     status: string;
+    connectors: ConnectorSummary[];
 }
 
 const upcomingAreas = [
-    ['Jellyfin Connector', 'Coming in a later V1 package.'],
-    ['Audiobookshelf Connector', 'Coming in a later V1 package.'],
     ['Library Health', 'Coming later.'],
     ['Review Tasks', 'Coming later.'],
 ];
 
 export default function Dashboard() {
-    const { status } = usePage<DashboardPageProps>().props;
+    const { status, connectors } = usePage<DashboardPageProps>().props;
 
     return (
         <>
@@ -68,10 +72,41 @@ export default function Dashboard() {
                         </div>
                     </section>
 
+                    <section aria-label="Connector status">
+                        <div className="mb-4 flex items-end justify-between gap-4">
+                            <div>
+                                <h2 className="text-xl font-semibold tracking-tight">Connectors</h2>
+                                <p className="mt-1 text-sm text-fg-muted">Configure and test your media servers. Connection tests only in V1.</p>
+                            </div>
+                            <Link className="text-sm font-medium text-accent hover:text-accent-hover" href="/connectors">
+                                Manage
+                            </Link>
+                        </div>
+                        <div className="grid gap-4 sm:grid-cols-2">
+                            {connectors.map((connector) => (
+                                <Link
+                                    className="flex flex-col gap-3 rounded-[--radius-md] border border-line bg-surface-raised p-5 shadow-sm transition-colors hover:border-accent"
+                                    href={`/connectors/${connector.key}`}
+                                    key={connector.key}
+                                >
+                                    <div className="flex items-start justify-between gap-4">
+                                        <h3 className="font-semibold">{connector.label}</h3>
+                                        <StatusBadge status={connector.status} />
+                                    </div>
+                                    <p className="text-sm text-fg-muted">
+                                        {connector.health_detail
+                                            ?? (connector.configured ? 'Configured — not checked yet.' : 'Not configured yet.')}
+                                    </p>
+                                    <p className="text-xs text-fg-muted">Last checked: {formatCheckedAt(connector.last_checked_at)}</p>
+                                </Link>
+                            ))}
+                        </div>
+                    </section>
+
                     <section className="rounded-[--radius-md] border border-line bg-surface-sunken p-5 sm:p-6">
                         <h2 className="text-xl font-semibold tracking-tight">What happens next</h2>
                         <p className="mt-2 max-w-3xl text-sm text-fg-muted">
-                            Connector setup, library reporting, and review workflows will be introduced as separate V1 packages. The navigation keeps those future areas visible without presenting unavailable actions as links.
+                            Library reporting and review workflows will be introduced as separate V1 packages. The navigation keeps those future areas visible without presenting unavailable actions as links.
                         </p>
                     </section>
 
