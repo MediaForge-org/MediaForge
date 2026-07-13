@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\SettingsController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', fn () => Inertia::render('Welcome', [
-    'version' => 'v0-foundation',
+    'version' => 'v1-foundation',
 ]))->name('home');
 
 Route::middleware('guest')->group(function (): void {
@@ -19,6 +20,9 @@ Route::middleware('guest')->group(function (): void {
 });
 
 Route::middleware('auth')->group(function (): void {
-    Route::get('/dashboard', fn () => Inertia::render('Dashboard'))->name('dashboard');
+    Route::get('/dashboard', fn () => Inertia::render('Dashboard', [
+        'status' => 'V1 foundation',
+    ]))->name('dashboard');
+    Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 });
