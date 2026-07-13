@@ -25,6 +25,8 @@ use Illuminate\Support\Carbon;
  * @property string|null $health_detail
  * @property Carbon|null $last_healthy_at
  * @property Carbon|null $last_checked_at
+ * @property Carbon|null $libraries_discovered_at
+ * @property string|null $last_discovery_error
  */
 class ConnectorInstance extends Model
 {
@@ -42,6 +44,7 @@ class ConnectorInstance extends Model
             'enabled' => 'boolean',
             'last_healthy_at' => 'datetime',
             'last_checked_at' => 'datetime',
+            'libraries_discovered_at' => 'datetime',
         ];
     }
 
@@ -49,5 +52,11 @@ class ConnectorInstance extends Model
     public function syncStates(): HasMany
     {
         return $this->hasMany(ConnectorSyncState::class, 'instance_id');
+    }
+
+    /** @return HasMany<ConnectorLibrary, $this> */
+    public function libraries(): HasMany
+    {
+        return $this->hasMany(ConnectorLibrary::class, 'connector_instance_id');
     }
 }

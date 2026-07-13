@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Connectors\Sdk;
 
 use App\Connectors\Sdk\Models\ConnectorInstance;
+use App\Connectors\Sdk\Models\ConnectorLibrary;
 use App\Connectors\Sdk\Models\ConnectorSyncState;
 use App\Connectors\Sdk\Registry\ConnectorRegistry;
 use App\Connectors\Sdk\Secrets\EncryptedSecretStore;
@@ -39,6 +40,7 @@ final class ConnectorSdkServiceProvider extends ServiceProvider
         Relation::enforceMorphMap([
             'connector_instance' => ConnectorInstance::class,
             'connector_sync_state' => ConnectorSyncState::class,
+            'connector_library' => ConnectorLibrary::class,
         ]);
     }
 }

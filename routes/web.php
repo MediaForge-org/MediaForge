@@ -35,4 +35,8 @@ Route::middleware('auth')->group(function (): void {
         ->whereIn('connector', $connectors)->name('connectors.update');
     Route::post('/connectors/{connector}/test', [ConnectorController::class, 'test'])
         ->whereIn('connector', $connectors)->name('connectors.test');
+    Route::post('/connectors/{connector}/libraries/discover', [ConnectorController::class, 'discover'])
+        ->whereIn('connector', $connectors)->name('connectors.libraries.discover');
+    Route::post('/connectors/{connector}/libraries/{library}/selection', [ConnectorController::class, 'updateLibrary'])
+        ->whereIn('connector', $connectors)->whereUlid('library')->name('connectors.libraries.selection');
 });
