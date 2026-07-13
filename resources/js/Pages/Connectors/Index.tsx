@@ -4,6 +4,7 @@ import { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import {
     type ConnectorSummary,
+    discoverySummary,
     formatCheckedAt,
     StatusBadge,
 } from '@/Components/Connectors/ConnectorStatus';
@@ -76,6 +77,14 @@ export default function ConnectorsIndex() {
                                     <div className="flex justify-between gap-4">
                                         <dt>Last checked</dt>
                                         <dd>{formatCheckedAt(connector.last_checked_at)}</dd>
+                                    </div>
+                                    <div className="flex justify-between gap-4">
+                                        <dt>Libraries</dt>
+                                        <dd>{discoverySummary(connector)}</dd>
+                                    </div>
+                                    <div className="flex justify-between gap-4">
+                                        <dt>Last discovered</dt>
+                                        <dd>{formatCheckedAt(connector.libraries_discovered_at)}</dd>
                                     </div>
                                 </dl>
 

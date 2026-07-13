@@ -3,20 +3,22 @@ import { type FormEvent, useState } from 'react';
 
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import {
-    type ConnectorSummary,
+    type ConnectorDetail,
+    type DiscoveredLibrary,
     formatCheckedAt,
     StatusBadge,
 } from '@/Components/Connectors/ConnectorStatus';
 
 interface ConnectorShowProps {
     [key: string]: unknown;
-    connector: ConnectorSummary;
+    connector: ConnectorDetail;
     flash: { success: string | null; error: string | null };
 }
 
 export default function ConnectorShow() {
     const { connector, flash } = usePage<ConnectorShowProps>().props;
     const [testing, setTesting] = useState(false);
+    const [discovering, setDiscovering] = useState(false);
 
     const form = useForm<{ base_url: string; secret: string; clear_secret: boolean }>({
         base_url: connector.base_url,
@@ -40,12 +42,28 @@ export default function ConnectorShow() {
         });
     }
 
+    function runDiscover() {
+        setDiscovering(true);
+        router.post(`/connectors/${connector.key}/libraries/discover`, {}, {
+            preserveScroll: true,
+            onFinish: () => setDiscovering(false),
+        });
+    }
+
+    function toggleLibrary(library: DiscoveredLibrary) {
+        router.post(
+            `/connectors/${connector.key}/libraries/${library.id}/selection`,
+            { enabled: !library.is_enabled },
+            { preserveScroll: true },
+        );
+    }
+
     return (
         <>
             <Head title={`${connector.label} connector`} />
 
             <AuthenticatedLayout>
-                <section className="flex max-w-2xl flex-col gap-6">
+                <section className="flex max-w-3xl flex-col gap-6">
                     <div>
                         <Link className="text-sm font-medium text-accent hover:text-accent-hover" href="/connectors">
                             ← Connectors
@@ -55,8 +73,8 @@ export default function ConnectorShow() {
                             <StatusBadge status={connector.status} />
                         </div>
                         <p className="mt-2 text-fg-muted">
-                            Store the server address and API key, then run a connection test. Connection test only — no library
-                            sync in V1 C.
+                            Store the server address and API key, test the connection, then discover the available libraries.
+                            Discovery only — no media sync in V1 D.
                         </p>
                     </div>
 
@@ -161,7 +179,75 @@ export default function ConnectorShow() {
                                 </div>
                             )}
                         </dl>
-                        <p className="mt-4 text-fg-muted">Connection test only — no library sync, scan, or media import runs in V1 C.</p>
+                        <p className="mt-4 text-fg-muted">Connection test only — no library sync, scan, or media import runs in V1 D.</p>
+                    </div>
+
+                    <div className="rounded-[--radius-md] border border-line bg-surface-raised p-6 shadow-sm">
+                        <div className="flex flex-wrap items-start justify-between gap-4">
+                            <div>
+                                <h2 className="text-xl font-semibold tracking-tight">Libraries</h2>
+                                <p className="mt-1 text-sm text-fg-muted">
+                                    {connector.libraries_discovered_at
+                                        ? `Last discovered ${formatCheckedAt(connector.libraries_discovered_at)}.`
+                                        : 'Not discovered yet.'}{' '}
+                                    Discovery only. No media sync in V1 D.
+                                </p>
+                            </div>
+                            <button
+                                className="rounded-[--radius-sm] bg-accent px-4 py-2 text-sm font-medium text-on-accent disabled:cursor-not-allowed disabled:opacity-60"
+                                disabled={!connector.configured || discovering}
+                                onClick={runDiscover}
+                                type="button"
+                            >
+                                {discovering ? 'Discovering…' : 'Discover libraries'}
+                            </button>
+                        </div>
+
+                        {connector.last_discovery_error && (
+                            <p className="mt-4 rounded-[--radius-sm] border border-error/40 bg-error/10 px-3 py-2 text-sm text-error">
+                                Last discovery failed: {connector.last_discovery_error}
+                            </p>
+                        )}
+
+                        {!connector.configured && (
+                            <p className="mt-4 text-sm text-fg-muted">Configure and connect this connector to discover its libraries.</p>
+                        )}
+
+                        {connector.libraries.length > 0 ? (
+                            <ul className="mt-5 divide-y divide-line">
+                                {connector.libraries.map((library) => (
+                                    <li className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between" key={library.id}>
+                                        <div className="min-w-0">
+                                            <div className="flex items-center gap-2">
+                                                <p className="truncate font-medium">{library.name}</p>
+                                                {library.type && (
+                                                    <span className="rounded-full bg-surface-sunken px-2 py-0.5 text-xs text-fg-muted">
+                                                        {library.type}
+                                                    </span>
+                                                )}
+                                                {library.discovery_status === 'missing' && (
+                                                    <span className="rounded-full bg-error/10 px-2 py-0.5 text-xs text-error">Missing</span>
+                                                )}
+                                            </div>
+                                            <p className="mt-1 truncate font-mono text-xs text-fg-muted">{library.external_id}</p>
+                                            <p className="mt-0.5 text-xs text-fg-muted">Last seen: {formatCheckedAt(library.last_seen_at)}</p>
+                                        </div>
+                                        <label className="flex shrink-0 items-center gap-2 text-sm">
+                                            <input
+                                                checked={library.is_enabled}
+                                                onChange={() => toggleLibrary(library)}
+                                                type="checkbox"
+                                            />
+                                            <span>Enable for later sync</span>
+                                        </label>
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : (
+                            connector.configured && (
+                                <p className="mt-5 text-sm text-fg-muted">No libraries discovered yet. Click “Discover libraries”.</p>
+                            )
+                        )}
                     </div>
                 </section>
             </AuthenticatedLayout>

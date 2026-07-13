@@ -3,6 +3,7 @@ import { Head, Link, usePage } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import {
     type ConnectorSummary,
+    discoverySummary,
     formatCheckedAt,
     StatusBadge,
 } from '@/Components/Connectors/ConnectorStatus';
@@ -76,7 +77,7 @@ export default function Dashboard() {
                         <div className="mb-4 flex items-end justify-between gap-4">
                             <div>
                                 <h2 className="text-xl font-semibold tracking-tight">Connectors</h2>
-                                <p className="mt-1 text-sm text-fg-muted">Configure and test your media servers. Connection tests only in V1.</p>
+                                <p className="mt-1 text-sm text-fg-muted">Configure, test, and discover libraries. No media sync in V1.</p>
                             </div>
                             <Link className="text-sm font-medium text-accent hover:text-accent-hover" href="/connectors">
                                 Manage
@@ -97,7 +98,9 @@ export default function Dashboard() {
                                         {connector.health_detail
                                             ?? (connector.configured ? 'Configured — not checked yet.' : 'Not configured yet.')}
                                     </p>
-                                    <p className="text-xs text-fg-muted">Last checked: {formatCheckedAt(connector.last_checked_at)}</p>
+                                    <p className="text-xs text-fg-muted">
+                                        {discoverySummary(connector)} · Last checked: {formatCheckedAt(connector.last_checked_at)}
+                                    </p>
                                 </Link>
                             ))}
                         </div>
