@@ -17,7 +17,10 @@
             })();
         </script>
 
-        @routes
+        {{-- Ziggy's @routes blob is intentionally omitted: the React/Inertia frontend
+             uses plain path strings, not route(), so emitting the full route table
+             (incl. Horizon admin routes) on every page load is dead weight. Re-add
+             @routes here if a future page needs the client-side route() helper. --}}
         @viteReactRefresh
         @vite(['resources/css/app.css', 'resources/js/app.tsx'])
         @inertiaHead
