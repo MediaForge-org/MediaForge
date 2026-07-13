@@ -24,6 +24,7 @@ use Illuminate\Support\Carbon;
  * @property string $health_status
  * @property string|null $health_detail
  * @property Carbon|null $last_healthy_at
+ * @property Carbon|null $last_checked_at
  */
 class ConnectorInstance extends Model
 {
@@ -40,6 +41,7 @@ class ConnectorInstance extends Model
             'settings' => 'array',
             'enabled' => 'boolean',
             'last_healthy_at' => 'datetime',
+            'last_checked_at' => 'datetime',
         ];
     }
 

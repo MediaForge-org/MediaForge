@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace App\Connectors\Jellyfin;
 
+use App\Connectors\Sdk\Registry\ConnectorRegistry;
 use Illuminate\Support\ServiceProvider;
 
 /**
- * Registers the Jellyfin connector manifest, client and diagnostics with the
- * Connector SDK registry. Implemented in the connector milestone (M6).
+ * Registers the Jellyfin connector with the Connector SDK registry. V1 Package C
+ * ships the connection test only; sync/diagnostics runtime is later.
  */
 final class JellyfinConnectorServiceProvider extends ServiceProvider
 {
@@ -19,6 +20,7 @@ final class JellyfinConnectorServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        //
+        $this->app->make(ConnectorRegistry::class)
+            ->register($this->app->make(JellyfinConnector::class));
     }
 }
