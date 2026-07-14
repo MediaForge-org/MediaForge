@@ -7,13 +7,18 @@
 
         <title inertia>{{ config('app.name', 'MediaForge') }}</title>
 
-        {{-- Set the theme before first paint to avoid a flash of the wrong theme. --}}
+        {{-- Set appearance + design preset before first paint to avoid a flash. --}}
         <script>
             (function () {
+                var root = document.documentElement;
                 var stored = localStorage.getItem('mediaforge.theme');
                 var dark = stored === 'dark' || ((stored === null || stored === 'system') &&
                     window.matchMedia('(prefers-color-scheme: dark)').matches);
-                document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+                root.setAttribute('data-theme', dark ? 'dark' : 'light');
+
+                var presets = ['neon-command', 'streaming-os', 'glass-workspace', 'holographic-console', 'hybrid'];
+                var preset = localStorage.getItem('mediaforge.preset');
+                root.setAttribute('data-design-preset', presets.indexOf(preset) !== -1 ? preset : 'hybrid');
             })();
         </script>
 
@@ -25,7 +30,7 @@
         @vite(['resources/css/app.css', 'resources/js/app.tsx'])
         @inertiaHead
     </head>
-    <body class="min-h-screen bg-surface text-fg antialiased">
+    <body class="antialiased">
         @inertia
     </body>
 </html>
