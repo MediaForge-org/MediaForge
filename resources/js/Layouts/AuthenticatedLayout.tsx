@@ -2,135 +2,154 @@ import { Link, useForm, usePage } from '@inertiajs/react';
 import type { FormEvent, ReactNode } from 'react';
 
 import NavLink from '@/Components/NavLink';
+import Badge from '@/Components/UI/Badge';
+import Button from '@/Components/UI/Button';
+import { ConnectorsIcon, DashboardIcon, LibraryIcon, ServerIcon, SettingsIcon } from '@/Components/UI/Icon';
+import PresetSelector from '@/Components/UI/PresetSelector';
+import ThemeToggle from '@/Components/UI/ThemeToggle';
 
 interface SharedPageProps {
     [key: string]: unknown;
-    auth: {
-        user: {
-            email: string;
-            name: string;
-        } | null;
-    };
+    auth: { user: { email: string; name: string } | null };
 }
 
-interface AuthenticatedLayoutProps {
-    children: ReactNode;
+const NAV = [
+    { href: '/dashboard', label: 'Dashboard', icon: <DashboardIcon className="size-4" /> },
+    { href: '/connectors', label: 'Connectors', icon: <ConnectorsIcon className="size-4" /> },
+    { href: '/settings', label: 'Settings', icon: <SettingsIcon className="size-4" /> },
+];
+
+const FUTURE = [
+    { label: 'Jellyfin', icon: <ServerIcon className="size-4" /> },
+    { label: 'Audiobookshelf', icon: <ServerIcon className="size-4" /> },
+    { label: 'Library Overview', icon: <LibraryIcon className="size-4" /> },
+    { label: 'Review Tasks', icon: <DashboardIcon className="size-4" /> },
+];
+
+function breadcrumb(url: string): [string, string] {
+    if (url.startsWith('/connectors/jellyfin')) return ['Connectors', 'Jellyfin'];
+    if (url.startsWith('/connectors/audiobookshelf')) return ['Connectors', 'Audiobookshelf'];
+    if (url.startsWith('/connectors')) return ['Connectors', 'Providers'];
+    if (url.startsWith('/settings')) return ['Settings', 'Foundation'];
+    return ['Dashboard', 'Local workspace'];
 }
 
-export default function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
+function Brand({ subtitle = true }: { subtitle?: boolean }) {
+    return (
+        <Link className="flex items-center gap-3" href="/dashboard">
+            <span className="mf-orb size-10 rounded-[--radius-md] text-base font-bold">M</span>
+            <span>
+                <span className="mf-gradient-text block text-lg font-semibold tracking-tight">MediaForge</span>
+                {subtitle && <span className="block text-xs text-fg-subtle">Local Media OS</span>}
+            </span>
+        </Link>
+    );
+}
+
+export default function AuthenticatedLayout({ children }: { children: ReactNode }) {
     const form = useForm<Record<string, never>>({});
     const { auth } = usePage<SharedPageProps>().props;
     const { url } = usePage();
+    const [crumbA, crumbB] = breadcrumb(url);
+    const initial = auth.user?.name?.charAt(0).toUpperCase() ?? 'M';
 
     function logout(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
         form.post('/logout');
     }
 
+    const NavList = () =>
+        NAV.map((item) => (
+            <NavLink active={url.startsWith(item.href)} href={item.href} icon={item.icon} key={item.href}>
+                {item.label}
+            </NavLink>
+        ));
+
     return (
-        <div className="min-h-screen bg-surface text-fg lg:flex">
-            <aside className="hidden w-72 shrink-0 border-r border-line bg-surface-raised lg:sticky lg:top-0 lg:flex lg:h-screen lg:flex-col">
-                <div className="border-b border-line p-6">
-                    <Link className="flex items-center gap-3 font-semibold tracking-tight" href="/dashboard">
-                        <span className="grid size-10 place-items-center rounded-[--radius-md] bg-accent text-base font-bold text-on-accent">
-                            M
-                        </span>
-                        <span>
-                            <span className="block text-lg">MediaForge</span>
-                            <span className="block text-xs font-normal text-fg-muted">Local media workspace</span>
-                        </span>
-                    </Link>
+        <div className="app-shell">
+            <aside className="app-sidebar">
+                <div className="flex h-24 items-center border-b border-[var(--sidebar-border)] px-6">
+                    <Brand />
                 </div>
 
-                <nav aria-label="Primary navigation" className="flex flex-1 flex-col gap-7 p-4">
+                <nav aria-label="Primary navigation" className="flex flex-1 flex-col gap-7 overflow-y-auto p-4">
                     <div>
-                        <p className="px-3 text-xs font-semibold uppercase tracking-[0.16em] text-fg-muted">Workspace</p>
+                        <p className="px-3 text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-fg-subtle">Workspace</p>
                         <div className="mt-2 grid gap-1">
-                            <NavLink active={url.startsWith('/dashboard')} href="/dashboard">
-                                Dashboard
-                            </NavLink>
-                            <NavLink active={url.startsWith('/connectors')} href="/connectors">
-                                Connectors
-                            </NavLink>
-                            <NavLink active={url.startsWith('/settings')} href="/settings">
-                                Settings
-                            </NavLink>
+                            <NavList />
                         </div>
                     </div>
 
                     <div>
-                        <p className="px-3 text-xs font-semibold uppercase tracking-[0.16em] text-fg-muted">Coming soon</p>
-                        <div className="mt-2 grid gap-1" aria-label="Planned MediaForge areas">
-                            {['Library Overview', 'Review Tasks'].map((label) => (
+                        <p className="px-3 text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-fg-subtle">Future engine areas</p>
+                        <div aria-label="Planned MediaForge areas" className="mt-2 grid gap-1">
+                            {FUTURE.map((item) => (
                                 <span
                                     aria-disabled="true"
-                                    className="flex cursor-not-allowed items-center justify-between rounded-[--radius-sm] px-3 py-2 text-sm text-fg-muted opacity-70"
-                                    key={label}
+                                    className="flex cursor-not-allowed items-center justify-between rounded-[--radius-md] px-3 py-2 text-sm text-fg-subtle"
+                                    key={item.label}
                                 >
-                                    {label}
-                                    <span className="rounded-full bg-surface-sunken px-2 py-0.5 text-[0.65rem] font-medium uppercase tracking-wide">
-                                        Later V1
+                                    <span className="flex items-center gap-3">
+                                        <span className="opacity-60">{item.icon}</span>
+                                        {item.label}
                                     </span>
+                                    <Badge tone="neutral">Later</Badge>
                                 </span>
                             ))}
                         </div>
                     </div>
                 </nav>
 
-                <div className="border-t border-line p-4">
+                <div className="border-t border-[var(--sidebar-border)] p-4">
                     {auth.user && (
-                        <div className="mb-4 rounded-[--radius-md] bg-surface-sunken p-3 text-sm">
-                            <p className="truncate font-medium">{auth.user.name}</p>
-                            <p className="mt-1 truncate text-fg-muted">{auth.user.email}</p>
+                        <div className="mf-panel mb-3 flex items-center gap-3 p-3">
+                            <span className="mf-orb size-9 rounded-full text-sm font-semibold">{initial}</span>
+                            <div className="min-w-0 text-sm">
+                                <p className="truncate font-medium">{auth.user.name}</p>
+                                <p className="truncate text-xs text-fg-muted">{auth.user.email}</p>
+                            </div>
                         </div>
                     )}
                     <form onSubmit={logout}>
-                        <button
-                            className="w-full rounded-[--radius-sm] border border-line px-3 py-2 text-sm font-medium transition-colors hover:bg-surface-sunken disabled:cursor-not-allowed disabled:opacity-60"
-                            disabled={form.processing}
-                            type="submit"
-                        >
+                        <Button className="w-full" loading={form.processing} type="submit" variant="secondary">
                             Sign out
-                        </button>
+                        </Button>
                     </form>
                 </div>
             </aside>
 
-            <div className="min-w-0 flex-1">
-                <header className="border-b border-line bg-surface-raised lg:hidden">
-                    <div className="flex flex-col gap-3 px-5 py-4">
-                        <div className="flex items-center justify-between gap-4">
-                            <Link className="flex items-center gap-2 font-semibold tracking-tight" href="/dashboard">
-                                <span className="grid size-8 place-items-center rounded-[--radius-sm] bg-accent text-sm font-bold text-on-accent">
-                                    M
-                                </span>
-                                MediaForge
-                            </Link>
-                            <form onSubmit={logout}>
-                                <button
-                                    className="rounded-[--radius-sm] border border-line px-3 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-60"
-                                    disabled={form.processing}
-                                    type="submit"
-                                >
-                                    Sign out
-                                </button>
-                            </form>
-                        </div>
-                        <nav aria-label="Primary navigation" className="flex gap-1 overflow-x-auto">
-                            <NavLink active={url.startsWith('/dashboard')} href="/dashboard">
-                                Dashboard
-                            </NavLink>
-                            <NavLink active={url.startsWith('/connectors')} href="/connectors">
-                                Connectors
-                            </NavLink>
-                            <NavLink active={url.startsWith('/settings')} href="/settings">
-                                Settings
-                            </NavLink>
-                        </nav>
+            <div className="app-main">
+                <header className="app-topbar mf-desktop-only">
+                    <div className="flex items-center gap-2 text-sm">
+                        <span className="font-semibold">{crumbA}</span>
+                        <span className="text-fg-subtle">/</span>
+                        <span className="text-fg-muted">{crumbB}</span>
+                    </div>
+                    <div className="flex items-center gap-2.5">
+                        <span className="mf-status-pill mf-desktop-only">
+                            <span className="size-2 rounded-full bg-success shadow-[0_0_8px_rgb(var(--status-success))]" />
+                            Local runtime online
+                        </span>
+                        <Badge tone="accent">V1</Badge>
+                        <ThemeToggle />
+                        <PresetSelector />
                     </div>
                 </header>
 
-                <main className="mx-auto w-full max-w-7xl px-5 py-7 sm:px-8 sm:py-10">{children}</main>
+                <header className="mf-mobile-topbar mf-mobile-only">
+                    <div className="flex items-center justify-between gap-3 px-4 py-3">
+                        <Brand subtitle={false} />
+                        <div className="flex items-center gap-2">
+                            <ThemeToggle />
+                            <PresetSelector />
+                        </div>
+                    </div>
+                    <nav aria-label="Primary navigation" className="flex gap-1 overflow-x-auto px-4 pb-3">
+                        <NavList />
+                    </nav>
+                </header>
+
+                <main className="app-content">{children}</main>
             </div>
         </div>
     );

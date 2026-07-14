@@ -1,5 +1,5 @@
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
-import { type FormEvent, useState } from 'react';
+import { type CSSProperties, type FormEvent, useState } from 'react';
 
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import {
@@ -8,6 +8,12 @@ import {
     formatCheckedAt,
     StatusBadge,
 } from '@/Components/Connectors/ConnectorStatus';
+import Alert from '@/Components/UI/Alert';
+import Badge from '@/Components/UI/Badge';
+import Button from '@/Components/UI/Button';
+import EmptyState from '@/Components/UI/EmptyState';
+import { CheckIcon, LibraryIcon } from '@/Components/UI/Icon';
+import TextField from '@/Components/UI/TextField';
 
 interface ConnectorShowProps {
     [key: string]: unknown;
@@ -15,16 +21,27 @@ interface ConnectorShowProps {
     flash: { success: string | null; error: string | null };
 }
 
+const SECRET_FACTS = [
+    'Token encrypted at rest',
+    'Token never rendered',
+    'Token never audited',
+    'Token sent only as auth header',
+    'Short timeouts enabled',
+];
+
 export default function ConnectorShow() {
     const { connector, flash } = usePage<ConnectorShowProps>().props;
     const [testing, setTesting] = useState(false);
     const [discovering, setDiscovering] = useState(false);
+    const [savingId, setSavingId] = useState<string | null>(null);
 
     const form = useForm<{ base_url: string; secret: string; clear_secret: boolean }>({
         base_url: connector.base_url,
         secret: '',
         clear_secret: false,
     });
+
+    const baseHint = connector.key === 'jellyfin' ? 'Example: http://jellyfin:8096' : 'Example: http://audiobookshelf:80';
 
     function submit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
@@ -36,25 +53,20 @@ export default function ConnectorShow() {
 
     function runTest() {
         setTesting(true);
-        router.post(`/connectors/${connector.key}/test`, {}, {
-            preserveScroll: true,
-            onFinish: () => setTesting(false),
-        });
+        router.post(`/connectors/${connector.key}/test`, {}, { preserveScroll: true, onFinish: () => setTesting(false) });
     }
 
     function runDiscover() {
         setDiscovering(true);
-        router.post(`/connectors/${connector.key}/libraries/discover`, {}, {
-            preserveScroll: true,
-            onFinish: () => setDiscovering(false),
-        });
+        router.post(`/connectors/${connector.key}/libraries/discover`, {}, { preserveScroll: true, onFinish: () => setDiscovering(false) });
     }
 
     function toggleLibrary(library: DiscoveredLibrary) {
+        setSavingId(library.id);
         router.post(
             `/connectors/${connector.key}/libraries/${library.id}/selection`,
             { enabled: !library.is_enabled },
-            { preserveScroll: true },
+            { preserveScroll: true, onFinish: () => setSavingId(null) },
         );
     }
 
@@ -63,193 +75,167 @@ export default function ConnectorShow() {
             <Head title={`${connector.label} connector`} />
 
             <AuthenticatedLayout>
-                <section className="flex max-w-3xl flex-col gap-6">
-                    <div>
-                        <Link className="text-sm font-medium text-accent hover:text-accent-hover" href="/connectors">
-                            ← Connectors
-                        </Link>
-                        <div className="mt-2 flex items-center justify-between gap-4">
-                            <h1 className="text-3xl font-semibold tracking-tight">{connector.label}</h1>
+                <div className="mf-grid">
+                    <header className="mf-col-12 mf-rise flex flex-wrap items-end justify-between gap-4">
+                        <div>
+                            <div className="flex items-center gap-2 text-sm">
+                                <Link className="text-fg-muted transition-colors hover:text-fg" href="/connectors">Connectors</Link>
+                                <span className="text-fg-subtle">/</span>
+                                <span className="text-fg-muted">{connector.label}</span>
+                            </div>
+                            <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">{connector.label} Connector</h1>
+                            <p className="mt-2 text-fg-muted">Configure, test and discover libraries. No media sync in V1.</p>
+                        </div>
+                        <div className="flex items-center gap-2">
                             <StatusBadge status={connector.status} />
+                            <Badge tone={connector.secret_configured ? 'success' : 'neutral'}>
+                                {connector.secret_configured ? 'Configured' : 'Not configured'}
+                            </Badge>
                         </div>
-                        <p className="mt-2 text-fg-muted">
-                            Store the server address and API key, test the connection, then discover the available libraries.
-                            Discovery only — no media sync in V1 D.
-                        </p>
-                    </div>
+                    </header>
 
-                    {flash.success && (
-                        <p className="rounded-[--radius-md] border border-success/40 bg-success/10 px-4 py-3 text-sm text-success">
-                            {flash.success}
-                        </p>
-                    )}
-                    {flash.error && (
-                        <p className="rounded-[--radius-md] border border-error/40 bg-error/10 px-4 py-3 text-sm text-error">
-                            {flash.error}
-                        </p>
-                    )}
+                    {flash.success && <div className="mf-col-12"><Alert tone="success">{flash.success}</Alert></div>}
+                    {flash.error && <div className="mf-col-12"><Alert tone="error">{flash.error}</Alert></div>}
 
-                    <form
-                        className="flex flex-col gap-5 rounded-[--radius-md] border border-line bg-surface-raised p-6 shadow-sm"
-                        onSubmit={submit}
-                    >
-                        <label className="block space-y-1.5 text-sm font-medium">
-                            <span>Base URL</span>
-                            <input
-                                autoComplete="off"
-                                className="w-full rounded-[--radius-sm] border border-line bg-surface px-3 py-2 text-fg outline-none focus:border-accent"
-                                name="base_url"
-                                onChange={(event) => form.setData('base_url', event.target.value)}
-                                placeholder="http://localhost:8096"
-                                required
-                                type="url"
-                                value={form.data.base_url}
-                            />
-                            {form.errors.base_url && <p className="text-sm text-error">{form.errors.base_url}</p>}
-                        </label>
-
-                        <label className="block space-y-1.5 text-sm font-medium">
-                            <span>
-                                API key / token
-                                <span className="ml-2 font-normal text-fg-muted">
-                                    {connector.secret_configured ? '(Configured)' : '(Not configured)'}
-                                </span>
-                            </span>
-                            <input
-                                autoComplete="new-password"
-                                className="w-full rounded-[--radius-sm] border border-line bg-surface px-3 py-2 text-fg outline-none focus:border-accent disabled:opacity-60"
-                                disabled={form.data.clear_secret}
-                                name="secret"
-                                onChange={(event) => form.setData('secret', event.target.value)}
-                                placeholder={connector.secret_configured ? 'Leave blank to keep the stored key' : 'Enter the API key'}
-                                type="password"
-                                value={form.data.secret}
-                            />
-                            {form.errors.secret && <p className="text-sm text-error">{form.errors.secret}</p>}
-                            <span className="block font-normal text-fg-muted">
-                                The stored key is never displayed. Leave this blank to keep it unchanged.
-                            </span>
-                        </label>
-
-                        {connector.secret_configured && (
-                            <label className="flex items-center gap-2 text-sm">
-                                <input
-                                    checked={form.data.clear_secret}
-                                    onChange={(event) => form.setData('clear_secret', event.target.checked)}
-                                    type="checkbox"
-                                />
-                                <span>Remove the stored API key</span>
-                            </label>
-                        )}
-
-                        <div className="flex flex-wrap items-center gap-2">
-                            <button
-                                className="rounded-[--radius-sm] bg-accent px-4 py-2 text-sm font-medium text-on-accent disabled:cursor-not-allowed disabled:opacity-60"
-                                disabled={form.processing}
-                                type="submit"
-                            >
-                                Save
-                            </button>
-                            <button
-                                className="rounded-[--radius-sm] border border-line px-4 py-2 text-sm font-medium transition-colors hover:bg-surface-sunken disabled:cursor-not-allowed disabled:opacity-60"
-                                disabled={!connector.configured || testing}
-                                onClick={runTest}
-                                type="button"
-                            >
-                                {testing ? 'Testing…' : 'Test connection'}
-                            </button>
-                        </div>
-                    </form>
-
-                    <div className="rounded-[--radius-md] border border-line bg-surface-sunken p-5 text-sm">
-                        <h2 className="font-semibold">Connection status</h2>
-                        <dl className="mt-3 grid gap-2 text-fg-muted">
-                            <div className="flex justify-between gap-4">
-                                <dt>Health</dt>
-                                <dd><StatusBadge status={connector.status} /></dd>
-                            </div>
-                            <div className="flex justify-between gap-4">
-                                <dt>Last checked</dt>
-                                <dd>{formatCheckedAt(connector.last_checked_at)}</dd>
-                            </div>
-                            {connector.health_detail && (
-                                <div className="flex justify-between gap-4">
-                                    <dt>Detail</dt>
-                                    <dd className="text-right text-fg">{connector.health_detail}</dd>
-                                </div>
-                            )}
-                        </dl>
-                        <p className="mt-4 text-fg-muted">Connection test only — no library sync, scan, or media import runs in V1 D.</p>
-                    </div>
-
-                    <div className="rounded-[--radius-md] border border-line bg-surface-raised p-6 shadow-sm">
-                        <div className="flex flex-wrap items-start justify-between gap-4">
-                            <div>
-                                <h2 className="text-xl font-semibold tracking-tight">Libraries</h2>
-                                <p className="mt-1 text-sm text-fg-muted">
-                                    {connector.libraries_discovered_at
-                                        ? `Last discovered ${formatCheckedAt(connector.libraries_discovered_at)}.`
-                                        : 'Not discovered yet.'}{' '}
-                                    Discovery only. No media sync in V1 D.
-                                </p>
-                            </div>
-                            <button
-                                className="rounded-[--radius-sm] bg-accent px-4 py-2 text-sm font-medium text-on-accent disabled:cursor-not-allowed disabled:opacity-60"
-                                disabled={!connector.configured || discovering}
-                                onClick={runDiscover}
-                                type="button"
-                            >
-                                {discovering ? 'Discovering…' : 'Discover libraries'}
-                            </button>
-                        </div>
-
-                        {connector.last_discovery_error && (
-                            <p className="mt-4 rounded-[--radius-sm] border border-error/40 bg-error/10 px-3 py-2 text-sm text-error">
-                                Last discovery failed: {connector.last_discovery_error}
+                    {/* Left column */}
+                    <div className="mf-col-7 mf-rise flex flex-col gap-6" style={{ '--mf-i': 1 } as CSSProperties}>
+                        <div className="mf-panel p-6">
+                            <h2 className="text-lg font-semibold tracking-tight">Connection</h2>
+                            <p className="mt-1 text-sm text-fg-muted">
+                                Base URL and API token are used only for connection tests and library discovery.
                             </p>
-                        )}
+                            <form className="mt-5 flex flex-col gap-5" onSubmit={submit}>
+                                <TextField
+                                    autoComplete="off"
+                                    error={form.errors.base_url}
+                                    hint={baseHint}
+                                    label="Base URL"
+                                    name="base_url"
+                                    onChange={(event) => form.setData('base_url', event.target.value)}
+                                    placeholder={baseHint.replace('Example: ', '')}
+                                    required
+                                    type="url"
+                                    value={form.data.base_url}
+                                />
+                                <TextField
+                                    autoComplete="new-password"
+                                    disabled={form.data.clear_secret}
+                                    error={form.errors.secret}
+                                    hint="Stored encrypted. Existing token is never shown."
+                                    label="API Token"
+                                    name="secret"
+                                    onChange={(event) => form.setData('secret', event.target.value)}
+                                    placeholder={connector.secret_configured ? 'Leave blank to keep the stored token' : 'Enter the API token'}
+                                    type="password"
+                                    value={form.data.secret}
+                                />
+                                <div className="flex items-center justify-between gap-3 rounded-[--radius-md] bg-[var(--nav-hover-bg)] px-3.5 py-2.5 text-sm">
+                                    <span className="text-fg-muted">Secret status</span>
+                                    <Badge dot tone={connector.secret_configured ? 'success' : 'neutral'}>
+                                        {connector.secret_configured ? 'Secret configured' : 'No secret configured'}
+                                    </Badge>
+                                </div>
+                                {connector.secret_configured && (
+                                    <label className="flex w-fit items-center gap-2 text-sm text-fg-muted">
+                                        <input checked={form.data.clear_secret} onChange={(event) => form.setData('clear_secret', event.target.checked)} type="checkbox" />
+                                        <span>Clear stored secret on save</span>
+                                    </label>
+                                )}
+                                <div className="flex flex-wrap items-center gap-2 border-t border-[var(--panel-border)] pt-5">
+                                    <Button loading={form.processing} type="submit">Save configuration</Button>
+                                </div>
+                            </form>
+                        </div>
 
-                        {!connector.configured && (
-                            <p className="mt-4 text-sm text-fg-muted">Configure and connect this connector to discover its libraries.</p>
-                        )}
+                        <div className="mf-panel p-6">
+                            <div className="flex flex-wrap items-start justify-between gap-3">
+                                <div>
+                                    <h2 className="text-lg font-semibold tracking-tight">Discovered Libraries</h2>
+                                    <p className="mt-1 text-sm text-fg-muted">Discovery only. No media sync in V1 D.</p>
+                                </div>
+                                <Button disabled={!connector.configured} loading={discovering} onClick={runDiscover} variant="secondary">
+                                    Discover libraries
+                                </Button>
+                            </div>
 
-                        {connector.libraries.length > 0 ? (
-                            <ul className="mt-5 divide-y divide-line">
-                                {connector.libraries.map((library) => (
-                                    <li className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between" key={library.id}>
-                                        <div className="min-w-0">
-                                            <div className="flex items-center gap-2">
-                                                <p className="truncate font-medium">{library.name}</p>
-                                                {library.type && (
-                                                    <span className="rounded-full bg-surface-sunken px-2 py-0.5 text-xs text-fg-muted">
-                                                        {library.type}
-                                                    </span>
-                                                )}
-                                                {library.discovery_status === 'missing' && (
-                                                    <span className="rounded-full bg-error/10 px-2 py-0.5 text-xs text-error">Missing</span>
-                                                )}
-                                            </div>
-                                            <p className="mt-1 truncate font-mono text-xs text-fg-muted">{library.external_id}</p>
-                                            <p className="mt-0.5 text-xs text-fg-muted">Last seen: {formatCheckedAt(library.last_seen_at)}</p>
-                                        </div>
-                                        <label className="flex shrink-0 items-center gap-2 text-sm">
-                                            <input
-                                                checked={library.is_enabled}
-                                                onChange={() => toggleLibrary(library)}
-                                                type="checkbox"
-                                            />
-                                            <span>Enable for later sync</span>
-                                        </label>
+                            {connector.last_discovery_error && (
+                                <Alert className="mt-4" tone="error">Last discovery failed: {connector.last_discovery_error}</Alert>
+                            )}
+
+                            <div className="mt-5">
+                                {!connector.configured ? (
+                                    <EmptyState description="Configure and connect this connector to discover its libraries." icon={<LibraryIcon className="size-5" />} title="Not configured yet" />
+                                ) : connector.libraries.length === 0 ? (
+                                    <EmptyState
+                                        action={<Button loading={discovering} onClick={runDiscover} size="sm" variant="secondary">Discover libraries</Button>}
+                                        description="Run discovery to list the libraries this server exposes. Nothing is synced or imported."
+                                        icon={<LibraryIcon className="size-5" />}
+                                        title="No libraries discovered yet"
+                                    />
+                                ) : (
+                                    <ul className="divide-y divide-[var(--panel-border)]">
+                                        {connector.libraries.map((library) => (
+                                            <li className="flex flex-col gap-3 py-4 first:pt-0 sm:flex-row sm:items-center sm:justify-between" key={library.id}>
+                                                <div className="min-w-0">
+                                                    <div className="flex flex-wrap items-center gap-2">
+                                                        <p className="truncate font-medium">{library.name}</p>
+                                                        {library.type && <Badge tone="neutral">{library.type}</Badge>}
+                                                        {library.discovery_status === 'missing' && <Badge tone="error">Missing</Badge>}
+                                                    </div>
+                                                    <p className="mt-1 truncate font-mono text-xs text-fg-subtle">{library.external_id}</p>
+                                                    <p className="mt-0.5 text-xs text-fg-subtle">Last seen {formatCheckedAt(library.last_seen_at)}</p>
+                                                </div>
+                                                <label className="flex shrink-0 items-center gap-2 text-sm text-fg-muted">
+                                                    <input checked={library.is_enabled} disabled={savingId === library.id} onChange={() => toggleLibrary(library)} type="checkbox" />
+                                                    <span>Enable for later sync</span>
+                                                </label>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Right column */}
+                    <div className="mf-col-5 mf-rise flex flex-col gap-6" style={{ '--mf-i': 2 } as CSSProperties}>
+                        <div className="mf-panel p-6">
+                            <h2 className="text-sm font-semibold uppercase tracking-wide text-fg-subtle">Connection Health</h2>
+                            <div className="mt-3"><StatusBadge status={connector.status} /></div>
+                            <dl className="mt-4 grid gap-2 text-sm">
+                                <div className="flex justify-between gap-4"><dt className="text-fg-muted">Last checked</dt><dd className="font-medium">{formatCheckedAt(connector.last_checked_at)}</dd></div>
+                                {connector.health_detail && <div className="flex justify-between gap-4"><dt className="text-fg-muted">Detail</dt><dd className="text-right font-medium">{connector.health_detail}</dd></div>}
+                            </dl>
+                            <div className="mt-4">
+                                <Button className="w-full" disabled={!connector.configured} loading={testing} onClick={runTest} variant="secondary">Test connection</Button>
+                            </div>
+                            <p className="mt-3 text-xs text-fg-subtle">No network calls happen during page render. Tests run only when triggered.</p>
+                        </div>
+
+                        <div className="mf-panel p-6">
+                            <h2 className="text-sm font-semibold uppercase tracking-wide text-fg-subtle">Secret Protection</h2>
+                            <ul className="mt-3 grid gap-2 text-sm">
+                                {SECRET_FACTS.map((fact) => (
+                                    <li className="flex items-center gap-2" key={fact}>
+                                        <CheckIcon className="size-4 text-success" />
+                                        <span className="text-fg-muted">{fact}</span>
                                     </li>
                                 ))}
                             </ul>
-                        ) : (
-                            connector.configured && (
-                                <p className="mt-5 text-sm text-fg-muted">No libraries discovered yet. Click “Discover libraries”.</p>
-                            )
-                        )}
+                        </div>
+
+                        <div className="mf-panel p-6">
+                            <div className="flex items-center gap-2">
+                                <h2 className="text-sm font-semibold uppercase tracking-wide text-fg-subtle">Future integrated engine</h2>
+                                <Badge tone="neutral">Later</Badge>
+                            </div>
+                            <p className="mt-3 text-sm text-fg-muted">
+                                Later, Jellyfin/Audiobookshelf may become first-class MediaForge engine areas. This connector
+                                remains compatibility mode.
+                            </p>
+                        </div>
                     </div>
-                </section>
+                </div>
             </AuthenticatedLayout>
         </>
     );

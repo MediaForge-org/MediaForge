@@ -1,12 +1,16 @@
 import { Head, Link, usePage } from '@inertiajs/react';
+import type { CSSProperties, ReactNode } from 'react';
 
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import {
     type ConnectorSummary,
-    discoverySummary,
     formatCheckedAt,
     StatusBadge,
 } from '@/Components/Connectors/ConnectorStatus';
+import Badge, { type BadgeTone } from '@/Components/UI/Badge';
+import { buttonClasses } from '@/Components/UI/Button';
+import { LibraryIcon, ServerIcon, SettingsIcon, ShieldIcon } from '@/Components/UI/Icon';
+import StatCard, { type StatTone } from '@/Components/UI/StatCard';
 
 interface DashboardPageProps {
     [key: string]: unknown;
@@ -14,127 +18,160 @@ interface DashboardPageProps {
     connectors: ConnectorSummary[];
 }
 
-const upcomingAreas = [
-    ['Library Health', 'Coming later.'],
-    ['Review Tasks', 'Coming later.'],
+const NEXT_ACTIONS: { label: string; tone: BadgeTone; badge: string }[] = [
+    { label: 'Configure connectors', tone: 'accent', badge: 'Current' },
+    { label: 'Discover libraries', tone: 'accent', badge: 'Current' },
+    { label: 'Review metadata localization', tone: 'neutral', badge: 'Later V1' },
+    { label: 'Sync foundation', tone: 'neutral', badge: 'Future' },
+];
+
+const ROADMAP: { id: string; label: string; done: boolean }[] = [
+    { id: 'V1 A', label: 'Auth', done: true },
+    { id: 'V1 B', label: 'App Shell', done: true },
+    { id: 'V1 C', label: 'Connectors', done: true },
+    { id: 'V1 D', label: 'Library Discovery', done: true },
+    { id: 'V1 E', label: 'UI / UX', done: true },
+    { id: 'V1 F', label: 'Sync Foundation', done: false },
 ];
 
 export default function Dashboard() {
     const { status, connectors } = usePage<DashboardPageProps>().props;
+    const find = (key: string) => connectors.find((c) => c.key === key);
+    const libraryTotal = connectors.reduce((sum, c) => sum + c.library_count, 0);
+
+    const statusCards: { label: string; value: string; hint: string; tone: StatTone; icon: ReactNode }[] = [
+        { label: 'Auth System', value: 'Authenticated', hint: 'Local session active', tone: 'success', icon: <ShieldIcon className="size-5" /> },
+        { label: 'Local Server', value: 'Online', hint: 'Application responding', tone: 'success', icon: <ServerIcon className="size-5" /> },
+        { label: 'Settings', value: 'Read-only', hint: 'Foundation', tone: 'neutral', icon: <SettingsIcon className="size-5" /> },
+        { label: 'Library Discovery', value: `${libraryTotal} found`, hint: 'Local', tone: libraryTotal > 0 ? 'accent' : 'neutral', icon: <LibraryIcon className="size-5" /> },
+    ];
 
     return (
         <>
             <Head title="Dashboard" />
 
             <AuthenticatedLayout>
-                <section className="flex flex-col gap-8">
-                    <div className="rounded-[--radius-md] border border-line bg-surface-raised p-6 shadow-sm sm:p-8">
-                        <div>
-                            <p className="text-sm font-medium text-accent">{status}</p>
-                            <h1 className="mt-1 text-3xl font-semibold tracking-tight sm:text-4xl">Your MediaForge workspace</h1>
-                            <p className="mt-2 max-w-2xl text-fg-muted">
-                                A local control surface for your media ecosystem. The foundation is live; integrations and operational workflows are deliberately staged for later V1 packages.
+                <div className="mf-grid">
+                    {/* Hero */}
+                    <section className="mf-hero mf-dash-hero mf-col-12 mf-rise relative grid items-center gap-8 p-8 lg:grid-cols-[1.35fr_0.85fr] xl:gap-12 xl:p-12">
+                        <div className="mf-glow -left-16 -top-24 size-80 bg-accent/25" />
+                        <div className="mf-glow right-1/4 top-1/2 size-80 bg-accent-2/20" />
+                        <div className="relative flex flex-col items-start gap-5">
+                            <span className="mf-status-pill">{status} · MediaForge V1 Workspace</span>
+                            <h1 className="text-4xl font-semibold leading-[1.05] tracking-tight sm:text-5xl xl:text-6xl">
+                                Command your local <span className="mf-gradient-text">media engines</span>
+                            </h1>
+                            <p className="max-w-xl text-base text-fg-muted xl:text-lg">
+                                Configure connectors, verify health and discover libraries from one workspace. Sync and media
+                                import arrive in a later V1 package.
                             </p>
-                        </div>
-                    </div>
-
-                    <section aria-label="Foundation status">
-                        <div className="mb-4">
-                            <h2 className="text-xl font-semibold tracking-tight">Foundation status</h2>
-                            <p className="mt-1 text-sm text-fg-muted">A quick view of the local app before connector packages are enabled.</p>
-                        </div>
-                        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                            <article className="rounded-[--radius-md] border border-line bg-surface-raised p-5 shadow-sm">
-                                <p className="text-sm text-fg-muted">V1 Foundation Status</p>
-                                <p className="mt-2 text-lg font-semibold">Ready</p>
-                                <p className="mt-1 flex items-center gap-2 text-sm text-success">
-                                    <span className="size-2 rounded-full bg-success" /> Core shell is available
-                                </p>
-                            </article>
-                            <article className="rounded-[--radius-md] border border-line bg-surface-raised p-5 shadow-sm">
-                                <p className="text-sm text-fg-muted">Auth Status</p>
-                                <p className="mt-2 text-lg font-semibold">Authenticated</p>
-                                <p className="mt-1 flex items-center gap-2 text-sm text-success">
-                                    <span className="size-2 rounded-full bg-success" /> Local session active
-                                </p>
-                            </article>
-                            <article className="rounded-[--radius-md] border border-line bg-surface-raised p-5 shadow-sm">
-                                <p className="text-sm text-fg-muted">Local Server Status</p>
-                                <p className="mt-2 text-lg font-semibold">Online</p>
-                                <p className="mt-1 flex items-center gap-2 text-sm text-success">
-                                    <span className="size-2 rounded-full bg-success" /> Application responding
-                                </p>
-                            </article>
-                            <article className="rounded-[--radius-md] border border-line bg-surface-raised p-5 shadow-sm">
-                                <p className="text-sm text-fg-muted">Settings Status</p>
-                                <p className="mt-2 text-lg font-semibold">Read-only</p>
-                                <p className="mt-1 text-sm text-fg-muted">Typed defaults are visible.</p>
-                            </article>
-                        </div>
-                    </section>
-
-                    <section aria-label="Connector status">
-                        <div className="mb-4 flex items-end justify-between gap-4">
-                            <div>
-                                <h2 className="text-xl font-semibold tracking-tight">Connectors</h2>
-                                <p className="mt-1 text-sm text-fg-muted">Configure, test, and discover libraries. No media sync in V1.</p>
+                            <div className="mt-2 flex flex-wrap gap-3">
+                                <Link className={buttonClasses('primary')} href="/connectors">Open connectors</Link>
+                                <Link className={buttonClasses('secondary')} href="/settings">View settings</Link>
                             </div>
-                            <Link className="text-sm font-medium text-accent hover:text-accent-hover" href="/connectors">
-                                Manage
-                            </Link>
                         </div>
-                        <div className="grid gap-4 sm:grid-cols-2">
-                            {connectors.map((connector) => (
-                                <Link
-                                    className="flex flex-col gap-3 rounded-[--radius-md] border border-line bg-surface-raised p-5 shadow-sm transition-colors hover:border-accent"
-                                    href={`/connectors/${connector.key}`}
-                                    key={connector.key}
-                                >
-                                    <div className="flex items-start justify-between gap-4">
-                                        <h3 className="font-semibold">{connector.label}</h3>
-                                        <StatusBadge status={connector.status} />
-                                    </div>
-                                    <p className="text-sm text-fg-muted">
-                                        {connector.health_detail
-                                            ?? (connector.configured ? 'Configured — not checked yet.' : 'Not configured yet.')}
-                                    </p>
-                                    <p className="text-xs text-fg-muted">
-                                        {discoverySummary(connector)} · Last checked: {formatCheckedAt(connector.last_checked_at)}
-                                    </p>
-                                </Link>
+
+                        {/* Engine radar widget (visual, from aggregates) */}
+                        <div className="mf-panel relative flex flex-col gap-3.5 p-6 xl:p-7">
+                            <div className="flex items-center justify-between">
+                                <p className="text-sm font-semibold">Engine radar</p>
+                                <span className="mf-pulse size-2.5 rounded-full bg-success shadow-[0_0_10px_rgb(var(--status-success))]" />
+                            </div>
+                            {[find('jellyfin'), find('audiobookshelf')].map((c, idx) => (
+                                <div className="flex items-center justify-between gap-3 text-sm" key={idx}>
+                                    <span className="text-fg-muted">{c?.label ?? (idx === 0 ? 'Jellyfin' : 'Audiobookshelf')}</span>
+                                    <StatusBadge status={c?.status ?? 'not_configured'} />
+                                </div>
+                            ))}
+                            <div className="flex items-center justify-between gap-3 border-t border-[var(--panel-border)] pt-3 text-sm">
+                                <span className="text-fg-muted">Libraries</span>
+                                <span className="font-semibold">{libraryTotal}</span>
+                            </div>
+                            <div className="flex items-center justify-between gap-3 text-sm">
+                                <span className="text-fg-muted">Local runtime</span>
+                                <span className="font-medium text-success">Online</span>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* Status cards */}
+                    <section className="mf-col-12 mf-rise" style={{ '--mf-i': 1 } as CSSProperties}>
+                        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                            {statusCards.map((card) => (
+                                <StatCard hint={card.hint} icon={card.icon} key={card.label} label={card.label} tone={card.tone} value={card.value} />
                             ))}
                         </div>
                     </section>
 
-                    <section className="rounded-[--radius-md] border border-line bg-surface-sunken p-5 sm:p-6">
-                        <h2 className="text-xl font-semibold tracking-tight">What happens next</h2>
-                        <p className="mt-2 max-w-3xl text-sm text-fg-muted">
-                            Library reporting and review workflows will be introduced as separate V1 packages. The navigation keeps those future areas visible without presenting unavailable actions as links.
-                        </p>
-                    </section>
-
-                    <section>
-                        <div className="mb-4">
-                            <h2 className="text-xl font-semibold tracking-tight">Media workspace roadmap</h2>
-                            <p className="mt-1 text-sm text-fg-muted">Visible previews only — no connector data or configuration is active yet.</p>
-                        </div>
-                        <div className="grid gap-4 md:grid-cols-2">
-                            {upcomingAreas.map(([title, description]) => (
-                                <article className="rounded-[--radius-md] border border-dashed border-line bg-surface-raised p-5" key={title}>
-                                    <div className="flex items-start justify-between gap-4">
-                                        <div>
-                                            <h3 className="font-semibold">{title}</h3>
-                                            <p className="mt-2 text-sm text-fg-muted">{description}</p>
+                    {/* Engine panels — three equal columns */}
+                    <section className="mf-col-12 mf-rise" style={{ '--mf-i': 2 } as CSSProperties}>
+                        <h2 className="mb-4 text-xl font-semibold tracking-tight">Engine panels</h2>
+                        <div className="mf-grid">
+                            {['jellyfin', 'audiobookshelf'].map((key) => {
+                                const c = find(key);
+                                const label = key === 'jellyfin' ? 'Jellyfin' : 'Audiobookshelf';
+                                return (
+                                    <div className="mf-col-4" key={key}>
+                                        <div className="mf-engine-card flex h-full flex-col gap-4 p-6">
+                                            <div className="flex items-start justify-between gap-3">
+                                                <div className="flex items-center gap-3">
+                                                    <span className="grid size-11 place-items-center rounded-[--radius-md] bg-accent/10 text-accent ring-1 ring-inset ring-accent/20">
+                                                        <ServerIcon className="size-6" />
+                                                    </span>
+                                                    <div>
+                                                        <h3 className="font-semibold">{label}</h3>
+                                                        <p className="text-xs text-fg-subtle">Engine connector</p>
+                                                    </div>
+                                                </div>
+                                                <StatusBadge status={c?.status ?? 'not_configured'} />
+                                            </div>
+                                            <p className="text-sm text-fg-muted">
+                                                {c?.health_detail ?? (c?.configured ? 'Configured — not checked yet.' : 'Not configured yet.')}
+                                            </p>
+                                            <dl className="grid grid-cols-2 gap-2 border-y border-[var(--panel-border)] py-3 text-sm">
+                                                <div><dt className="text-xs text-fg-subtle">Libraries</dt><dd className="font-semibold">{c?.library_count ?? 0}</dd></div>
+                                                <div><dt className="text-xs text-fg-subtle">Last checked</dt><dd className="font-medium">{formatCheckedAt(c?.last_checked_at ?? null)}</dd></div>
+                                            </dl>
+                                            <div className="mt-auto flex flex-wrap gap-2">
+                                                <Link className={buttonClasses('secondary', 'sm')} href={`/connectors/${key}`}>Configure</Link>
+                                            </div>
                                         </div>
-                                        <span className="shrink-0 rounded-full bg-surface-sunken px-2.5 py-1 text-xs font-medium text-fg-muted">
-                                            Later V1
-                                        </span>
                                     </div>
-                                </article>
+                                );
+                            })}
+                            <div className="mf-col-4">
+                                <div className="mf-panel flex h-full flex-col p-6">
+                                    <h3 className="mb-3 font-semibold">Next actions</h3>
+                                    <div className="flex flex-col divide-y divide-[var(--panel-border)]">
+                                        {NEXT_ACTIONS.map((action) => (
+                                            <div className="flex items-center justify-between gap-3 py-3 text-sm first:pt-0" key={action.label}>
+                                                <span>{action.label}</span>
+                                                <Badge tone={action.tone}>{action.badge}</Badge>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* Roadmap strip */}
+                    <section className="mf-col-12 mf-rise" style={{ '--mf-i': 4 } as CSSProperties}>
+                        <h2 className="mb-4 text-lg font-semibold tracking-tight">Roadmap</h2>
+                        <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-6">
+                            {ROADMAP.map((step) => (
+                                <div className="mf-panel p-4" key={step.id}>
+                                    <div className="flex items-center justify-between">
+                                        <span className="font-mono text-xs text-fg-subtle">{step.id}</span>
+                                        <span className={`size-2 rounded-full ${step.done ? 'bg-success' : 'bg-fg-subtle'}`} />
+                                    </div>
+                                    <p className="mt-2 text-sm font-medium">{step.label}</p>
+                                    <p className="mt-0.5 text-xs text-fg-muted">{step.done ? 'Done' : 'Later'}</p>
+                                </div>
                             ))}
                         </div>
                     </section>
-                </section>
+                </div>
             </AuthenticatedLayout>
         </>
     );
