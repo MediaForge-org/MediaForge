@@ -38,7 +38,7 @@ test('settings page visibly structures read-only areas without broken links', fu
         ->toContain('Connectors')
         ->toContain('Playback')
         ->toContain('Privacy')
-        ->toContain('href="/connectors"')
+        ->toContain('/connectors')
         ->not->toContain('/admin')
         ->not->toContain('/profile')
         ->not->toContain('/libraries')

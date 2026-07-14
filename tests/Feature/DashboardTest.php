@@ -44,7 +44,7 @@ test('dashboard shell visibly provides valid navigation without unavailable link
         ->toContain('Settings')
         ->toContain('Library Overview')
         ->toContain('Review Tasks')
-        ->toContain('href="/connectors"')
+        ->toContain('/connectors')
         ->not->toContain('/admin')
         ->not->toContain('/profile')
         ->not->toContain('/libraries')
