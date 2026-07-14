@@ -5,20 +5,14 @@ interface NavLinkProps {
     active: boolean;
     children: ReactNode;
     href: string;
+    icon?: ReactNode;
 }
 
-export default function NavLink({ active, children, href }: NavLinkProps) {
+export default function NavLink({ active, children, href, icon }: NavLinkProps) {
     return (
-        <Link
-            aria-current={active ? 'page' : undefined}
-            className={`rounded-[--radius-sm] px-3 py-2 text-sm font-medium transition-colors ${
-                active
-                    ? 'bg-surface-sunken text-fg'
-                    : 'text-fg-muted hover:bg-surface-sunken hover:text-fg'
-            }`}
-            href={href}
-        >
-            {children}
+        <Link aria-current={active ? 'page' : undefined} className="mf-nav-item" href={href}>
+            {icon && <span className={active ? 'text-accent' : 'text-fg-subtle'}>{icon}</span>}
+            <span className="flex-1">{children}</span>
         </Link>
     );
 }
