@@ -6,23 +6,32 @@ import {
     type ConnectorSummary,
     formatCheckedAt,
     StatusBadge,
+    SyncStatusBadge,
 } from '@/Components/Connectors/ConnectorStatus';
 import Badge, { type BadgeTone } from '@/Components/UI/Badge';
 import { buttonClasses } from '@/Components/UI/Button';
-import { LibraryIcon, ServerIcon, SettingsIcon, ShieldIcon } from '@/Components/UI/Icon';
+import { LibraryIcon, ServerIcon, SettingsIcon, ShieldIcon, SyncIcon } from '@/Components/UI/Icon';
 import StatCard, { type StatTone } from '@/Components/UI/StatCard';
+
+interface SyncSummary {
+    selected_libraries: number;
+    attention_count: number;
+    ready_count: number;
+    last_dry_run_at: string | null;
+}
 
 interface DashboardPageProps {
     [key: string]: unknown;
     status: string;
     connectors: ConnectorSummary[];
+    syncSummary: SyncSummary;
 }
 
 const NEXT_ACTIONS: { label: string; tone: BadgeTone; badge: string }[] = [
     { label: 'Configure connectors', tone: 'accent', badge: 'Current' },
     { label: 'Discover libraries', tone: 'accent', badge: 'Current' },
+    { label: 'Run a sync dry run', tone: 'accent', badge: 'Current' },
     { label: 'Review metadata localization', tone: 'neutral', badge: 'Later V1' },
-    { label: 'Sync foundation', tone: 'neutral', badge: 'Future' },
 ];
 
 const ROADMAP: { id: string; label: string; done: boolean }[] = [
@@ -31,11 +40,11 @@ const ROADMAP: { id: string; label: string; done: boolean }[] = [
     { id: 'V1 C', label: 'Connectors', done: true },
     { id: 'V1 D', label: 'Library Discovery', done: true },
     { id: 'V1 E', label: 'UI / UX', done: true },
-    { id: 'V1 F', label: 'Sync Foundation', done: false },
+    { id: 'V1 F', label: 'Sync Foundation', done: true },
 ];
 
 export default function Dashboard() {
-    const { status, connectors } = usePage<DashboardPageProps>().props;
+    const { status, connectors, syncSummary } = usePage<DashboardPageProps>().props;
     const find = (key: string) => connectors.find((c) => c.key === key);
     const libraryTotal = connectors.reduce((sum, c) => sum + c.library_count, 0);
 
@@ -100,6 +109,52 @@ export default function Dashboard() {
                             {statusCards.map((card) => (
                                 <StatCard hint={card.hint} icon={card.icon} key={card.label} label={card.label} tone={card.tone} value={card.value} />
                             ))}
+                        </div>
+                    </section>
+
+                    {/* Sync Foundation (V1 F) */}
+                    <section className="mf-col-12 mf-rise" style={{ '--mf-i': 1.5 } as CSSProperties}>
+                        <div className="mf-panel p-6">
+                            <div className="flex flex-wrap items-center justify-between gap-3">
+                                <div className="flex items-center gap-3">
+                                    <span className="grid size-11 place-items-center rounded-[--radius-md] bg-accent/10 text-accent ring-1 ring-inset ring-accent/20">
+                                        <SyncIcon className="size-6" />
+                                    </span>
+                                    <div>
+                                        <h2 className="text-lg font-semibold tracking-tight">Sync Foundation</h2>
+                                        <p className="text-xs text-fg-subtle">Dry run only. No media import in V1 F.</p>
+                                    </div>
+                                </div>
+                                <Link className={buttonClasses('secondary', 'sm')} href="/sync">Open sync</Link>
+                            </div>
+
+                            <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                                {[
+                                    { label: 'Selected libraries', value: String(syncSummary.selected_libraries), hint: 'Marked for later sync' },
+                                    { label: 'Last dry run', value: formatCheckedAt(syncSummary.last_dry_run_at), hint: 'Most recent, any connector' },
+                                    { label: 'Attention required', value: String(syncSummary.attention_count), hint: 'Connectors needing review' },
+                                    { label: 'Ready connectors', value: String(syncSummary.ready_count), hint: 'Last dry run completed' },
+                                ].map((item) => (
+                                    <div className="mf-panel p-4" key={item.label}>
+                                        <p className="text-xs uppercase tracking-wide text-fg-subtle">{item.label}</p>
+                                        <p className="mt-1 text-lg font-semibold">{item.value}</p>
+                                        <p className="mt-0.5 text-xs text-fg-muted">{item.hint}</p>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                                {['jellyfin', 'audiobookshelf'].map((key) => {
+                                    const c = find(key);
+                                    const label = key === 'jellyfin' ? 'Jellyfin' : 'Audiobookshelf';
+                                    return (
+                                        <div className="flex items-center justify-between gap-3 rounded-[--radius-md] bg-[var(--nav-hover-bg)] px-3.5 py-2.5 text-sm" key={key}>
+                                            <span className="text-fg-muted">{label}</span>
+                                            <SyncStatusBadge status={c?.sync.status ?? 'not_ready'} />
+                                        </div>
+                                    );
+                                })}
+                            </div>
                         </div>
                     </section>
 

@@ -6,7 +6,9 @@ import {
     type ConnectorSummary,
     discoverySummary,
     formatCheckedAt,
+    runStatusLabel,
     StatusBadge,
+    SyncStatusBadge,
 } from '@/Components/Connectors/ConnectorStatus';
 import Alert from '@/Components/UI/Alert';
 import Badge from '@/Components/UI/Badge';
@@ -86,6 +88,16 @@ export default function ConnectorsIndex() {
                                     {discoverySummary(connector)} · Last checked {formatCheckedAt(connector.last_checked_at)}
                                 </p>
 
+                                <div className="flex flex-wrap items-center justify-between gap-2 rounded-[--radius-md] bg-[var(--nav-hover-bg)] px-3.5 py-2.5">
+                                    <span className="flex items-center gap-2 text-sm">
+                                        <span className="text-fg-muted">Sync foundation</span>
+                                        <SyncStatusBadge status={connector.sync.status} />
+                                    </span>
+                                    <span className="text-xs text-fg-subtle">
+                                        {connector.sync.selected_count} selected · {connector.sync.last_run ? runStatusLabel(connector.sync.last_run.status) : 'No dry run yet'}
+                                    </span>
+                                </div>
+
                                 <div className="mt-auto flex flex-wrap items-center gap-2">
                                     <Link className={buttonClasses('primary', 'sm')} href={`/connectors/${connector.key}`}>Configure</Link>
                                     {connector.configured && (
@@ -95,6 +107,9 @@ export default function ConnectorsIndex() {
                                             </Button>
                                             <Button loading={busy === `${connector.key}-disc`} onClick={() => post(`/connectors/${connector.key}/libraries/discover`, `${connector.key}-disc`)} size="sm" variant="secondary">
                                                 Discover libraries
+                                            </Button>
+                                            <Button loading={busy === `${connector.key}-dry`} onClick={() => post(`/connectors/${connector.key}/sync/dry-run`, `${connector.key}-dry`)} size="sm" variant="secondary">
+                                                Run dry run
                                             </Button>
                                         </>
                                     )}

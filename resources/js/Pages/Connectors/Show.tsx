@@ -6,7 +6,10 @@ import {
     type ConnectorDetail,
     type DiscoveredLibrary,
     formatCheckedAt,
+    plannedActionLabel,
+    runStatusLabel,
     StatusBadge,
+    SyncStatusBadge,
 } from '@/Components/Connectors/ConnectorStatus';
 import Alert from '@/Components/UI/Alert';
 import Badge from '@/Components/UI/Badge';
@@ -34,6 +37,11 @@ export default function ConnectorShow() {
     const [testing, setTesting] = useState(false);
     const [discovering, setDiscovering] = useState(false);
     const [savingId, setSavingId] = useState<string | null>(null);
+    const [dryRunning, setDryRunning] = useState(false);
+    const [showRun, setShowRun] = useState(false);
+
+    const sync = connector.sync;
+    const lastRun = sync.last_run;
 
     const form = useForm<{ base_url: string; secret: string; clear_secret: boolean }>({
         base_url: connector.base_url,
@@ -59,6 +67,11 @@ export default function ConnectorShow() {
     function runDiscover() {
         setDiscovering(true);
         router.post(`/connectors/${connector.key}/libraries/discover`, {}, { preserveScroll: true, onFinish: () => setDiscovering(false) });
+    }
+
+    function runDryRun() {
+        setDryRunning(true);
+        router.post(`/connectors/${connector.key}/sync/dry-run`, {}, { preserveScroll: true, onFinish: () => setDryRunning(false) });
     }
 
     function toggleLibrary(library: DiscoveredLibrary) {
@@ -192,6 +205,92 @@ export default function ConnectorShow() {
                                             </li>
                                         ))}
                                     </ul>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Sync Foundation (V1 F) */}
+                        <div className="mf-panel p-6">
+                            <div className="flex flex-wrap items-start justify-between gap-3">
+                                <div>
+                                    <div className="flex items-center gap-2">
+                                        <h2 className="text-lg font-semibold tracking-tight">Sync Foundation</h2>
+                                        <SyncStatusBadge status={sync.status} />
+                                    </div>
+                                    <p className="mt-1 text-sm text-fg-muted">
+                                        Dry run only. No media import in V1 F. No files are copied, moved or deleted.
+                                    </p>
+                                </div>
+                                <Button disabled={!connector.configured} loading={dryRunning} onClick={runDryRun} variant="secondary">
+                                    Run dry run
+                                </Button>
+                            </div>
+
+                            <dl className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                                {[
+                                    ['Discovered', sync.discovered_count],
+                                    ['Selected', sync.selected_count],
+                                    ['Ready', sync.selected_present_count],
+                                    ['Missing', sync.selected_missing_count],
+                                ].map(([label, value]) => (
+                                    <div className="mf-panel px-3 py-2.5 text-center" key={label}>
+                                        <dt className="text-[0.7rem] uppercase tracking-wide text-fg-subtle">{label}</dt>
+                                        <dd className="mt-1 text-lg font-semibold">{value}</dd>
+                                    </div>
+                                ))}
+                            </dl>
+
+                            <div className="mt-5">
+                                {!lastRun ? (
+                                    <EmptyState
+                                        action={<Button disabled={!connector.configured} loading={dryRunning} onClick={runDryRun} size="sm" variant="secondary">Run dry run</Button>}
+                                        description="Run a dry run to inspect the selected libraries. Nothing is synced, imported, moved or deleted — it only prepares future sync safely."
+                                        icon={<LibraryIcon className="size-5" />}
+                                        title="No dry run yet"
+                                    />
+                                ) : (
+                                    <div className="rounded-[--radius-md] border border-[var(--panel-border)] p-4">
+                                        <div className="flex flex-wrap items-center justify-between gap-2">
+                                            <p className="font-medium">{runStatusLabel(lastRun.status)}</p>
+                                            <button
+                                                className="text-xs text-accent underline-offset-2 hover:underline"
+                                                onClick={() => setShowRun((v) => !v)}
+                                                type="button"
+                                            >
+                                                {showRun ? 'Hide latest run' : 'View latest run'}
+                                            </button>
+                                        </div>
+                                        <p className="mt-1 text-xs text-fg-subtle">
+                                            Started {formatCheckedAt(lastRun.started_at)} · Finished {formatCheckedAt(lastRun.finished_at)}
+                                        </p>
+
+                                        {lastRun.summary.issues.length > 0 && (
+                                            <ul className="mt-3 grid gap-1.5">
+                                                {lastRun.summary.issues.map((issue) => (
+                                                    <li className="flex items-start gap-2 text-sm" key={issue.code}>
+                                                        <Badge tone={issue.blocking ? 'error' : 'neutral'}>{issue.action}</Badge>
+                                                        <span className="text-fg-muted">{issue.message}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        )}
+
+                                        {showRun && (
+                                            <ul className="mt-4 divide-y divide-[var(--panel-border)]">
+                                                {(lastRun.libraries ?? []).map((library) => (
+                                                    <li className="flex items-center justify-between gap-3 py-2.5 text-sm first:pt-0" key={library.external_id}>
+                                                        <span className="min-w-0">
+                                                            <span className="block truncate font-medium">{library.name}</span>
+                                                            {library.type && <span className="text-xs text-fg-subtle">{library.type}</span>}
+                                                        </span>
+                                                        <Badge tone={library.status === 'ready' ? 'success' : library.status === 'warning' ? 'error' : 'neutral'}>
+                                                            {plannedActionLabel(library.planned_action)}
+                                                        </Badge>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        )}
+                                    </div>
                                 )}
                             </div>
                         </div>

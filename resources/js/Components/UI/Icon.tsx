@@ -175,3 +175,14 @@ export function SpinnerIcon(props: IconProps) {
         </svg>
     );
 }
+
+export function SyncIcon(props: IconProps) {
+    return (
+        <svg {...base(props)}>
+            <path d="M4 10a8 8 0 0 1 14-3.5L21 9" />
+            <path d="M21 4v5h-5" />
+            <path d="M20 14a8 8 0 0 1-14 3.5L3 15" />
+            <path d="M3 20v-5h5" />
+        </svg>
+    );
+}
