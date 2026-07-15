@@ -23,7 +23,10 @@ use Illuminate\Support\Carbon;
  * @property array<string, mixed> $evidence
  * @property array<string, mixed>|null $resolution
  * @property string $created_by
+ * @property string|null $resolved_by
  * @property Carbon|null $resolved_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  */
 class ReviewTask extends Model
 {

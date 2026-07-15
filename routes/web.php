@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Connectors\ConnectorController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\SyncController;
 use Illuminate\Support\Facades\Route;
@@ -26,6 +27,11 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
     Route::get('/sync', [SyncController::class, 'index'])->name('sync.index');
+    Route::get('/review', [ReviewController::class, 'index'])->name('review.index');
+    Route::post('/review/tasks/{task}/dismiss', [ReviewController::class, 'dismiss'])
+        ->whereUlid('task')->name('review.tasks.dismiss');
+    Route::post('/review/tasks/{task}/reopen', [ReviewController::class, 'reopen'])
+        ->whereUlid('task')->name('review.tasks.reopen');
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
     $connectors = ['jellyfin', 'audiobookshelf'];
