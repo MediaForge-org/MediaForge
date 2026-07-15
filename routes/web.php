@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Connectors\ConnectorController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\SyncController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -24,6 +25,7 @@ Route::middleware('guest')->group(function (): void {
 Route::middleware('auth')->group(function (): void {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
+    Route::get('/sync', [SyncController::class, 'index'])->name('sync.index');
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
     $connectors = ['jellyfin', 'audiobookshelf'];
@@ -39,4 +41,6 @@ Route::middleware('auth')->group(function (): void {
         ->whereIn('connector', $connectors)->name('connectors.libraries.discover');
     Route::post('/connectors/{connector}/libraries/{library}/selection', [ConnectorController::class, 'updateLibrary'])
         ->whereIn('connector', $connectors)->whereUlid('library')->name('connectors.libraries.selection');
+    Route::post('/connectors/{connector}/sync/dry-run', [ConnectorController::class, 'dryRun'])
+        ->whereIn('connector', $connectors)->name('connectors.sync.dry-run');
 });

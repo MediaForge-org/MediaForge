@@ -17,9 +17,56 @@ final class DashboardController extends Controller
 {
     public function index(ConnectorCatalog $catalog): Response
     {
+        $connectors = $catalog->overview();
+
         return Inertia::render('Dashboard', [
             'status' => 'V1 foundation',
-            'connectors' => $catalog->overview(),
+            'connectors' => $connectors,
+            'syncSummary' => $this->syncSummary($connectors),
         ]);
+    }
+
+    /**
+     * Aggregate the connectors' stored sync-foundation state for the dashboard.
+     * Pure array math over data already loaded — no extra queries, no network.
+     *
+     * @param  list<array<string, mixed>>  $connectors
+     * @return array<string, mixed>
+     */
+    private function syncSummary(array $connectors): array
+    {
+        $selectedLibraries = 0;
+        $attention = 0;
+        $lastDryRunAt = null;
+        $ready = 0;
+
+        foreach ($connectors as $connector) {
+            /** @var array<string, mixed> $sync */
+            $sync = is_array($connector['sync'] ?? null) ? $connector['sync'] : [];
+
+            $selectedCount = $sync['selected_count'] ?? 0;
+            $selectedLibraries += is_numeric($selectedCount) ? (int) $selectedCount : 0;
+
+            if (($sync['status'] ?? null) === 'attention_required') {
+                $attention++;
+            }
+
+            if (($sync['status'] ?? null) === 'last_dry_run_completed') {
+                $ready++;
+            }
+
+            $finishedAt = is_array($sync['last_run'] ?? null) ? ($sync['last_run']['finished_at'] ?? null) : null;
+
+            if (is_string($finishedAt) && ($lastDryRunAt === null || $finishedAt > $lastDryRunAt)) {
+                $lastDryRunAt = $finishedAt;
+            }
+        }
+
+        return [
+            'selected_libraries' => $selectedLibraries,
+            'attention_count' => $attention,
+            'ready_count' => $ready,
+            'last_dry_run_at' => $lastDryRunAt,
+        ];
     }
 }

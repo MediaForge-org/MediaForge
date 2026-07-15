@@ -6,6 +6,8 @@ namespace App\Connectors\Sdk;
 
 use App\Connectors\Sdk\Models\ConnectorInstance;
 use App\Connectors\Sdk\Models\ConnectorLibrary;
+use App\Connectors\Sdk\Models\ConnectorSyncRun;
+use App\Connectors\Sdk\Models\ConnectorSyncRunLibrary;
 use App\Connectors\Sdk\Models\ConnectorSyncState;
 use App\Connectors\Sdk\Registry\ConnectorRegistry;
 use App\Connectors\Sdk\Secrets\EncryptedSecretStore;
@@ -41,6 +43,8 @@ final class ConnectorSdkServiceProvider extends ServiceProvider
             'connector_instance' => ConnectorInstance::class,
             'connector_sync_state' => ConnectorSyncState::class,
             'connector_library' => ConnectorLibrary::class,
+            'connector_sync_run' => ConnectorSyncRun::class,
+            'connector_sync_run_library' => ConnectorSyncRunLibrary::class,
         ]);
     }
 }

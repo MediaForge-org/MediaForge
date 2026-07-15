@@ -6,10 +6,12 @@ namespace App\Http\Controllers\Connectors;
 
 use App\Connectors\Sdk\Actions\ConnectorConfigInput;
 use App\Connectors\Sdk\Actions\DiscoverConnectorLibraries;
+use App\Connectors\Sdk\Actions\RunConnectorDryRun;
 use App\Connectors\Sdk\Actions\RunConnectorTest;
 use App\Connectors\Sdk\Actions\SaveConnectorConfig;
 use App\Connectors\Sdk\Actions\UpdateConnectorLibrarySelection;
 use App\Connectors\Sdk\ConnectorCatalog;
+use App\Connectors\Sdk\Sync\SyncRunStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Connectors\SaveConnectorRequest;
 use Illuminate\Http\RedirectResponse;
@@ -81,5 +83,25 @@ final class ConnectorController extends Controller
         $action->execute($connector, $library, $request->boolean('enabled'));
 
         return back()->with('success', 'Library selection updated.');
+    }
+
+    /**
+     * V1 F: run a sync-foundation dry run. This inspects stored discovery/health
+     * state only — no network calls, no media import, no file operations. A clean
+     * run is a success flash; a run with warnings surfaces the attention items.
+     */
+    public function dryRun(string $connector, ConnectorCatalog $catalog, RunConnectorDryRun $action): RedirectResponse
+    {
+        if ($catalog->view($connector)['configured'] !== true) {
+            return back()->with('error', 'Configure and connect the connector before running a dry run.');
+        }
+
+        $run = $action->execute($connector);
+
+        return match (SyncRunStatus::from($run->status)) {
+            SyncRunStatus::Completed => back()->with('success', 'Dry run completed. Selected libraries are ready for future sync. No media was imported.'),
+            SyncRunStatus::CompletedWithWarnings => back()->with('error', 'Dry run completed with warnings. Review the attention items — no media was imported.'),
+            default => back()->with('error', 'Dry run finished. No media was imported.'),
+        };
     }
 }

@@ -20,6 +20,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $status
  * @property string $priority
  * @property array<string, mixed> $evidence
+ * @property array<string, mixed>|null $resolution
+ * @property string $created_by
+ * @property \Illuminate\Support\Carbon|null $resolved_at
  */
 class ReviewTask extends Model
 {
