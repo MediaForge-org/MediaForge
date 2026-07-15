@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Connectors\Sdk\ConnectorCatalog;
+use App\Connectors\Sdk\ReviewCenterCatalog;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -15,14 +16,19 @@ use Inertia\Response;
  */
 final class DashboardController extends Controller
 {
-    public function index(ConnectorCatalog $catalog): Response
+    public function index(ConnectorCatalog $catalog, ReviewCenterCatalog $reviewCenter): Response
     {
         $connectors = $catalog->overview();
+        $openTaskCount = $reviewCenter->openTaskCount();
 
         return Inertia::render('Dashboard', [
             'status' => 'V1 foundation',
             'connectors' => $connectors,
             'syncSummary' => $this->syncSummary($connectors),
+            'reviewSummary' => [
+                'status' => $reviewCenter->status($connectors, $openTaskCount),
+                'open_task_count' => $openTaskCount,
+            ],
         ]);
     }
 

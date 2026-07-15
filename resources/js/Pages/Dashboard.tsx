@@ -10,7 +10,7 @@ import {
 } from '@/Components/Connectors/ConnectorStatus';
 import Badge, { type BadgeTone } from '@/Components/UI/Badge';
 import { buttonClasses } from '@/Components/UI/Button';
-import { LibraryIcon, ServerIcon, SettingsIcon, ShieldIcon, SyncIcon } from '@/Components/UI/Icon';
+import { LibraryIcon, ReviewIcon, ServerIcon, SettingsIcon, ShieldIcon, SyncIcon } from '@/Components/UI/Icon';
 import StatCard, { type StatTone } from '@/Components/UI/StatCard';
 
 interface SyncSummary {
@@ -20,12 +20,26 @@ interface SyncSummary {
     last_dry_run_at: string | null;
 }
 
+type ReviewStatus = 'all_clear' | 'warnings' | 'attention_required';
+
+interface ReviewSummary {
+    status: ReviewStatus;
+    open_task_count: number;
+}
+
 interface DashboardPageProps {
     [key: string]: unknown;
     status: string;
     connectors: ConnectorSummary[];
     syncSummary: SyncSummary;
+    reviewSummary: ReviewSummary;
 }
+
+const REVIEW_STATUS_META: Record<ReviewStatus, { label: string; tone: BadgeTone }> = {
+    all_clear: { label: 'All clear', tone: 'success' },
+    warnings: { label: 'Warnings', tone: 'warning' },
+    attention_required: { label: 'Attention required', tone: 'error' },
+};
 
 const NEXT_ACTIONS: { label: string; tone: BadgeTone; badge: string }[] = [
     { label: 'Configure connectors', tone: 'accent', badge: 'Current' },
@@ -44,7 +58,7 @@ const ROADMAP: { id: string; label: string; done: boolean }[] = [
 ];
 
 export default function Dashboard() {
-    const { status, connectors, syncSummary } = usePage<DashboardPageProps>().props;
+    const { status, connectors, syncSummary, reviewSummary } = usePage<DashboardPageProps>().props;
     const find = (key: string) => connectors.find((c) => c.key === key);
     const libraryTotal = connectors.reduce((sum, c) => sum + c.library_count, 0);
 
@@ -109,6 +123,29 @@ export default function Dashboard() {
                             {statusCards.map((card) => (
                                 <StatCard hint={card.hint} icon={card.icon} key={card.label} label={card.label} tone={card.tone} value={card.value} />
                             ))}
+                        </div>
+                    </section>
+
+                    {/* Review Center (V1 G) */}
+                    <section className="mf-col-12 mf-rise" style={{ '--mf-i': 1.2 } as CSSProperties}>
+                        <div className="mf-panel flex flex-wrap items-center justify-between gap-4 p-6">
+                            <div className="flex items-center gap-3">
+                                <span className="grid size-11 place-items-center rounded-[--radius-md] bg-accent/10 text-accent ring-1 ring-inset ring-accent/20">
+                                    <ReviewIcon className="size-6" />
+                                </span>
+                                <div>
+                                    <div className="flex items-center gap-2">
+                                        <h2 className="text-lg font-semibold tracking-tight">Review Center</h2>
+                                        <Badge dot tone={REVIEW_STATUS_META[reviewSummary.status].tone}>
+                                            {REVIEW_STATUS_META[reviewSummary.status].label}
+                                        </Badge>
+                                    </div>
+                                    <p className="text-xs text-fg-subtle">
+                                        {reviewSummary.open_task_count} open {reviewSummary.open_task_count === 1 ? 'task' : 'tasks'} · Connector and dry-run issues in one place
+                                    </p>
+                                </div>
+                            </div>
+                            <Link className={buttonClasses('secondary', 'sm')} href="/review">Open review center</Link>
                         </div>
                     </section>
 

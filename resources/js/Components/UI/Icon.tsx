@@ -186,3 +186,12 @@ export function SyncIcon(props: IconProps) {
         </svg>
     );
 }
+
+export function ReviewIcon(props: IconProps) {
+    return (
+        <svg {...base(props)}>
+            <path d="M9 3h6a2 2 0 0 1 2 2v14l-5-3-5 3V5a2 2 0 0 1 2-2Z" />
+            <path d="m9.5 11 2 2 3-3.5" />
+        </svg>
+    );
+}
