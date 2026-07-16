@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace App\Connectors\Sdk;
 
 use App\Connectors\Sdk\Actions\CreateCatalogReviewTasks;
+use App\Connectors\Sdk\Catalog\CatalogItemQuery;
 use App\Connectors\Sdk\Catalog\CatalogSnapshotStatus;
+use App\Connectors\Sdk\Catalog\ExternalMediaKind;
 use App\Connectors\Sdk\Models\ConnectorCatalogItem;
 use App\Connectors\Sdk\Models\ConnectorCatalogSnapshotRun;
 use App\Connectors\Sdk\Models\ConnectorInstance;
+use App\Connectors\Sdk\Models\ConnectorLibrary;
 use App\Connectors\Sdk\Registry\ConnectorRegistry;
 use App\Core\Review\ReviewTask;
 
@@ -196,10 +199,12 @@ final class CatalogReadModel
     }
 
     /** @return list<array<string, mixed>> */
-    private function latestRuns(): array
+    private function latestRuns(?string $instanceId = null, ?string $libraryId = null): array
     {
         return array_values(ConnectorCatalogSnapshotRun::query()
             ->with(['instance:id,connector_key', 'library:id,name'])
+            ->when($instanceId !== null, fn ($query) => $query->where('connector_instance_id', $instanceId))
+            ->when($libraryId !== null, fn ($query) => $query->where('connector_library_id', $libraryId))
             ->latest('created_at')
             ->orderByDesc('id')
             ->limit(self::LATEST_RUNS)
@@ -219,27 +224,206 @@ final class CatalogReadModel
     }
 
     /** @return list<array<string, mixed>> */
-    private function latestItems(): array
+    private function latestItems(?string $instanceId = null, ?string $libraryId = null): array
     {
         return array_values(ConnectorCatalogItem::query()
             ->with(['instance:id,connector_key', 'library:id,name'])
             ->where('is_present', true)
+            ->when($instanceId !== null, fn ($query) => $query->where('connector_instance_id', $instanceId))
+            ->when($libraryId !== null, fn ($query) => $query->where('connector_library_id', $libraryId))
             ->latest('last_seen_at')
             ->limit(self::LATEST_ITEMS)
             ->get()
-            ->map(fn (ConnectorCatalogItem $item): array => [
-                'id' => $item->id,
-                'title' => $item->title,
-                'media_kind' => $item->media_kind,
-                'year' => $item->year,
-                'index_number' => $item->index_number,
-                'runtime_seconds' => $item->runtime_seconds,
-                'connector' => $this->connectorLabel($item->instance?->connector_key),
-                'library_name' => $item->library?->name,
-                'is_present' => $item->is_present,
-                'last_seen_at' => $item->last_seen_at?->toIso8601String(),
-            ])
+            ->map(fn (ConnectorCatalogItem $item): array => $this->itemView($item))
             ->all());
+    }
+
+    /**
+     * Paginated, filtered, sorted list of captured external items. Every dynamic
+     * clause is allowlisted upstream (CatalogItemQuery), and search is a bound LIKE
+     * parameter with its wildcards escaped — no raw request input reaches SQL. All
+     * queries are scoped and bounded (fixed page size). No network, no secrets.
+     *
+     * @return array{data: list<array<string, mixed>>, meta: array<string, int|null>}
+     */
+    public function items(CatalogItemQuery $q): array
+    {
+        $sort = in_array($q->sort, CatalogItemQuery::SORTS, true) ? $q->sort : 'title';
+        $direction = in_array($q->direction, CatalogItemQuery::DIRECTIONS, true) ? $q->direction : 'asc';
+
+        $query = ConnectorCatalogItem::query()
+            ->with(['instance:id,connector_key', 'library:id,name'])
+            // Scope by the connector KEY via the relation: a registered connector
+            // with no configured instance must yield nothing, not everything.
+            ->when(
+                $q->connectorKey !== null,
+                fn ($sub) => $sub->whereHas('instance', fn ($instance) => $instance->where('connector_key', $q->connectorKey)),
+            )
+            ->when($q->libraryId !== null, fn ($sub) => $sub->where('connector_library_id', $q->libraryId))
+            ->when(
+                $q->kind !== null && in_array($q->kind, ExternalMediaKind::values(), true),
+                fn ($sub) => $sub->where('media_kind', $q->kind),
+            )
+            ->when($q->status === 'present', fn ($sub) => $sub->where('is_present', true))
+            ->when($q->status === 'missing', fn ($sub) => $sub->where('is_present', false));
+
+        $search = $q->search !== null ? trim($q->search) : '';
+
+        if ($search !== '') {
+            // Escape LIKE wildcards so a literal % or _ can't widen the match.
+            $like = '%'.str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $search).'%';
+            $query->where(function ($sub) use ($like): void {
+                $sub->where('title', 'ILIKE', $like)
+                    ->orWhere('original_title', 'ILIKE', $like)
+                    ->orWhere('sort_title', 'ILIKE', $like);
+            });
+        }
+
+        $paginator = $query
+            ->orderBy($sort, $direction)
+            ->orderBy('id', $direction)
+            ->paginate($q->perPage, ['*'], 'page', max(1, $q->page));
+
+        return [
+            'data' => array_values($paginator->getCollection()
+                ->map(fn (ConnectorCatalogItem $item): array => $this->itemView($item))
+                ->all()),
+            'meta' => [
+                'current_page' => $paginator->currentPage(),
+                'last_page' => $paginator->lastPage(),
+                'per_page' => $paginator->perPage(),
+                'total' => $paginator->total(),
+                'from' => $paginator->firstItem(),
+                'to' => $paginator->lastItem(),
+            ],
+        ];
+    }
+
+    /**
+     * Library filter options (id, name, connector, capture counts), optionally
+     * scoped to one connector KEY. Bounded to the discovered libraries only. A
+     * registered connector with no configured instance scopes to an empty list
+     * (`whereIn` over no ids) rather than falling back to every library.
+     *
+     * @return list<array<string, mixed>>
+     */
+    public function libraryOptions(?string $connectorKey = null): array
+    {
+        $instanceIds = $connectorKey !== null
+            ? ConnectorInstance::query()->where('connector_key', $connectorKey)->pluck('id')->all()
+            : null;
+
+        $counts = ConnectorCatalogItem::query()
+            ->toBase()
+            ->whereNotNull('connector_library_id')
+            ->when($instanceIds !== null, fn ($sub) => $sub->whereIn('connector_instance_id', $instanceIds))
+            ->select('connector_library_id')
+            ->selectRaw('COUNT(*) FILTER (WHERE is_present) AS present')
+            ->selectRaw('COUNT(*) FILTER (WHERE NOT is_present) AS missing')
+            ->groupBy('connector_library_id')
+            ->get()
+            ->keyBy('connector_library_id');
+
+        return array_values(ConnectorLibrary::query()
+            ->with('instance:id,connector_key')
+            ->when($instanceIds !== null, fn ($sub) => $sub->whereIn('connector_instance_id', $instanceIds))
+            ->orderBy('name')
+            ->get()
+            ->map(function (ConnectorLibrary $library) use ($counts): array {
+                $row = $counts->get($library->id);
+
+                return [
+                    'id' => $library->id,
+                    'name' => $library->name,
+                    'type' => $library->collection_type,
+                    'connector' => $this->connectorLabel($library->instance?->connector_key),
+                    'present_item_count' => $this->countProp(is_object($row) ? $row : null, 'present'),
+                    'missing_item_count' => $this->countProp(is_object($row) ? $row : null, 'missing'),
+                    'is_enabled' => $library->is_enabled,
+                    'discovery_status' => $library->discovery_status,
+                ];
+            })
+            ->all());
+    }
+
+    /** Find a library that belongs to the given connector instance, or null. */
+    public function findLibrary(string $connectorInstanceId, string $libraryId): ?ConnectorLibrary
+    {
+        return ConnectorLibrary::query()
+            ->where('connector_instance_id', $connectorInstanceId)
+            ->where('id', $libraryId)
+            ->first();
+    }
+
+    /**
+     * Scoped page payload for one connector: catalog summary (with per-library
+     * capture counts), the connector's latest runs, latest items and library list.
+     *
+     * @return array{summary: array<string, mixed>, latest_runs: list<array<string, mixed>>, latest_items: list<array<string, mixed>>, libraries: list<array<string, mixed>>}
+     */
+    public function connectorScope(?ConnectorInstance $instance, bool $configured): array
+    {
+        return [
+            'summary' => $this->connectorSummary($instance, $configured, true),
+            'latest_runs' => $instance !== null ? $this->latestRuns($instance->id) : [],
+            'latest_items' => $instance !== null ? $this->latestItems($instance->id) : [],
+            'libraries' => $instance !== null ? $this->libraryOptions($instance->connector_key) : [],
+        ];
+    }
+
+    /**
+     * Scoped page payload for one library: capture counts, run count, the latest
+     * run and the library's recent runs. Stored state only — no network, no secret.
+     *
+     * @return array<string, mixed>
+     */
+    public function libraryScope(ConnectorInstance $instance, ConnectorLibrary $library): array
+    {
+        $counts = ConnectorCatalogItem::query()
+            ->where('connector_instance_id', $instance->id)
+            ->where('connector_library_id', $library->id)
+            ->toBase()
+            ->selectRaw('COUNT(*) AS total')
+            ->selectRaw('COUNT(*) FILTER (WHERE is_present) AS present')
+            ->selectRaw('COUNT(*) FILTER (WHERE NOT is_present) AS missing')
+            ->first();
+
+        $latest = ConnectorCatalogSnapshotRun::query()
+            ->where('connector_instance_id', $instance->id)
+            ->where('connector_library_id', $library->id)
+            ->latest('created_at')
+            ->orderByDesc('id')
+            ->first();
+
+        return [
+            'external_item_count' => $this->countProp($counts, 'total'),
+            'present_item_count' => $this->countProp($counts, 'present'),
+            'missing_item_count' => $this->countProp($counts, 'missing'),
+            'snapshot_run_count' => ConnectorCatalogSnapshotRun::query()
+                ->where('connector_instance_id', $instance->id)
+                ->where('connector_library_id', $library->id)
+                ->count(),
+            'last_run' => $latest !== null ? $this->runView($latest) : null,
+            'latest_runs' => $this->latestRuns($instance->id, $library->id),
+        ];
+    }
+
+    /** @return array<string, mixed> The read-model view of one captured item. */
+    private function itemView(ConnectorCatalogItem $item): array
+    {
+        return [
+            'id' => $item->id,
+            'title' => $item->title,
+            'media_kind' => $item->media_kind,
+            'year' => $item->year,
+            'index_number' => $item->index_number,
+            'parent_index_number' => $item->parent_index_number,
+            'runtime_seconds' => $item->runtime_seconds,
+            'connector' => $this->connectorLabel($item->instance?->connector_key),
+            'library_name' => $item->library?->name,
+            'is_present' => $item->is_present,
+            'last_seen_at' => $item->last_seen_at?->toIso8601String(),
+        ];
     }
 
     /** @return array{key: string, label: string}|null */

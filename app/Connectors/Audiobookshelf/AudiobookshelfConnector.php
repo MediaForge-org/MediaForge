@@ -131,21 +131,24 @@ final class AudiobookshelfConnector implements ConnectorProvider
 
     /**
      * Read-only item snapshot via `/api/libraries/{id}/items`: the authenticated,
-     * paged endpoint that lists a library's items (id + minimal metadata) without
-     * downloading or modifying any audio file. `limit` caps the rows; the response
-     * `total` tells us whether the library held more (→ truncated). Redirects are
-     * disabled and the timeout is short.
+     * paged endpoint that lists ONE page of a library's items (id + minimal
+     * metadata) without downloading or modifying any audio file. Audiobookshelf
+     * pages by a zero-based `page` index of size `limit`; the caller advances the
+     * offset across pages (offset is always a multiple of the page size). The
+     * response `total` reports the remote's full size so the caller can page and
+     * detect truncation. Redirects are disabled and the timeout is short.
      */
     public function snapshotLibraryItems(CatalogSnapshotRequest $request): CatalogSnapshotResult
     {
         $url = BaseUrl::normalize($request->baseUrl).'/api/libraries/'.rawurlencode($request->libraryExternalId).'/items';
+        $page = $request->limit > 0 ? intdiv($request->offset, $request->limit) : 0;
 
         try {
             $response = $this->http->make()
                 ->withToken($request->secret ?? '')
                 ->get($url, [
                     'limit' => $request->limit,
-                    'page' => 0,
+                    'page' => $page,
                     'sort' => 'media.metadata.title',
                     'minified' => 1,
                 ]);

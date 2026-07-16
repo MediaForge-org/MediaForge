@@ -28,7 +28,6 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
     Route::get('/sync', [SyncController::class, 'index'])->name('sync.index');
-    Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog.index');
     Route::get('/review', [ReviewController::class, 'index'])->name('review.index');
     Route::post('/review/tasks/{task}/dismiss', [ReviewController::class, 'dismiss'])
         ->whereUlid('task')->name('review.tasks.dismiss');
@@ -37,6 +36,12 @@ Route::middleware('auth')->group(function (): void {
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
     $connectors = ['jellyfin', 'audiobookshelf'];
+
+    Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog.index');
+    Route::get('/catalog/{connector}', [CatalogController::class, 'connector'])
+        ->whereIn('connector', $connectors)->name('catalog.connector');
+    Route::get('/catalog/{connector}/libraries/{library}', [CatalogController::class, 'library'])
+        ->whereIn('connector', $connectors)->whereUlid('library')->name('catalog.library');
 
     Route::get('/connectors', [ConnectorController::class, 'index'])->name('connectors.index');
     Route::get('/connectors/{connector}', [ConnectorController::class, 'show'])

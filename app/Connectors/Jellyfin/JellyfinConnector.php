@@ -131,10 +131,11 @@ final class JellyfinConnector implements ConnectorProvider
 
     /**
      * Read-only item snapshot via `/Items?ParentId={library}`: a bounded, paged,
-     * authenticated listing of a library's items with a small, fixed field set. No
-     * media is fetched, downloaded or modified — this is a pure read. `Limit` caps
-     * the rows; `TotalRecordCount` tells us whether the library held more (→
-     * truncated). Redirects are disabled and the timeout is short.
+     * authenticated listing of ONE page of a library's items with a small, fixed
+     * field set. No media is fetched, downloaded or modified — this is a pure read.
+     * `StartIndex`/`Limit` select the page (the caller advances the offset across
+     * pages); `TotalRecordCount` reports the remote's full size so the caller can
+     * page and detect truncation. Redirects are disabled and the timeout is short.
      */
     public function snapshotLibraryItems(CatalogSnapshotRequest $request): CatalogSnapshotResult
     {
@@ -147,7 +148,7 @@ final class JellyfinConnector implements ConnectorProvider
                     'ParentId' => $request->libraryExternalId,
                     'Recursive' => 'true',
                     'Limit' => $request->limit,
-                    'StartIndex' => 0,
+                    'StartIndex' => $request->offset,
                     'EnableImages' => 'false',
                     'EnableUserData' => 'false',
                     'Fields' => 'OriginalTitle,SortName,ProductionYear,DateCreated',

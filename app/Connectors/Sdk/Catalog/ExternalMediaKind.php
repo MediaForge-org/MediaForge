@@ -28,4 +28,10 @@ enum ExternalMediaKind: string
     {
         return self::tryFrom(strtolower(trim((string) $raw))) ?? self::Unknown;
     }
+
+    /** @return list<string> The string values, for filter allowlists. */
+    public static function values(): array
+    {
+        return array_map(static fn (self $kind): string => $kind->value, self::cases());
+    }
 }
