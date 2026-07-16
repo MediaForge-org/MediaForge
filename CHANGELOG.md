@@ -10,6 +10,28 @@ All notable changes to MediaForge are documented here. The format is based on
 Targeting the first tagged pre-release **`v0.2.0-alpha.1`** (V1 local core, alpha —
 not production-ready). See [docs/MediaForge/V1_READINESS.md](docs/MediaForge/V1_READINESS.md).
 
+### Added — V2 A: read-only connector catalog snapshots
+
+- **Read-only catalog snapshots**: explicitly triggered (POST-only), bounded snapshots of a
+  connector library. External items are captured as a **connector read-model**, never as MediaForge
+  media. **No media import, no `media_items`/`media_editions`/`media_files`, no file operations**,
+  no changes on Jellyfin/Audiobookshelf, no remote scans, and no automatic/background snapshots.
+- New tables `connector_catalog_snapshot_runs` (run history + sanitized summary) and
+  `connector_catalog_items` (external items, unique per connector + external id).
+- Jellyfin snapshots via the read-only `/Items?ParentId=` endpoint; Audiobookshelf via
+  `/api/libraries/{id}/items`. Tokens are sent as headers only, never in a query string; no raw API
+  payloads are stored. A `supportsCatalogSnapshot()` capability models providers that cannot
+  snapshot yet — handled explicitly without any network call.
+- **Bounded to 500 items per run.** A larger library marks the run `truncated` and raises a
+  `snapshot_truncated` warning review task.
+- Vanished items are flagged (`is_present=false` + `missing_since`), never deleted; a *failed*
+  snapshot never flags or wipes previously captured items.
+- New `/catalog` page (summary cards, connector cards, latest runs, latest external items, empty
+  state, safety note) plus catalog blocks on the dashboard, connectors overview and connector
+  detail (with per-library "Create read-only snapshot" buttons), and a real sidebar link.
+- Snapshot problems raise deduplicated `connector_catalog` review tasks; a clean snapshot
+  self-heals the queue. Audit event `connector.catalog_snapshot_completed` is sanitized.
+
 ### Added — V1 local core (alpha)
 
 - **V1 A — Auth**: local session authentication (login, register, POST-only logout),
