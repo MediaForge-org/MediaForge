@@ -2,6 +2,63 @@
 
 MediaForge can run locally either from a stable production build or through the Vite HMR server. On Windows bind mounts, prefer the production-build mode when Vite stops responding or the browser still shows an older React page.
 
+## After a laptop reboot
+
+Docker Desktop does **not** reliably restart every container after a Windows reboot, so an empty browser or a connection error after restarting usually means "the stack simply is not running" — not a broken app. Work through this list before debugging anything else.
+
+1. **Start Docker Desktop** and wait until it reports *Engine running*.
+2. **Start the stack** from the project root:
+
+   ```powershell
+   docker compose -f deploy/dev/docker-compose.yml up -d   # or: make dev-up
+   ```
+
+3. **Check what is actually running:**
+
+   ```powershell
+   docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"   # or: make dev-ps
+   ```
+
+4. **Expected containers:**
+
+   | Container | Purpose | Port |
+   | --- | --- | --- |
+   | `dev-app-1` | Laravel app (nginx + PHP-FPM) | 8100 |
+   | `dev-postgres-1` | PostgreSQL 17 | 5440 |
+   | `dev-redis-1` | Redis 7 | 6390 |
+   | `dev-mailpit-1` | Mail catcher | 8126 / 1126 |
+   | `dev-jellyfin-dev-1` | Local Jellyfin for connector testing | 8110 |
+   | `dev-audiobookshelf-dev-1` | Local Audiobookshelf for connector testing | 13380 |
+   | `dev-scheduler-1`, `dev-worker-1`, `dev-horizon-1` | Scheduler / queue / Horizon (if your compose file defines them) | — |
+   | `dev-vite-1` | **Only** in HMR mode (`--profile hmr`) — not part of the production-build default | 5273 |
+
+   `dev-app-1` should reach `(healthy)`. If a container is missing, re-run step 2; if it keeps exiting, check `docker compose -f deploy/dev/docker-compose.yml logs <service>`.
+
+5. **A quick read-only overall check:**
+
+   ```powershell
+   make dev-doctor   # compose state + container list + app /up + registered GET routes
+   ```
+
+6. **Browser empty, or showing old assets?** That is the asset/OPcache path, not the container path:
+
+   ```powershell
+   Remove-Item public/hot -Force -ErrorAction SilentlyContinue
+   npm run build
+   docker compose -f deploy/dev/docker-compose.yml exec app php artisan optimize:clear
+   make runtime-reset
+   ```
+
+   Because the dev PHP overlay keeps `opcache.validate_timestamps=Off`, the running web server can still serve **old PHP bytecode** after you edit PHP files. Recreate the app container so it picks the new code up:
+
+   ```powershell
+   docker compose -f deploy/dev/docker-compose.yml up -d --force-recreate --no-deps app
+   ```
+
+   Then hard-reload with `Ctrl+Shift+R`.
+
+MediaForge intentionally installs **no autostart service, no Task Scheduler entry and no registry change** for Docker — starting the stack stays an explicit, reversible step you run yourself.
+
 ## Default mode: production build
 
 The **production build is the default**. The `vite` service in `deploy/dev/docker-compose.yml` sits behind the `hmr` Compose profile, so `make up` (`docker compose up`) starts the stack **without** the Vite dev server and **without** creating `public/hot`. Laravel then serves the fingerprinted assets from `public/build/`. This avoids the recurring Windows/Docker failure where a hung or stale Vite HMR server left the browser blank.

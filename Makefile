@@ -18,7 +18,7 @@ PEST := $(COMPOSE) exec -T $(TEST_ENV) app php vendor/bin/pest
 .DEFAULT_GOAL := help
 .PHONY: help setup up down restart build logs shell \
         migrate fresh seed test lint analyse types stan pint ci \
-        assets runtime-reset hmr
+        assets runtime-reset hmr dev-up dev-ps dev-doctor
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | \
@@ -90,3 +90,25 @@ runtime-reset: ## Force stable production-build mode (remove public/hot, clear c
 
 hmr: ## Start optional Vite HMR (Windows: fall back to `make assets` if it stalls)
 	$(COMPOSE) --profile hmr up -d vite
+
+# --- After a laptop reboot -------------------------------------------------
+# Docker Desktop does not always bring every container back up. These read-only
+# helpers make "is my stack actually running?" a one-liner. See
+# docs/MediaForge/dev-runtime.md#after-a-laptop-reboot.
+
+dev-up: ## Start the dev stack after a reboot (same as `up`, spelled out)
+	$(COMPOSE) up -d
+
+dev-ps: ## Show which containers are running, with status and ports
+	docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+
+dev-doctor: ## Read-only health check: compose state + app reachability + routes
+	@echo "== compose services =="
+	-$(COMPOSE) ps
+	@echo "\n== running containers =="
+	-docker ps --format "table {{.Names}}\t{{.Status}}"
+	@echo "\n== app health (/up) =="
+	-$(COMPOSE) exec -T app php artisan --version
+	-$(COMPOSE) exec -T app sh -lc 'curl -fsS -o /dev/null -w "app /up -> HTTP %{http_code}\n" http://localhost/up || echo "app /up -> unreachable"'
+	@echo "\n== registered GET routes =="
+	-$(APP) php artisan route:list --method=GET

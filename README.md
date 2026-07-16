@@ -116,6 +116,21 @@ make hmr             # opt in to Vite HMR only when you need live frontend updat
 `APP_URL` must stay aligned with the served port (default `http://localhost:8100`) — see
 [docs/MediaForge/dev-runtime.md](docs/MediaForge/dev-runtime.md) for the full runtime guide.
 
+### After a reboot
+
+Docker Desktop does not reliably restart every container, so an unreachable app after a reboot
+usually means the stack is simply not running:
+
+```bash
+make dev-up       # docker compose -f deploy/dev/docker-compose.yml up -d
+make dev-ps       # which containers are running, with status and ports
+make dev-doctor   # read-only check: compose state, app /up, registered GET routes
+```
+
+The expected container list is in
+[docs/MediaForge/dev-runtime.md](docs/MediaForge/dev-runtime.md#after-a-laptop-reboot). MediaForge
+installs no autostart service or system change for Docker on purpose.
+
 ## Tests and quality gates
 
 The hermetic test environment (`APP_ENV=testing`, `DB_DATABASE=mediaforge_test`) is pinned by

@@ -10,6 +10,37 @@ All notable changes to MediaForge are documented here. The format is based on
 Targeting the first tagged pre-release **`v0.2.0-alpha.1`** (V1 local core, alpha —
 not production-ready). See [docs/MediaForge/V1_READINESS.md](docs/MediaForge/V1_READINESS.md).
 
+### Added — V2 B: catalog browsing, filters, pagination and paged snapshots
+
+- **Browsable `/catalog`**: search by title, filter by connector / library / media kind /
+  presence (present · missing · all), sort by title / last seen / year / kind in both directions,
+  and paginate (24 per page). Filters live in the URL query string, so a filtered view is
+  shareable and back-button friendly.
+- **New read-only catalog pages**: `GET /catalog/{connector}` (connector summary, its libraries,
+  latest runs and items) and `GET /catalog/{connector}/libraries/{library}` (library counts, last
+  snapshot, truncation notice, POST-only snapshot button and the library's items). `{connector}` is
+  constrained to registered keys, `{library}` to a ULID that must belong to that connector —
+  anything else 404s. There is deliberately **no global `/libraries` route**.
+- **Paginated snapshots** replace the rigid 500-item one-shot: a run now reads the remote one
+  bounded page at a time (`PAGE_SIZE = 500`) up to a hard cap (`MAX_ITEMS_PER_SNAPSHOT = 5000`).
+  Jellyfin pages via `StartIndex`/`Limit`, Audiobookshelf via its zero-based `page`/`limit`; tokens
+  stay headers on every page. The loop is bounded by page count, item cap and the remote's reported
+  total, so it can never run away, and duplicate ids across pages are collapsed.
+- A truncated run (remote holds more than the cap, or a later page failed) is marked `truncated`,
+  raises the `snapshot_truncated` warning review task, and reports `captured_count` / `remote_total` /
+  `cap` in its summary.
+- **An incomplete read never flags items missing** — vanished-item detection now runs only after a
+  *complete* read, so a truncated or partially failed snapshot cannot mislabel the tail it never saw.
+- Captured items are stored with a **chunked bulk upsert** instead of two queries per item, so a
+  capped 5000-item run costs a handful of statements. `first_seen_at` stays insert-only.
+- **Dev runtime after a laptop reboot** is documented (expected containers, how to start, verify and
+  reset) with new `make dev-up` / `make dev-ps` / `make dev-doctor` helpers. No autostart service,
+  Task Scheduler entry or registry change is installed.
+- Readiness guardrail added: **every literal `href` in every `.tsx` must resolve to a registered GET
+  route** (template literals included), so a link to a non-existent page fails the suite.
+- Still **100% read-only**: no media import, no `media_items`/`media_editions`/`media_files`, no file
+  operations, no automatic/background snapshots.
+
 ### Added — V2 A: read-only connector catalog snapshots
 
 - **Read-only catalog snapshots**: explicitly triggered (POST-only), bounded snapshots of a
