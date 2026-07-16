@@ -3,6 +3,7 @@ import type { CSSProperties, ReactNode } from 'react';
 
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import {
+    CatalogStatusBadge,
     type ConnectorSummary,
     formatCheckedAt,
     StatusBadge,
@@ -10,7 +11,7 @@ import {
 } from '@/Components/Connectors/ConnectorStatus';
 import Badge, { type BadgeTone } from '@/Components/UI/Badge';
 import { buttonClasses } from '@/Components/UI/Button';
-import { LibraryIcon, ReviewIcon, ServerIcon, SettingsIcon, ShieldIcon, SyncIcon } from '@/Components/UI/Icon';
+import { CatalogIcon, LibraryIcon, ReviewIcon, ServerIcon, SettingsIcon, ShieldIcon, SyncIcon } from '@/Components/UI/Icon';
 import StatCard, { type StatTone } from '@/Components/UI/StatCard';
 
 interface SyncSummary {
@@ -27,12 +28,19 @@ interface ReviewSummary {
     open_task_count: number;
 }
 
+interface CatalogSummary {
+    external_items: number;
+    attention_count: number;
+    last_snapshot_at: string | null;
+}
+
 interface DashboardPageProps {
     [key: string]: unknown;
     status: string;
     connectors: ConnectorSummary[];
     syncSummary: SyncSummary;
     reviewSummary: ReviewSummary;
+    catalogSummary: CatalogSummary;
 }
 
 const REVIEW_STATUS_META: Record<ReviewStatus, { label: string; tone: BadgeTone }> = {
@@ -58,7 +66,7 @@ const ROADMAP: { id: string; label: string; done: boolean }[] = [
 ];
 
 export default function Dashboard() {
-    const { status, connectors, syncSummary, reviewSummary } = usePage<DashboardPageProps>().props;
+    const { status, connectors, syncSummary, reviewSummary, catalogSummary } = usePage<DashboardPageProps>().props;
     const find = (key: string) => connectors.find((c) => c.key === key);
     const libraryTotal = connectors.reduce((sum, c) => sum + c.library_count, 0);
 
@@ -146,6 +154,51 @@ export default function Dashboard() {
                                 </div>
                             </div>
                             <Link className={buttonClasses('secondary', 'sm')} href="/review">Open review center</Link>
+                        </div>
+                    </section>
+
+                    {/* External Catalog (V2 A) */}
+                    <section className="mf-col-12 mf-rise" style={{ '--mf-i': 1.3 } as CSSProperties}>
+                        <div className="mf-panel p-6">
+                            <div className="flex flex-wrap items-center justify-between gap-3">
+                                <div className="flex items-center gap-3">
+                                    <span className="grid size-11 place-items-center rounded-[--radius-md] bg-accent/10 text-accent ring-1 ring-inset ring-accent/20">
+                                        <CatalogIcon className="size-6" />
+                                    </span>
+                                    <div>
+                                        <h2 className="text-lg font-semibold tracking-tight">External Catalog</h2>
+                                        <p className="text-xs text-fg-subtle">Read-only snapshots. No media import in V2 A.</p>
+                                    </div>
+                                </div>
+                                <Link className={buttonClasses('secondary', 'sm')} href="/catalog">Open catalog</Link>
+                            </div>
+
+                            <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                                {[
+                                    { label: 'External items', value: String(catalogSummary.external_items), hint: 'Captured, read-only' },
+                                    { label: 'Last snapshot', value: formatCheckedAt(catalogSummary.last_snapshot_at), hint: 'Most recent, any connector' },
+                                    { label: 'Attention required', value: String(catalogSummary.attention_count), hint: 'Connectors needing review' },
+                                ].map((item) => (
+                                    <div className="mf-panel p-4" key={item.label}>
+                                        <p className="text-xs uppercase tracking-wide text-fg-subtle">{item.label}</p>
+                                        <p className="mt-1 text-lg font-semibold">{item.value}</p>
+                                        <p className="mt-0.5 text-xs text-fg-muted">{item.hint}</p>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                                {['jellyfin', 'audiobookshelf'].map((key) => {
+                                    const c = find(key);
+                                    const label = key === 'jellyfin' ? 'Jellyfin' : 'Audiobookshelf';
+                                    return (
+                                        <div className="flex items-center justify-between gap-3 rounded-[--radius-md] bg-[var(--nav-hover-bg)] px-3.5 py-2.5 text-sm" key={key}>
+                                            <span className="text-fg-muted">{label}</span>
+                                            <CatalogStatusBadge status={c?.catalog.status ?? 'not_ready'} />
+                                        </div>
+                                    );
+                                })}
+                            </div>
                         </div>
                     </section>
 

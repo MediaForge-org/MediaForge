@@ -3,19 +3,22 @@ import { type CSSProperties, type FormEvent, useState } from 'react';
 
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import {
+    type CatalogLibraryCapture,
+    CatalogStatusBadge,
     type ConnectorDetail,
     type DiscoveredLibrary,
     formatCheckedAt,
     plannedActionLabel,
     runStatusLabel,
+    snapshotStatusLabel,
     StatusBadge,
     SyncStatusBadge,
 } from '@/Components/Connectors/ConnectorStatus';
 import Alert from '@/Components/UI/Alert';
 import Badge from '@/Components/UI/Badge';
-import Button from '@/Components/UI/Button';
+import Button, { buttonClasses } from '@/Components/UI/Button';
 import EmptyState from '@/Components/UI/EmptyState';
-import { CheckIcon, LibraryIcon } from '@/Components/UI/Icon';
+import { CatalogIcon, CheckIcon, LibraryIcon } from '@/Components/UI/Icon';
 import TextField from '@/Components/UI/TextField';
 
 interface ConnectorShowProps {
@@ -39,9 +42,17 @@ export default function ConnectorShow() {
     const [savingId, setSavingId] = useState<string | null>(null);
     const [dryRunning, setDryRunning] = useState(false);
     const [showRun, setShowRun] = useState(false);
+    const [snapshottingId, setSnapshottingId] = useState<string | null>(null);
 
     const sync = connector.sync;
     const lastRun = sync.last_run;
+    const catalog = connector.catalog;
+    const lastSnapshot = catalog.last_run;
+
+    /** Per-library capture counts, defaulted so an un-snapshotted library renders cleanly. */
+    function catalogCapture(libraryId: string): CatalogLibraryCapture {
+        return catalog.libraries[libraryId] ?? { external_item_count: 0, last_seen_at: null };
+    }
 
     const form = useForm<{ base_url: string; secret: string; clear_secret: boolean }>({
         base_url: connector.base_url,
@@ -80,6 +91,15 @@ export default function ConnectorShow() {
             `/connectors/${connector.key}/libraries/${library.id}/selection`,
             { enabled: !library.is_enabled },
             { preserveScroll: true, onFinish: () => setSavingId(null) },
+        );
+    }
+
+    function snapshotLibrary(library: DiscoveredLibrary) {
+        setSnapshottingId(library.id);
+        router.post(
+            `/connectors/${connector.key}/libraries/${library.id}/snapshot`,
+            {},
+            { preserveScroll: true, onFinish: () => setSnapshottingId(null) },
         );
     }
 
@@ -196,12 +216,30 @@ export default function ConnectorShow() {
                                                         {library.discovery_status === 'missing' && <Badge tone="error">Missing</Badge>}
                                                     </div>
                                                     <p className="mt-1 truncate font-mono text-xs text-fg-subtle">{library.external_id}</p>
-                                                    <p className="mt-0.5 text-xs text-fg-subtle">Last seen {formatCheckedAt(library.last_seen_at)}</p>
+                                                    <p className="mt-0.5 text-xs text-fg-subtle">
+                                                        Last seen {formatCheckedAt(library.last_seen_at)}
+                                                        {' · '}
+                                                        {catalogCapture(library.id).external_item_count} external{' '}
+                                                        {catalogCapture(library.id).external_item_count === 1 ? 'item' : 'items'}
+                                                        {' · '}
+                                                        Snapshot {formatCheckedAt(catalogCapture(library.id).last_seen_at)}
+                                                    </p>
                                                 </div>
-                                                <label className="flex shrink-0 items-center gap-2 text-sm text-fg-muted">
-                                                    <input checked={library.is_enabled} disabled={savingId === library.id} onChange={() => toggleLibrary(library)} type="checkbox" />
-                                                    <span>Enable for later sync</span>
-                                                </label>
+                                                <div className="flex shrink-0 flex-wrap items-center gap-3">
+                                                    <label className="flex items-center gap-2 text-sm text-fg-muted">
+                                                        <input checked={library.is_enabled} disabled={savingId === library.id} onChange={() => toggleLibrary(library)} type="checkbox" />
+                                                        <span>Enable for later sync</span>
+                                                    </label>
+                                                    <Button
+                                                        disabled={!connector.configured || library.discovery_status === 'missing'}
+                                                        loading={snapshottingId === library.id}
+                                                        onClick={() => snapshotLibrary(library)}
+                                                        size="sm"
+                                                        variant="secondary"
+                                                    >
+                                                        Create read-only snapshot
+                                                    </Button>
+                                                </div>
                                             </li>
                                         ))}
                                     </ul>
@@ -286,6 +324,76 @@ export default function ConnectorShow() {
                                                         <Badge tone={library.status === 'ready' ? 'success' : library.status === 'warning' ? 'error' : 'neutral'}>
                                                             {plannedActionLabel(library.planned_action)}
                                                         </Badge>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* External Catalog Snapshot (V2 A) */}
+                        <div className="mf-panel p-6">
+                            <div className="flex flex-wrap items-start justify-between gap-3">
+                                <div>
+                                    <div className="flex items-center gap-2">
+                                        <span className="grid size-9 place-items-center rounded-[--radius-md] bg-accent/10 text-accent ring-1 ring-inset ring-accent/20">
+                                            <CatalogIcon className="size-5" />
+                                        </span>
+                                        <h2 className="text-lg font-semibold tracking-tight">External Catalog Snapshot</h2>
+                                        <CatalogStatusBadge status={catalog.status} />
+                                    </div>
+                                    <p className="mt-2 text-sm text-fg-muted">
+                                        Read-only snapshot. No media import in V2 A. No files are copied, moved or deleted.
+                                    </p>
+                                </div>
+                                <Link className={buttonClasses('secondary', 'sm')} href="/catalog">View catalog</Link>
+                            </div>
+
+                            <dl className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                                {[
+                                    ['External items', catalog.present_item_count],
+                                    ['Missing', catalog.missing_item_count],
+                                    ['Snapshot runs', catalog.snapshot_run_count],
+                                    ['Warnings', lastSnapshot?.warnings_count ?? 0],
+                                ].map(([label, value]) => (
+                                    <div className="mf-panel px-3 py-2.5 text-center" key={label}>
+                                        <dt className="text-[0.7rem] uppercase tracking-wide text-fg-subtle">{label}</dt>
+                                        <dd className="mt-1 text-lg font-semibold">{value}</dd>
+                                    </div>
+                                ))}
+                            </dl>
+
+                            <div className="mt-5">
+                                {!lastSnapshot ? (
+                                    <EmptyState
+                                        description="Take a read-only snapshot of a discovered library above. External items are captured for display only — nothing is imported, moved or deleted."
+                                        icon={<CatalogIcon className="size-5" />}
+                                        title="No snapshot yet"
+                                    />
+                                ) : (
+                                    <div className="rounded-[--radius-md] border border-[var(--panel-border)] p-4">
+                                        <div className="flex flex-wrap items-center justify-between gap-2">
+                                            <p className="font-medium">{snapshotStatusLabel(lastSnapshot.status)}</p>
+                                            <span className="text-xs text-fg-subtle">
+                                                {lastSnapshot.summary.library_name}
+                                            </span>
+                                        </div>
+                                        <p className="mt-1 text-xs text-fg-subtle">
+                                            Started {formatCheckedAt(lastSnapshot.started_at)} · Finished {formatCheckedAt(lastSnapshot.finished_at)}
+                                        </p>
+                                        <p className="mt-1 text-xs text-fg-subtle">
+                                            {lastSnapshot.items_stored_count} stored of {lastSnapshot.items_seen_count} seen
+                                            {lastSnapshot.errors_count > 0 && ` · ${lastSnapshot.errors_count} error${lastSnapshot.errors_count === 1 ? '' : 's'}`}
+                                        </p>
+
+                                        {lastSnapshot.summary.issues.length > 0 && (
+                                            <ul className="mt-3 grid gap-1.5">
+                                                {lastSnapshot.summary.issues.map((issue) => (
+                                                    <li className="flex items-start gap-2 text-sm" key={issue.code}>
+                                                        <Badge tone={issue.blocking ? 'error' : 'neutral'}>{issue.action}</Badge>
+                                                        <span className="text-fg-muted">{issue.message}</span>
                                                     </li>
                                                 ))}
                                             </ul>

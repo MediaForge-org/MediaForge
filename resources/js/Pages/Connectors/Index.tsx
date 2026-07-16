@@ -3,10 +3,12 @@ import { type CSSProperties, useState } from 'react';
 
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import {
+    CatalogStatusBadge,
     type ConnectorSummary,
     discoverySummary,
     formatCheckedAt,
     runStatusLabel,
+    snapshotStatusLabel,
     StatusBadge,
     SyncStatusBadge,
 } from '@/Components/Connectors/ConnectorStatus';
@@ -98,8 +100,19 @@ export default function ConnectorsIndex() {
                                     </span>
                                 </div>
 
+                                <div className="flex flex-wrap items-center justify-between gap-2 rounded-[--radius-md] bg-[var(--nav-hover-bg)] px-3.5 py-2.5">
+                                    <span className="flex items-center gap-2 text-sm">
+                                        <span className="text-fg-muted">External catalog</span>
+                                        <CatalogStatusBadge status={connector.catalog.status} />
+                                    </span>
+                                    <span className="text-xs text-fg-subtle">
+                                        {connector.catalog.present_item_count} {connector.catalog.present_item_count === 1 ? 'item' : 'items'} · {connector.catalog.last_run ? snapshotStatusLabel(connector.catalog.last_run.status) : 'No snapshot yet'}
+                                    </span>
+                                </div>
+
                                 <div className="mt-auto flex flex-wrap items-center gap-2">
                                     <Link className={buttonClasses('primary', 'sm')} href={`/connectors/${connector.key}`}>Configure</Link>
+                                    <Link className={buttonClasses('secondary', 'sm')} href="/catalog">View catalog</Link>
                                     {connector.configured && (
                                         <>
                                             <Button loading={busy === `${connector.key}-test`} onClick={() => post(`/connectors/${connector.key}/test`, `${connector.key}-test`)} size="sm" variant="secondary">

@@ -49,6 +49,71 @@ export interface SyncFoundation {
     last_run: SyncRun | null;
 }
 
+export type CatalogStatus = 'not_ready' | 'ready_for_snapshot' | 'last_snapshot_completed' | 'attention_required';
+
+export type SnapshotRunStatus = 'pending' | 'running' | 'completed' | 'completed_with_warnings' | 'failed' | 'cancelled';
+
+export type ExternalMediaKind =
+    | 'movie'
+    | 'series'
+    | 'season'
+    | 'episode'
+    | 'audiobook'
+    | 'book'
+    | 'podcast'
+    | 'music'
+    | 'playlist'
+    | 'folder'
+    | 'unknown';
+
+export interface CatalogIssue {
+    code: string;
+    message: string;
+    action: string;
+    blocking: boolean;
+}
+
+export interface SnapshotRunSummary {
+    library_external_id: string;
+    library_name: string;
+    items_stored: number;
+    items_seen: number;
+    truncated: boolean;
+    http_status: number | null;
+    outcome: string;
+    issues: CatalogIssue[];
+    note: string;
+}
+
+export interface SnapshotRun {
+    id: string;
+    status: SnapshotRunStatus;
+    started_at: string | null;
+    finished_at: string | null;
+    items_seen_count: number;
+    items_stored_count: number;
+    warnings_count: number;
+    errors_count: number;
+    summary: SnapshotRunSummary;
+}
+
+/** Per-library capture counts, keyed by connector_library_id. */
+export interface CatalogLibraryCapture {
+    external_item_count: number;
+    last_seen_at: string | null;
+}
+
+export interface CatalogFoundation {
+    status: CatalogStatus;
+    external_item_count: number;
+    present_item_count: number;
+    missing_item_count: number;
+    snapshot_run_count: number;
+    open_review_count: number;
+    last_run: SnapshotRun | null;
+    libraries: Record<string, CatalogLibraryCapture>;
+}
+
 export interface ConnectorSummary {
     key: string;
     label: string;
@@ -64,6 +129,7 @@ export interface ConnectorSummary {
     libraries_discovered_at: string | null;
     last_discovery_error: string | null;
     sync: SyncFoundation;
+    catalog: CatalogFoundation;
 }
 
 export interface DiscoveredLibrary {
@@ -157,4 +223,64 @@ const PLANNED_ACTION_LABEL: Record<SyncRunLibrary['planned_action'], string> = {
 
 export function plannedActionLabel(action: SyncRunLibrary['planned_action']): string {
     return PLANNED_ACTION_LABEL[action];
+}
+
+const CATALOG_STATUS_META: Record<CatalogStatus, { label: string; tone: BadgeTone }> = {
+    not_ready: { label: 'Not ready', tone: 'neutral' },
+    ready_for_snapshot: { label: 'Ready for snapshot', tone: 'accent' },
+    last_snapshot_completed: { label: 'Last snapshot completed', tone: 'success' },
+    attention_required: { label: 'Attention required', tone: 'error' },
+};
+
+export function CatalogStatusBadge({ status }: { status: CatalogStatus }) {
+    const meta = CATALOG_STATUS_META[status];
+
+    return (
+        <Badge dot tone={meta.tone}>
+            {meta.label}
+        </Badge>
+    );
+}
+
+const SNAPSHOT_STATUS_LABEL: Record<SnapshotRunStatus, string> = {
+    pending: 'Pending',
+    running: 'Running',
+    completed: 'Snapshot completed',
+    completed_with_warnings: 'Snapshot completed with warnings',
+    failed: 'Snapshot failed',
+    cancelled: 'Cancelled',
+};
+
+export function snapshotStatusLabel(status: SnapshotRunStatus): string {
+    return SNAPSHOT_STATUS_LABEL[status];
+}
+
+const MEDIA_KIND_LABEL: Record<ExternalMediaKind, string> = {
+    movie: 'Movie',
+    series: 'Series',
+    season: 'Season',
+    episode: 'Episode',
+    audiobook: 'Audiobook',
+    book: 'Book',
+    podcast: 'Podcast',
+    music: 'Music',
+    playlist: 'Playlist',
+    folder: 'Folder',
+    unknown: 'Unknown',
+};
+
+export function mediaKindLabel(kind: ExternalMediaKind): string {
+    return MEDIA_KIND_LABEL[kind] ?? 'Unknown';
+}
+
+/** Format a runtime in seconds as a compact "1h 24m" / "48m" string. */
+export function formatRuntime(seconds: number | null): string | null {
+    if (!seconds || seconds <= 0) {
+        return null;
+    }
+
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.round((seconds % 3600) / 60);
+
+    return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
 }

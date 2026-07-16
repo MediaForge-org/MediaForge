@@ -187,6 +187,18 @@ export function SyncIcon(props: IconProps) {
     );
 }
 
+export function CatalogIcon(props: IconProps) {
+    return (
+        <svg {...base(props)}>
+            <rect x="3" y="4" width="7" height="7" rx="1.5" />
+            <rect x="14" y="4" width="7" height="7" rx="1.5" />
+            <rect x="3" y="15" width="7" height="5" rx="1.5" />
+            <path d="M14 15h7" />
+            <path d="M14 19h7" />
+        </svg>
+    );
+}
+
 export function ReviewIcon(props: IconProps) {
     return (
         <svg {...base(props)}>

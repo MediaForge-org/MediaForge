@@ -4,7 +4,7 @@ import type { FormEvent, ReactNode } from 'react';
 import NavLink from '@/Components/NavLink';
 import Badge from '@/Components/UI/Badge';
 import Button from '@/Components/UI/Button';
-import { ConnectorsIcon, DashboardIcon, LibraryIcon, ReviewIcon, ServerIcon, SettingsIcon, SyncIcon } from '@/Components/UI/Icon';
+import { CatalogIcon, ConnectorsIcon, DashboardIcon, LibraryIcon, ReviewIcon, ServerIcon, SettingsIcon, SyncIcon } from '@/Components/UI/Icon';
 import PresetSelector from '@/Components/UI/PresetSelector';
 import ThemeToggle from '@/Components/UI/ThemeToggle';
 
@@ -16,6 +16,7 @@ interface SharedPageProps {
 const NAV = [
     { href: '/dashboard', label: 'Dashboard', icon: <DashboardIcon className="size-4" /> },
     { href: '/connectors', label: 'Connectors', icon: <ConnectorsIcon className="size-4" /> },
+    { href: '/catalog', label: 'External Catalog', icon: <CatalogIcon className="size-4" /> },
     { href: '/sync', label: 'Sync', icon: <SyncIcon className="size-4" /> },
     { href: '/review', label: 'Review Tasks', icon: <ReviewIcon className="size-4" /> },
     { href: '/settings', label: 'Settings', icon: <SettingsIcon className="size-4" /> },
@@ -31,6 +32,7 @@ function breadcrumb(url: string): [string, string] {
     if (url.startsWith('/connectors/jellyfin')) return ['Connectors', 'Jellyfin'];
     if (url.startsWith('/connectors/audiobookshelf')) return ['Connectors', 'Audiobookshelf'];
     if (url.startsWith('/connectors')) return ['Connectors', 'Providers'];
+    if (url.startsWith('/catalog')) return ['External Catalog', 'Read-only snapshots'];
     if (url.startsWith('/sync')) return ['Sync', 'Foundation'];
     if (url.startsWith('/review')) return ['Review', 'Center'];
     if (url.startsWith('/settings')) return ['Settings', 'Foundation'];
