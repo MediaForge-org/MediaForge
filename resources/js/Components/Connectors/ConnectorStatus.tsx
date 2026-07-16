@@ -78,11 +78,95 @@ export interface SnapshotRunSummary {
     library_name: string;
     items_stored: number;
     items_seen: number;
+    captured_count: number;
+    remote_total: number;
+    cap: number;
     truncated: boolean;
     http_status: number | null;
     outcome: string;
     issues: CatalogIssue[];
     note: string;
+}
+
+/** A connector reference echoed on runs/items ({ key, label }) or null when unknown. */
+export interface ConnectorRef {
+    key: string;
+    label: string;
+}
+
+/** One browsable captured external item (CatalogReadModel::itemView). */
+export interface CatalogItemRow {
+    id: string;
+    title: string;
+    media_kind: ExternalMediaKind;
+    year: number | null;
+    index_number: number | null;
+    parent_index_number: number | null;
+    runtime_seconds: number | null;
+    connector: ConnectorRef | null;
+    library_name: string | null;
+    is_present: boolean;
+    last_seen_at: string | null;
+}
+
+export interface PaginationMeta {
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+    from: number | null;
+    to: number | null;
+}
+
+export interface CatalogItemsPage {
+    data: CatalogItemRow[];
+    meta: PaginationMeta;
+}
+
+/** The applied catalog filters, echoed back so the UI selects stay in sync. */
+export interface CatalogFilters {
+    q: string;
+    connector: string;
+    library: string;
+    kind: string;
+    status: string;
+    sort: string;
+    direction: string;
+}
+
+/** A library option for the catalog filter + connector page (with capture counts). */
+export interface CatalogLibraryOption {
+    id: string;
+    name: string;
+    type: string | null;
+    connector: ConnectorRef | null;
+    present_item_count: number;
+    missing_item_count: number;
+    is_enabled: boolean;
+    discovery_status: 'present' | 'missing';
+}
+
+/** Scoped counts + runs for a single library catalog page (CatalogReadModel::libraryScope). */
+export interface CatalogLibraryScope {
+    external_item_count: number;
+    present_item_count: number;
+    missing_item_count: number;
+    snapshot_run_count: number;
+    last_run: SnapshotRun | null;
+    latest_runs: LatestSnapshotRun[];
+}
+
+/** A row in the "latest snapshot runs" lists (CatalogReadModel::latestRuns). */
+export interface LatestSnapshotRun {
+    id: string;
+    status: SnapshotRunStatus;
+    connector: ConnectorRef | null;
+    library_name: string | null;
+    items_stored_count: number;
+    items_seen_count: number;
+    warnings_count: number;
+    errors_count: number;
+    finished_at: string | null;
 }
 
 export interface SnapshotRun {

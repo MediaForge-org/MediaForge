@@ -230,6 +230,9 @@ export default function ConnectorShow() {
                                                         <input checked={library.is_enabled} disabled={savingId === library.id} onChange={() => toggleLibrary(library)} type="checkbox" />
                                                         <span>Enable for later sync</span>
                                                     </label>
+                                                    <Link className={buttonClasses('ghost', 'sm')} href={`/catalog/${connector.key}/libraries/${library.id}`}>
+                                                        View catalog
+                                                    </Link>
                                                     <Button
                                                         disabled={!connector.configured || library.discovery_status === 'missing'}
                                                         loading={snapshottingId === library.id}
