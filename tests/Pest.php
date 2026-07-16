@@ -24,6 +24,7 @@ uses(RefreshDatabase::class)->in(
     'Feature/Connectors',
     'Feature/Sync',
     'Feature/Review',
+    'Feature/Catalog',
     'Feature/Auth',
     'Feature/Admin',
 );
