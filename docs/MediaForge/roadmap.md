@@ -6,15 +6,15 @@ Zurück zur [Masterdatei](MediaForge_Master_Engineering.md). Governance und Fron
 
 Die frühere grobe V1–V3-Roadmap ist seit 2026-07-11 **superseded** und nicht mehr arbeitssteuernd. Der finale Master-Prompt ersetzt sie durch 35 interne Engineering-Phasen von V0 bis V34. Diese Phasen sind keine automatischen GitHub-Release-Nummern.
 
-Aktiv ist ausschließlich **V0**. V1 und alle späteren Phasen bleiben gesperrt, bis das reproduzierbare V0-Gate vollständig grün ist.
+**Stand 2026-07-16:** Das V0-Gate ist grün. Die Engineering-Phase **V1 (Lokale Core-App und sichere V1-Basis)** wurde als lokale Alpha in acht Paketen (V1 A–H) ausgeliefert — Details und Readiness in [CURRENT_PHASE.md](CURRENT_PHASE.md) und [V1_READINESS.md](V1_READINESS.md). V1 ist local alpha, **nicht** production-ready. Alle Phasen ab **V2** bleiben geplant/gesperrt; die untenstehende Phasentabelle bleibt die verbindliche ADR-Governance und wird davon nicht verändert.
 
 ## Verbindliche Phasen
 
 | Phase | Schwerpunkt | Status |
 |---|---|---|
-| V0 | Repository, Fundament und Developer Baseline | aktiv |
-| V1 | Lokale Core-App und sichere V1-Basis | gesperrt bis V0 grün |
-| V2 | Connector Suite, Dashboard und bestehende Dienste übernehmen | geplant |
+| V0 | Repository, Fundament und Developer Baseline | abgeschlossen |
+| V1 | Lokale Core-App und sichere V1-Basis | ausgeliefert (local alpha, V1 A–H) |
+| V2 | Connector Suite, Dashboard und bestehende Dienste übernehmen | nächste Phase |
 | V3 | Security Hardening und Privacy Baseline | geplant |
 | V4 | React UI/UX Design System und App-Shell | geplant |
 | V5 | Internationalisierung und sprachliche Qualität | geplant |
