@@ -75,6 +75,38 @@ function fakeJellyfinItems(array $items, ?int $total = null): void
     ], 200)]);
 }
 
+/**
+ * A page of `$count` distinct Jellyfin items starting at index `$start`.
+ *
+ * @return list<array<string, mixed>>
+ */
+function jellyfinPage(int $start, int $count): array
+{
+    $items = [];
+
+    for ($i = $start; $i < $start + $count; $i++) {
+        $items[] = ['Id' => "jf-{$i}", 'Name' => "Item {$i}", 'Type' => 'Movie'];
+    }
+
+    return $items;
+}
+
+/**
+ * A page of `$count` distinct Audiobookshelf items starting at index `$start`.
+ *
+ * @return list<array<string, mixed>>
+ */
+function audiobookshelfPage(int $start, int $count): array
+{
+    $results = [];
+
+    for ($i = $start; $i < $start + $count; $i++) {
+        $results[] = ['id' => "abs-{$i}", 'mediaType' => 'book', 'media' => ['metadata' => ['title' => "Book {$i}"]]];
+    }
+
+    return $results;
+}
+
 test('guests cannot run a catalog snapshot', function () {
     [, $library] = seedCatalogConnector();
 
@@ -264,32 +296,34 @@ test('a truncated snapshot stores only the bounded subset and raises a warning r
     $user = User::factory()->create();
     [, $library] = seedCatalogConnector();
 
-    // The remote reports far more items than the bounded limit returns.
-    $limit = RunConnectorCatalogSnapshot::ITEM_LIMIT;
+    // One full page whose remote reports far more items than a single page returns.
+    $pageSize = RunConnectorCatalogSnapshot::PAGE_SIZE;
     $items = [];
-    for ($i = 0; $i < $limit; $i++) {
+    for ($i = 0; $i < $pageSize; $i++) {
         $items[] = ['Id' => "jf-{$i}", 'Name' => "Item {$i}", 'Type' => 'Movie'];
     }
 
-    fakeJellyfinItems($items, total: $limit * 3);
+    // Every page returns the same full page; the remote claims 3x that total, so the
+    // read is always short of the total and is marked truncated.
+    fakeJellyfinItems($items, total: $pageSize * 3);
 
     $this->actingAs($user)->post("/connectors/jellyfin/libraries/{$library->id}/snapshot")
         ->assertSessionHas('error'); // completed_with_warnings
 
     $run = ConnectorCatalogSnapshotRun::query()->sole();
     expect($run->status)->toBe('completed_with_warnings')
-        ->and($run->items_stored_count)->toBe($limit)
+        ->and($run->items_stored_count)->toBe($pageSize)
         ->and($run->warnings_count)->toBe(1)
         ->and($run->summary['truncated'])->toBeTrue();
 
-    // Bounded: never stores more than the limit even though the remote has 3x.
-    expect(ConnectorCatalogItem::query()->count())->toBe($limit);
+    // Bounded: never stores more than a page of distinct ids even though the remote has 3x.
+    expect(ConnectorCatalogItem::query()->count())->toBe($pageSize);
 
     $task = ReviewTask::query()->where('task_type', 'connector_catalog')->sole();
     expect(array_column($task->evidence['issues'], 'code'))->toContain('snapshot_truncated');
 });
 
-test('the snapshot request honours the bounded item limit', function () {
+test('the snapshot request honours the bounded page size', function () {
     $user = User::factory()->create();
     [, $library] = seedCatalogConnector();
 
@@ -297,7 +331,138 @@ test('the snapshot request honours the bounded item limit', function () {
 
     $this->actingAs($user)->post("/connectors/jellyfin/libraries/{$library->id}/snapshot");
 
-    Http::assertSent(fn (Request $request): bool => str_contains($request->url(), 'Limit='.RunConnectorCatalogSnapshot::ITEM_LIMIT));
+    Http::assertSent(fn (Request $request): bool => str_contains($request->url(), 'Limit='.RunConnectorCatalogSnapshot::PAGE_SIZE));
+});
+
+test('a Jellyfin snapshot pages through the remote and stores items from every page', function () {
+    $user = User::factory()->create();
+    [, $library] = seedCatalogConnector();
+    $pageSize = RunConnectorCatalogSnapshot::PAGE_SIZE;
+    $total = $pageSize + 250;
+
+    // A full first page (→ keep paging) followed by a short final page (→ stop).
+    Http::fakeSequence('*/Items*')
+        ->push(['Items' => jellyfinPage(0, $pageSize), 'TotalRecordCount' => $total], 200)
+        ->push(['Items' => jellyfinPage($pageSize, 250), 'TotalRecordCount' => $total], 200);
+
+    $this->actingAs($user)->post("/connectors/jellyfin/libraries/{$library->id}/snapshot")
+        ->assertSessionHas('success');
+
+    $run = ConnectorCatalogSnapshotRun::query()->sole();
+    expect($run->status)->toBe('completed')
+        ->and($run->items_stored_count)->toBe($total)
+        ->and($run->summary['truncated'])->toBeFalse();
+
+    // Items from BOTH pages are stored — the read is complete, so not truncated.
+    expect(ConnectorCatalogItem::query()->count())->toBe($total)
+        ->and(ConnectorCatalogItem::query()->where('external_id', 'jf-0')->exists())->toBeTrue()
+        ->and(ConnectorCatalogItem::query()->where('external_id', 'jf-'.($total - 1))->exists())->toBeTrue();
+
+    // The offset advances by a page each read.
+    Http::assertSentCount(2);
+    Http::assertSent(fn (Request $request): bool => str_contains($request->url(), 'StartIndex=0'));
+    Http::assertSent(fn (Request $request): bool => str_contains($request->url(), 'StartIndex='.$pageSize));
+});
+
+test('a snapshot stops at the hard item cap and marks the run truncated', function () {
+    $user = User::factory()->create();
+    [, $library] = seedCatalogConnector();
+    $pageSize = RunConnectorCatalogSnapshot::PAGE_SIZE;
+    $cap = RunConnectorCatalogSnapshot::MAX_ITEMS_PER_SNAPSHOT;
+    $expectedPages = intdiv($cap, $pageSize);
+
+    // A remote that would happily keep serving full pages forever — one more page
+    // than the cap allows, so an unbounded loop would be caught.
+    $sequence = Http::fakeSequence('*/Items*');
+    for ($page = 0; $page <= $expectedPages; $page++) {
+        $sequence->push(['Items' => jellyfinPage($page * $pageSize, $pageSize), 'TotalRecordCount' => 100_000], 200);
+    }
+
+    $this->actingAs($user)->post("/connectors/jellyfin/libraries/{$library->id}/snapshot")
+        ->assertSessionHas('error'); // completed_with_warnings
+
+    $run = ConnectorCatalogSnapshotRun::query()->sole();
+    expect($run->status)->toBe('completed_with_warnings')
+        ->and($run->items_stored_count)->toBe($cap)
+        ->and($run->summary['truncated'])->toBeTrue()
+        ->and($run->summary['cap'])->toBe($cap)
+        ->and($run->summary['remote_total'])->toBe(100_000);
+
+    // Bounded: never reads more pages than the cap allows, never stores past the cap.
+    Http::assertSentCount($expectedPages);
+    expect(ConnectorCatalogItem::query()->count())->toBe($cap);
+
+    $task = ReviewTask::query()->where('task_type', 'connector_catalog')->sole();
+    expect(array_column($task->evidence['issues'], 'code'))->toContain('snapshot_truncated');
+});
+
+test('a repeated paginated snapshot upserts across pages without duplicating items', function () {
+    $user = User::factory()->create();
+    [, $library] = seedCatalogConnector();
+    $pageSize = RunConnectorCatalogSnapshot::PAGE_SIZE;
+    $total = $pageSize + 10;
+
+    Http::fakeSequence('*/Items*')
+        ->push(['Items' => jellyfinPage(0, $pageSize), 'TotalRecordCount' => $total], 200)
+        ->push(['Items' => jellyfinPage($pageSize, 10), 'TotalRecordCount' => $total], 200)
+        ->push(['Items' => jellyfinPage(0, $pageSize), 'TotalRecordCount' => $total], 200)
+        ->push(['Items' => jellyfinPage($pageSize, 10), 'TotalRecordCount' => $total], 200);
+
+    $this->actingAs($user)->post("/connectors/jellyfin/libraries/{$library->id}/snapshot");
+    expect(ConnectorCatalogItem::query()->count())->toBe($total);
+
+    $this->actingAs($user)->post("/connectors/jellyfin/libraries/{$library->id}/snapshot");
+
+    // Same rows, upserted in place — a second paginated run never duplicates them.
+    expect(ConnectorCatalogItem::query()->count())->toBe($total)
+        ->and(ConnectorCatalogSnapshotRun::query()->count())->toBe(2)
+        ->and(ConnectorCatalogItem::query()->where('is_present', false)->count())->toBe(0);
+});
+
+test('a failed later page keeps the captured items, marks the run truncated and never flags items missing', function () {
+    $user = User::factory()->create();
+    [, $library] = seedCatalogConnector();
+    $pageSize = RunConnectorCatalogSnapshot::PAGE_SIZE;
+
+    Http::fakeSequence('*/Items*')
+        ->push(['Items' => jellyfinPage(0, $pageSize), 'TotalRecordCount' => 100_000], 200)
+        ->push([], 500);
+
+    $this->actingAs($user)->post("/connectors/jellyfin/libraries/{$library->id}/snapshot")
+        ->assertSessionHas('error');
+
+    // The captured first page is kept; a partial read is a warning, not a hard failure.
+    $run = ConnectorCatalogSnapshotRun::query()->sole();
+    expect($run->status)->toBe('completed_with_warnings')
+        ->and($run->items_stored_count)->toBe($pageSize)
+        ->and($run->summary['truncated'])->toBeTrue();
+
+    // An incomplete read must NEVER flag the un-read tail as missing.
+    expect(ConnectorCatalogItem::query()->count())->toBe($pageSize)
+        ->and(ConnectorCatalogItem::query()->where('is_present', false)->count())->toBe(0);
+});
+
+test('an Audiobookshelf snapshot advances the zero-based page index across pages', function () {
+    $user = User::factory()->create();
+    [$instance, $library] = seedCatalogConnector('audiobookshelf', 'ABS-PAGE-TOKEN', 'healthy', 'book');
+    $pageSize = RunConnectorCatalogSnapshot::PAGE_SIZE;
+    $total = $pageSize + 5;
+
+    Http::fakeSequence('*/api/libraries/*/items*')
+        ->push(['results' => audiobookshelfPage(0, $pageSize), 'total' => $total], 200)
+        ->push(['results' => audiobookshelfPage($pageSize, 5), 'total' => $total], 200);
+
+    $this->actingAs($user)->post("/connectors/audiobookshelf/libraries/{$library->id}/snapshot")
+        ->assertSessionHas('success');
+
+    expect(ConnectorCatalogItem::query()->where('connector_instance_id', $instance->id)->count())->toBe($total);
+
+    // Audiobookshelf pages by a zero-based index; the token stays a header on every page.
+    Http::assertSentCount(2);
+    Http::assertSent(fn (Request $request): bool => str_contains($request->url(), 'page=0'));
+    Http::assertSent(fn (Request $request): bool => str_contains($request->url(), 'page=1')
+        && $request->hasHeader('Authorization', 'Bearer ABS-PAGE-TOKEN')
+        && !str_contains($request->url(), 'ABS-PAGE-TOKEN'));
 });
 
 test('repeated snapshot problems do not duplicate the review task and a clean snapshot dismisses it', function () {
