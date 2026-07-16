@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace App\Connectors\Jellyfin;
 
+use App\Connectors\Sdk\Catalog\CatalogSnapshotRequest;
+use App\Connectors\Sdk\Catalog\CatalogSnapshotResult;
+use App\Connectors\Sdk\Catalog\ExternalMediaKind;
+use App\Connectors\Sdk\Catalog\SnapshotItem;
 use App\Connectors\Sdk\Contracts\ConnectorProvider;
 use App\Connectors\Sdk\Diagnostics\DiscoveredLibrary;
 use App\Connectors\Sdk\Diagnostics\LibraryDiscoveryRequest;
@@ -120,6 +124,112 @@ final class JellyfinConnector implements ConnectorProvider
         );
     }
 
+    public function supportsCatalogSnapshot(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Read-only item snapshot via `/Items?ParentId={library}`: a bounded, paged,
+     * authenticated listing of a library's items with a small, fixed field set. No
+     * media is fetched, downloaded or modified — this is a pure read. `Limit` caps
+     * the rows; `TotalRecordCount` tells us whether the library held more (→
+     * truncated). Redirects are disabled and the timeout is short.
+     */
+    public function snapshotLibraryItems(CatalogSnapshotRequest $request): CatalogSnapshotResult
+    {
+        $url = BaseUrl::normalize($request->baseUrl).'/Items';
+
+        try {
+            $response = $this->http->make()
+                ->withHeaders(['X-Emby-Token' => $request->secret ?? ''])
+                ->get($url, [
+                    'ParentId' => $request->libraryExternalId,
+                    'Recursive' => 'true',
+                    'Limit' => $request->limit,
+                    'StartIndex' => 0,
+                    'EnableImages' => 'false',
+                    'EnableUserData' => 'false',
+                    'Fields' => 'OriginalTitle,SortName,ProductionYear,DateCreated',
+                    'SortBy' => 'SortName',
+                    'SortOrder' => 'Ascending',
+                ]);
+        } catch (ConnectionException) {
+            return CatalogSnapshotResult::failure('Could not reach the Jellyfin server. Check the base URL and that the server is running.');
+        }
+
+        $status = $response->status();
+
+        if (in_array($status, [401, 403], true)) {
+            return CatalogSnapshotResult::failure("Jellyfin rejected the API key (HTTP {$status}).", $status);
+        }
+
+        if (!$response->successful()) {
+            return CatalogSnapshotResult::failure("Jellyfin returned an unexpected response (HTTP {$status}).", $status);
+        }
+
+        $items = [];
+
+        foreach ($this->itemsArray($response->json('Items')) as $item) {
+            if (!is_array($item)) {
+                continue;
+            }
+
+            $externalId = $this->stringField($item['Id'] ?? null);
+            $title = $this->stringField($item['Name'] ?? null);
+
+            if ($externalId === null || $title === null) {
+                continue;
+            }
+
+            $items[] = new SnapshotItem(
+                externalId: $externalId,
+                title: $title,
+                kind: $this->mapKind($this->stringField($item['Type'] ?? null)),
+                externalParentId: $this->stringField($item['SeriesId'] ?? null) ?? $this->stringField($item['ParentId'] ?? null),
+                sortTitle: $this->stringField($item['SortName'] ?? null),
+                originalTitle: $this->stringField($item['OriginalTitle'] ?? null),
+                year: $this->intField($item['ProductionYear'] ?? null),
+                indexNumber: $this->intField($item['IndexNumber'] ?? null),
+                parentIndexNumber: $this->intField($item['ParentIndexNumber'] ?? null),
+                runtimeSeconds: $this->ticksToSeconds($item['RunTimeTicks'] ?? null),
+            );
+        }
+
+        $total = $this->intField($response->json('TotalRecordCount')) ?? count($items);
+        $truncated = $total > count($items);
+
+        return CatalogSnapshotResult::success(
+            $items,
+            'Captured '.count($items).' external '.(count($items) === 1 ? 'item' : 'items').'.',
+            $truncated,
+            $total,
+            $status,
+        );
+    }
+
+    private function mapKind(?string $type): ExternalMediaKind
+    {
+        return match (strtolower((string) $type)) {
+            'movie' => ExternalMediaKind::Movie,
+            'series' => ExternalMediaKind::Series,
+            'season' => ExternalMediaKind::Season,
+            'episode' => ExternalMediaKind::Episode,
+            'audio', 'musicalbum', 'musicartist' => ExternalMediaKind::Music,
+            'audiobook' => ExternalMediaKind::Audiobook,
+            'book' => ExternalMediaKind::Book,
+            'playlist' => ExternalMediaKind::Playlist,
+            'folder', 'collectionfolder', 'boxset' => ExternalMediaKind::Folder,
+            default => ExternalMediaKind::Unknown,
+        };
+    }
+
+    private function ticksToSeconds(mixed $ticks): ?int
+    {
+        // Jellyfin RunTimeTicks are 100-nanosecond units.
+        return is_int($ticks) && $ticks > 0 ? intdiv($ticks, 10_000_000) : null;
+    }
+
     /** @return array<int, mixed> */
     private function itemsArray(mixed $items): array
     {
@@ -129,5 +239,10 @@ final class JellyfinConnector implements ConnectorProvider
     private function stringField(mixed $value): ?string
     {
         return is_string($value) && $value !== '' ? $value : null;
+    }
+
+    private function intField(mixed $value): ?int
+    {
+        return is_int($value) ? $value : (is_numeric($value) ? (int) $value : null);
     }
 }

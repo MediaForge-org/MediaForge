@@ -25,6 +25,7 @@ final class ConnectorCatalog
     public function __construct(
         private readonly ConnectorRegistry $registry,
         private readonly SecretStore $secrets,
+        private readonly CatalogReadModel $catalog,
     ) {}
 
     /** @return list<array<string, mixed>> One entry per registered connector. */
@@ -68,6 +69,8 @@ final class ConnectorCatalog
             'last_discovery_error' => $instance?->last_discovery_error,
             // Sync foundation aggregates (V1 F). Stored state only, no network.
             'sync' => $this->syncView($instance, $configured, false),
+            // External catalog aggregates (V2 A). Stored state only, no network.
+            'catalog' => $this->catalog->connectorSummary($instance, $configured, false),
         ];
     }
 
@@ -85,6 +88,8 @@ final class ConnectorCatalog
         $view['libraries'] = $instance !== null ? $this->libraries($instance) : [];
         // Re-render the sync block with the latest run's per-library breakdown.
         $view['sync'] = $this->syncView($instance, $view['configured'] === true, true);
+        // Re-render the catalog block with per-library capture counts.
+        $view['catalog'] = $this->catalog->connectorSummary($instance, $view['configured'] === true, true);
 
         return $view;
     }

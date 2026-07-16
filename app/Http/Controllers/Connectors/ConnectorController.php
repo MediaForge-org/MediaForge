@@ -6,10 +6,12 @@ namespace App\Http\Controllers\Connectors;
 
 use App\Connectors\Sdk\Actions\ConnectorConfigInput;
 use App\Connectors\Sdk\Actions\DiscoverConnectorLibraries;
+use App\Connectors\Sdk\Actions\RunConnectorCatalogSnapshot;
 use App\Connectors\Sdk\Actions\RunConnectorDryRun;
 use App\Connectors\Sdk\Actions\RunConnectorTest;
 use App\Connectors\Sdk\Actions\SaveConnectorConfig;
 use App\Connectors\Sdk\Actions\UpdateConnectorLibrarySelection;
+use App\Connectors\Sdk\Catalog\CatalogSnapshotStatus;
 use App\Connectors\Sdk\ConnectorCatalog;
 use App\Connectors\Sdk\Sync\SyncRunStatus;
 use App\Http\Controllers\Controller;
@@ -102,6 +104,27 @@ final class ConnectorController extends Controller
             SyncRunStatus::Completed => back()->with('success', 'Dry run completed. Selected libraries are ready for future sync. No media was imported.'),
             SyncRunStatus::CompletedWithWarnings => back()->with('error', 'Dry run completed with warnings. Review the attention items — no media was imported.'),
             default => back()->with('error', 'Dry run finished. No media was imported.'),
+        };
+    }
+
+    /**
+     * V2 A: take a read-only catalog snapshot of one library. This READS external
+     * items and stores them as a read-only connector read-model — no media import,
+     * no media_items/editions/files, no file operations. The network read happens
+     * only on this explicit POST, never while rendering a page.
+     */
+    public function snapshotLibrary(string $connector, string $library, ConnectorCatalog $catalog, RunConnectorCatalogSnapshot $action): RedirectResponse
+    {
+        if ($catalog->view($connector)['configured'] !== true) {
+            return back()->with('error', 'Configure and connect the connector before taking a snapshot.');
+        }
+
+        $run = $action->execute($connector, $library);
+
+        return match (CatalogSnapshotStatus::from($run->status)) {
+            CatalogSnapshotStatus::Completed => back()->with('success', "Read-only snapshot completed. Captured {$run->items_stored_count} external items. No media was imported."),
+            CatalogSnapshotStatus::CompletedWithWarnings => back()->with('error', 'Read-only snapshot completed with warnings. Review the attention items — no media was imported.'),
+            default => back()->with('error', 'Read-only snapshot failed. No media was imported.'),
         };
     }
 }

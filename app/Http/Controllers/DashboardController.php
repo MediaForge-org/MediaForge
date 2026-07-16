@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Connectors\Sdk\CatalogReadModel;
 use App\Connectors\Sdk\ConnectorCatalog;
 use App\Connectors\Sdk\ReviewCenterCatalog;
 use Inertia\Inertia;
@@ -16,7 +17,7 @@ use Inertia\Response;
  */
 final class DashboardController extends Controller
 {
-    public function index(ConnectorCatalog $catalog, ReviewCenterCatalog $reviewCenter): Response
+    public function index(ConnectorCatalog $catalog, ReviewCenterCatalog $reviewCenter, CatalogReadModel $catalogReadModel): Response
     {
         $connectors = $catalog->overview();
         $openTaskCount = $reviewCenter->openTaskCount();
@@ -29,6 +30,7 @@ final class DashboardController extends Controller
                 'status' => $reviewCenter->status($connectors, $openTaskCount),
                 'open_task_count' => $openTaskCount,
             ],
+            'catalogSummary' => $catalogReadModel->dashboardSummary($connectors),
         ]);
     }
 

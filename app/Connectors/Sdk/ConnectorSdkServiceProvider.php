@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Connectors\Sdk;
 
+use App\Connectors\Sdk\Models\ConnectorCatalogItem;
+use App\Connectors\Sdk\Models\ConnectorCatalogSnapshotRun;
 use App\Connectors\Sdk\Models\ConnectorInstance;
 use App\Connectors\Sdk\Models\ConnectorLibrary;
 use App\Connectors\Sdk\Models\ConnectorSyncRun;
@@ -45,6 +47,8 @@ final class ConnectorSdkServiceProvider extends ServiceProvider
             'connector_library' => ConnectorLibrary::class,
             'connector_sync_run' => ConnectorSyncRun::class,
             'connector_sync_run_library' => ConnectorSyncRunLibrary::class,
+            'connector_catalog_snapshot_run' => ConnectorCatalogSnapshotRun::class,
+            'connector_catalog_item' => ConnectorCatalogItem::class,
         ]);
     }
 }

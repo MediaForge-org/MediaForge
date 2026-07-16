@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\Connectors\ConnectorController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ReviewController;
@@ -27,6 +28,7 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
     Route::get('/sync', [SyncController::class, 'index'])->name('sync.index');
+    Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog.index');
     Route::get('/review', [ReviewController::class, 'index'])->name('review.index');
     Route::post('/review/tasks/{task}/dismiss', [ReviewController::class, 'dismiss'])
         ->whereUlid('task')->name('review.tasks.dismiss');
@@ -49,4 +51,6 @@ Route::middleware('auth')->group(function (): void {
         ->whereIn('connector', $connectors)->whereUlid('library')->name('connectors.libraries.selection');
     Route::post('/connectors/{connector}/sync/dry-run', [ConnectorController::class, 'dryRun'])
         ->whereIn('connector', $connectors)->name('connectors.sync.dry-run');
+    Route::post('/connectors/{connector}/libraries/{library}/snapshot', [ConnectorController::class, 'snapshotLibrary'])
+        ->whereIn('connector', $connectors)->whereUlid('library')->name('connectors.catalog.snapshot');
 });
