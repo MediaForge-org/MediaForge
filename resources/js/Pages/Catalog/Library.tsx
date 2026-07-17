@@ -4,6 +4,7 @@ import { useState } from 'react';
 import CatalogFilterBar from '@/Components/Catalog/CatalogFilterBar';
 import CatalogItemsTable from '@/Components/Catalog/CatalogItemsTable';
 import { filtersToQuery } from '@/Components/Catalog/catalogQuery';
+import NormalizationSummaryCards from '@/Components/Catalog/NormalizationSummaryCards';
 import {
     type CatalogFilters,
     type CatalogItemsPage,
@@ -11,12 +12,13 @@ import {
     type ConnectorStatus,
     type ExternalMediaKind,
     formatCheckedAt,
+    type NormalizationSummary,
     snapshotStatusLabel,
     StatusBadge,
 } from '@/Components/Connectors/ConnectorStatus';
 import Alert from '@/Components/UI/Alert';
 import Badge from '@/Components/UI/Badge';
-import Button from '@/Components/UI/Button';
+import Button, { buttonClasses } from '@/Components/UI/Button';
 import { LibraryIcon, ShieldIcon } from '@/Components/UI/Icon';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 
@@ -44,13 +46,16 @@ interface CatalogLibraryProps {
     scope: CatalogLibraryScope;
     items: CatalogItemsPage;
     kinds: ExternalMediaKind[];
+    issues: string[];
+    normalization: NormalizationSummary;
     filters: CatalogFilters;
     flash: { success: string | null; error: string | null };
 }
 
 export default function CatalogLibraryPage() {
-    const { connector, library, scope, items, kinds, filters, flash } = usePage<CatalogLibraryProps>().props;
+    const { connector, library, scope, items, kinds, issues, normalization, filters, flash } = usePage<CatalogLibraryProps>().props;
     const [snapshotting, setSnapshotting] = useState(false);
+    const [rebuilding, setRebuilding] = useState(false);
     const basePath = `/catalog/${connector.key}/libraries/${library.id}`;
     const lastRun = scope.last_run;
     const canSnapshot = connector.configured && library.discovery_status !== 'missing';
@@ -62,6 +67,12 @@ export default function CatalogLibraryPage() {
             {},
             { preserveScroll: true, onFinish: () => setSnapshotting(false) },
         );
+    }
+
+    /** POST-only: rebuilds this library's normalization read-model. Imports nothing. */
+    function rebuildNormalization() {
+        setRebuilding(true);
+        router.post(`${basePath}/normalize`, {}, { preserveScroll: true, onFinish: () => setRebuilding(false) });
     }
 
     return (
@@ -95,9 +106,14 @@ export default function CatalogLibraryPage() {
                                 {library.discovery_status === 'missing' && <Badge tone="error">Missing from discovery</Badge>}
                             </p>
                         </div>
-                        <Button disabled={!canSnapshot} loading={snapshotting} onClick={snapshot} variant="secondary">
-                            Create read-only snapshot
-                        </Button>
+                        <div className="flex flex-wrap items-center gap-2">
+                            <Button disabled={!canSnapshot} loading={snapshotting} onClick={snapshot} variant="secondary">
+                                Create read-only snapshot
+                            </Button>
+                            <Button loading={rebuilding} onClick={rebuildNormalization} variant="secondary">
+                                Rebuild normalization
+                            </Button>
+                        </div>
                     </header>
 
                     {flash.success && (
@@ -138,11 +154,25 @@ export default function CatalogLibraryPage() {
                         </section>
                     )}
 
+                    {/* Normalization summary (V2 C), scoped to this library */}
+                    <section className="mf-col-12">
+                        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                            <h2 className="text-lg font-semibold tracking-tight">Normalization</h2>
+                            <Link
+                                className={buttonClasses('ghost', 'sm')}
+                                href={`/catalog/matches?connector=${connector.key}&library=${library.id}`}
+                            >
+                                View match preview
+                            </Link>
+                        </div>
+                        <NormalizationSummaryCards basePath={basePath} summary={normalization} />
+                    </section>
+
                     {/* Main column */}
                     <section className="mf-col-8 flex flex-col gap-6">
                         <div>
                             <h2 className="mb-3 text-lg font-semibold tracking-tight">Browse items</h2>
-                            <CatalogFilterBar basePath={basePath} filters={filters} kinds={kinds} />
+                            <CatalogFilterBar basePath={basePath} filters={filters} issues={issues} kinds={kinds} />
                             <div className="mt-4">
                                 <CatalogItemsTable
                                     basePath={basePath}

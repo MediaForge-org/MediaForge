@@ -2,7 +2,7 @@ import { router } from '@inertiajs/react';
 import { type FormEvent, useEffect, useRef, useState } from 'react';
 
 import { filtersToQuery } from '@/Components/Catalog/catalogQuery';
-import { type CatalogFilters, type ConnectorRef, type ExternalMediaKind, mediaKindLabel } from '@/Components/Connectors/ConnectorStatus';
+import { type CatalogFilters, type ConnectorRef, type ExternalMediaKind, issueLabel, mediaKindLabel } from '@/Components/Connectors/ConnectorStatus';
 import { SearchIcon } from '@/Components/UI/Icon';
 
 const CONTROL =
@@ -21,6 +21,15 @@ const STATUS_OPTIONS: { value: string; label: string }[] = [
     { value: 'all', label: 'All' },
 ];
 
+/** V2 C: normalization verdict filter. */
+const NORMALIZATION_OPTIONS: { value: string; label: string }[] = [
+    { value: 'all', label: 'Any quality' },
+    { value: 'clean', label: 'Clean' },
+    { value: 'warning', label: 'Warning' },
+    { value: 'needs_review', label: 'Needs review' },
+    { value: 'unsupported', label: 'Not media' },
+];
+
 const DEFAULTS: CatalogFilters = {
     q: '',
     connector: '',
@@ -29,6 +38,9 @@ const DEFAULTS: CatalogFilters = {
     status: 'present',
     sort: 'title',
     direction: 'asc',
+    normalization: 'all',
+    issue: '',
+    duplicates: '',
 };
 
 interface LibraryOption {
@@ -41,6 +53,8 @@ interface CatalogFilterBarProps {
     basePath: string;
     filters: CatalogFilters;
     kinds: ExternalMediaKind[];
+    /** V2 C: the normalization issue codes offered in the issue select. */
+    issues: string[];
     /** Provided → render the connector select (only on the global overview). */
     connectorOptions?: ConnectorRef[];
     /** Provided → render the library select (overview + connector page). */
@@ -65,13 +79,13 @@ interface CatalogFilterBarProps {
  *
  * Nothing here mutates data — it only narrows what is displayed.
  */
-export default function CatalogFilterBar({ basePath, filters, kinds, connectorOptions, libraryOptions }: CatalogFilterBarProps) {
+export default function CatalogFilterBar({ basePath, filters, kinds, issues, connectorOptions, libraryOptions }: CatalogFilterBarProps) {
     const [draft, setDraft] = useState<CatalogFilters>(filters);
     const dirty = useRef(false);
 
     // Only re-sync from the server on a real external change (reset, back/forward)
     // — and never while unsubmitted text is in the box.
-    const serverKey = `${filters.q}|${filters.connector}|${filters.library}|${filters.kind}|${filters.status}|${filters.sort}|${filters.direction}`;
+    const serverKey = `${filters.q}|${filters.connector}|${filters.library}|${filters.kind}|${filters.status}|${filters.sort}|${filters.direction}|${filters.normalization}|${filters.issue}|${filters.duplicates}`;
 
     useEffect(() => {
         if (dirty.current) {
@@ -119,6 +133,9 @@ export default function CatalogFilterBar({ basePath, filters, kinds, connectorOp
         filters.status !== 'present' ||
         filters.sort !== 'title' ||
         filters.direction !== 'asc' ||
+        filters.normalization !== 'all' ||
+        filters.issue !== '' ||
+        filters.duplicates === '1' ||
         draft.q !== '';
 
     return (
@@ -214,6 +231,52 @@ export default function CatalogFilterBar({ basePath, filters, kinds, connectorOp
                             </option>
                         ))}
                     </select>
+                </label>
+            </div>
+
+            {/* V2 C: data-quality filters over the normalized read-model. */}
+            <div className="flex flex-wrap items-center gap-3 border-t border-[var(--panel-border)] pt-3">
+                <span className="text-xs uppercase tracking-wide text-fg-subtle">Quality</span>
+                <label className="flex items-center gap-2 text-sm">
+                    <span className="sr-only">Normalization status</span>
+                    <select
+                        aria-label="Filter by normalization status"
+                        className={CONTROL}
+                        onChange={(event) => apply({ normalization: event.target.value })}
+                        value={draft.normalization}
+                    >
+                        {NORMALIZATION_OPTIONS.map((option) => (
+                            <option key={option.value} value={option.value}>
+                                {option.label}
+                            </option>
+                        ))}
+                    </select>
+                </label>
+
+                <label className="flex items-center gap-2 text-sm">
+                    <span className="sr-only">Data issue</span>
+                    <select
+                        aria-label="Filter by data issue"
+                        className={CONTROL}
+                        onChange={(event) => apply({ issue: event.target.value })}
+                        value={draft.issue}
+                    >
+                        <option value="">Any issue</option>
+                        {issues.map((issue) => (
+                            <option key={issue} value={issue}>
+                                {issueLabel(issue)}
+                            </option>
+                        ))}
+                    </select>
+                </label>
+
+                <label className="flex cursor-pointer items-center gap-2 text-sm text-fg-muted">
+                    <input
+                        checked={draft.duplicates === '1'}
+                        onChange={(event) => apply({ duplicates: event.target.checked ? '1' : '' })}
+                        type="checkbox"
+                    />
+                    <span>Duplicate suspects only</span>
                 </label>
             </div>
 

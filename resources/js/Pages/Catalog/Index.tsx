@@ -1,9 +1,10 @@
-import { Head, Link, usePage } from '@inertiajs/react';
-import type { CSSProperties } from 'react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import { type CSSProperties, useState } from 'react';
 
 import CatalogFilterBar from '@/Components/Catalog/CatalogFilterBar';
 import CatalogItemsTable from '@/Components/Catalog/CatalogItemsTable';
 import { filtersToQuery } from '@/Components/Catalog/catalogQuery';
+import NormalizationSummaryCards from '@/Components/Catalog/NormalizationSummaryCards';
 import {
     type CatalogFilters,
     type CatalogItemsPage,
@@ -13,10 +14,12 @@ import {
     type ExternalMediaKind,
     formatCheckedAt,
     type LatestSnapshotRun,
+    type NormalizationSummary,
     snapshotStatusLabel,
 } from '@/Components/Connectors/ConnectorStatus';
+import Alert from '@/Components/UI/Alert';
 import Badge from '@/Components/UI/Badge';
-import { buttonClasses } from '@/Components/UI/Button';
+import Button, { buttonClasses } from '@/Components/UI/Button';
 import EmptyState from '@/Components/UI/EmptyState';
 import { CatalogIcon, ServerIcon, ShieldIcon } from '@/Components/UI/Icon';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
@@ -36,7 +39,10 @@ interface CatalogPageProps {
     items: CatalogItemsPage;
     libraryOptions: CatalogLibraryOption[];
     kinds: ExternalMediaKind[];
+    issues: string[];
+    normalization: NormalizationSummary;
     filters: CatalogFilters;
+    flash: { success: string | null; error: string | null };
 }
 
 const RUN_TONE: Record<LatestSnapshotRun['status'], 'success' | 'error' | 'neutral'> = {
@@ -49,9 +55,17 @@ const RUN_TONE: Record<LatestSnapshotRun['status'], 'success' | 'error' | 'neutr
 };
 
 export default function CatalogIndex() {
-    const { connectors, summary, latestRuns, items, libraryOptions, kinds, filters } = usePage<CatalogPageProps>().props;
+    const { connectors, summary, latestRuns, items, libraryOptions, kinds, issues, normalization, filters, flash } =
+        usePage<CatalogPageProps>().props;
+    const [rebuilding, setRebuilding] = useState(false);
 
     const connectorRefs = connectors.map((connector) => ({ key: connector.key, label: connector.label }));
+
+    /** POST-only: rebuilds the normalization read-model. Imports nothing. */
+    function rebuildNormalization() {
+        setRebuilding(true);
+        router.post('/catalog/normalize', {}, { preserveScroll: true, onFinish: () => setRebuilding(false) });
+    }
 
     return (
         <>
@@ -67,10 +81,29 @@ export default function CatalogIndex() {
                                 Browse the read-only connector catalog. No media import. No files are copied, moved, deleted or renamed.
                             </p>
                         </div>
-                        <span className="mf-status-pill">
-                            {summary.external_items} external {summary.external_items === 1 ? 'item' : 'items'}
-                        </span>
+                        <div className="flex flex-wrap items-center gap-2">
+                            <span className="mf-status-pill">
+                                {summary.external_items} external {summary.external_items === 1 ? 'item' : 'items'}
+                            </span>
+                            <Link className={buttonClasses('secondary', 'sm')} href="/catalog/matches">
+                                View match preview
+                            </Link>
+                            <Button loading={rebuilding} onClick={rebuildNormalization} size="sm" variant="secondary">
+                                Rebuild normalization
+                            </Button>
+                        </div>
                     </header>
+
+                    {flash.success && (
+                        <div className="mf-col-12">
+                            <Alert tone="success">{flash.success}</Alert>
+                        </div>
+                    )}
+                    {flash.error && (
+                        <div className="mf-col-12">
+                            <Alert tone="error">{flash.error}</Alert>
+                        </div>
+                    )}
 
                     {/* Summary cards */}
                     <section className="mf-col-12">
@@ -90,6 +123,12 @@ export default function CatalogIndex() {
                         </div>
                     </section>
 
+                    {/* Normalization summary (V2 C) */}
+                    <section className="mf-col-12">
+                        <h2 className="mb-3 text-lg font-semibold tracking-tight">Normalization</h2>
+                        <NormalizationSummaryCards basePath="/catalog" summary={normalization} />
+                    </section>
+
                     {/* Main column */}
                     <section className="mf-col-8 flex flex-col gap-6">
                         <div>
@@ -98,6 +137,7 @@ export default function CatalogIndex() {
                                 basePath="/catalog"
                                 connectorOptions={connectorRefs}
                                 filters={filters}
+                                issues={issues}
                                 kinds={kinds}
                                 libraryOptions={libraryOptions}
                             />

@@ -3,6 +3,7 @@ import { Head, Link, usePage } from '@inertiajs/react';
 import CatalogFilterBar from '@/Components/Catalog/CatalogFilterBar';
 import CatalogItemsTable from '@/Components/Catalog/CatalogItemsTable';
 import { filtersToQuery } from '@/Components/Catalog/catalogQuery';
+import NormalizationSummaryCards from '@/Components/Catalog/NormalizationSummaryCards';
 import {
     type CatalogFilters,
     type CatalogFoundation,
@@ -13,6 +14,7 @@ import {
     type ExternalMediaKind,
     formatCheckedAt,
     type LatestSnapshotRun,
+    type NormalizationSummary,
     snapshotStatusLabel,
     StatusBadge,
 } from '@/Components/Connectors/ConnectorStatus';
@@ -37,6 +39,8 @@ interface CatalogConnectorProps {
     latestRuns: LatestSnapshotRun[];
     items: CatalogItemsPage;
     kinds: ExternalMediaKind[];
+    issues: string[];
+    normalization: NormalizationSummary;
     filters: CatalogFilters;
 }
 
@@ -50,7 +54,7 @@ const RUN_TONE: Record<LatestSnapshotRun['status'], 'success' | 'error' | 'neutr
 };
 
 export default function CatalogConnectorPage() {
-    const { connector, libraries, latestRuns, items, kinds, filters } = usePage<CatalogConnectorProps>().props;
+    const { connector, libraries, latestRuns, items, kinds, issues, normalization, filters } = usePage<CatalogConnectorProps>().props;
     const { catalog } = connector;
     const basePath = `/catalog/${connector.key}`;
     const libraryOptions = libraries.map((library) => ({ id: library.id, name: library.name }));
@@ -98,11 +102,22 @@ export default function CatalogConnectorPage() {
                         </dl>
                     </section>
 
+                    {/* Normalization summary (V2 C), scoped to this connector */}
+                    <section className="mf-col-12">
+                        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                            <h2 className="text-lg font-semibold tracking-tight">Normalization</h2>
+                            <Link className={buttonClasses('ghost', 'sm')} href={`/catalog/matches?connector=${connector.key}`}>
+                                View match preview
+                            </Link>
+                        </div>
+                        <NormalizationSummaryCards basePath={basePath} summary={normalization} />
+                    </section>
+
                     {/* Main column */}
                     <section className="mf-col-8 flex flex-col gap-6">
                         <div>
                             <h2 className="mb-3 text-lg font-semibold tracking-tight">Browse items</h2>
-                            <CatalogFilterBar basePath={basePath} filters={filters} kinds={kinds} libraryOptions={libraryOptions} />
+                            <CatalogFilterBar basePath={basePath} filters={filters} issues={issues} kinds={kinds} libraryOptions={libraryOptions} />
                             <div className="mt-4">
                                 <CatalogItemsTable
                                     basePath={basePath}

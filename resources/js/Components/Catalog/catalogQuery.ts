@@ -16,6 +16,10 @@ export function filtersToQuery(filters: CatalogFilters, includeConnector: boolea
     if (filters.status && filters.status !== 'present') params.status = filters.status;
     if (filters.sort && filters.sort !== 'title') params.sort = filters.sort;
     if (filters.direction && filters.direction !== 'asc') params.direction = filters.direction;
+    // V2 C normalization filters ('all'/'' are the implicit defaults).
+    if (filters.normalization && filters.normalization !== 'all') params.normalization = filters.normalization;
+    if (filters.issue) params.issue = filters.issue;
+    if (filters.duplicates === '1') params.duplicates = '1';
 
     return params;
 }

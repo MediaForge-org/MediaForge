@@ -94,6 +94,42 @@ export interface ConnectorRef {
     label: string;
 }
 
+/** V2 C: the quality verdict of a normalized external item. */
+export type NormalizationStatus = 'clean' | 'warning' | 'needs_review' | 'unsupported';
+
+/** V2 C: one sanitized data-quality issue ({ code, message }). */
+export interface NormalizationIssueView {
+    code: string;
+    message: string;
+}
+
+/** V2 C: the normalized read-model of one captured item. */
+export interface ItemNormalization {
+    kind: ExternalMediaKind;
+    title: string;
+    sort_title: string | null;
+    release_year: number | null;
+    season_number: number | null;
+    episode_number: number | null;
+    parent_title: string | null;
+    runtime_seconds: number | null;
+    confidence: number;
+    status: NormalizationStatus;
+    issues: NormalizationIssueView[];
+}
+
+/** V2 C: normalization aggregates for a scope (all / connector / library). */
+export interface NormalizationSummary {
+    normalized: number;
+    clean: number;
+    warning: number;
+    needs_review: number;
+    unsupported: number;
+    unknown_kind: number;
+    weak_metadata: number;
+    duplicate_suspects: number;
+}
+
 /** One browsable captured external item (CatalogReadModel::itemView). */
 export interface CatalogItemRow {
     id: string;
@@ -107,6 +143,8 @@ export interface CatalogItemRow {
     library_name: string | null;
     is_present: boolean;
     last_seen_at: string | null;
+    /** null when the item predates normalization (not yet rebuilt). */
+    normalization: ItemNormalization | null;
 }
 
 export interface PaginationMeta {
@@ -132,6 +170,12 @@ export interface CatalogFilters {
     status: string;
     sort: string;
     direction: string;
+    /** V2 C: normalization verdict filter ('all' = unfiltered). */
+    normalization: string;
+    /** V2 C: a single normalization issue code ('' = unfiltered). */
+    issue: string;
+    /** V2 C: '1' = only duplicate suspects. */
+    duplicates: string;
 }
 
 /** A library option for the catalog filter + connector page (with capture counts). */
@@ -355,6 +399,46 @@ const MEDIA_KIND_LABEL: Record<ExternalMediaKind, string> = {
 
 export function mediaKindLabel(kind: ExternalMediaKind): string {
     return MEDIA_KIND_LABEL[kind] ?? 'Unknown';
+}
+
+const NORMALIZATION_STATUS_META: Record<NormalizationStatus, { label: string; tone: BadgeTone }> = {
+    clean: { label: 'Clean', tone: 'success' },
+    warning: { label: 'Warning', tone: 'warning' },
+    needs_review: { label: 'Needs review', tone: 'error' },
+    unsupported: { label: 'Not media', tone: 'neutral' },
+};
+
+export function NormalizationStatusBadge({ status }: { status: NormalizationStatus }) {
+    const meta = NORMALIZATION_STATUS_META[status];
+
+    return (
+        <Badge dot tone={meta.tone}>
+            {meta.label}
+        </Badge>
+    );
+}
+
+export function normalizationStatusLabel(status: NormalizationStatus): string {
+    return NORMALIZATION_STATUS_META[status]?.label ?? 'Unknown';
+}
+
+/** Turn a normalization issue code into a readable label ("unknown_kind" → "Unknown kind"). */
+export function issueLabel(code: string): string {
+    const text = code.replace(/_/g, ' ');
+
+    return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+/** Compact "S02E05" style label, or null when there is nothing to show. */
+export function episodeLabel(season: number | null, episode: number | null): string | null {
+    if (season === null && episode === null) {
+        return null;
+    }
+
+    const seasonPart = season !== null ? `S${String(season).padStart(2, '0')}` : '';
+    const episodePart = episode !== null ? `E${String(episode).padStart(2, '0')}` : '';
+
+    return `${seasonPart}${episodePart}`;
 }
 
 /** Format a runtime in seconds as a compact "1h 24m" / "48m" string. */
