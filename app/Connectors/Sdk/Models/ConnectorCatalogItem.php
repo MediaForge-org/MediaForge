@@ -7,6 +7,7 @@ namespace App\Connectors\Sdk\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 
 /**
@@ -79,5 +80,12 @@ class ConnectorCatalogItem extends Model
     public function snapshotRun(): BelongsTo
     {
         return $this->belongsTo(ConnectorCatalogSnapshotRun::class, 'snapshot_run_id');
+    }
+
+    /** The V2 C normalized read-model of this item (one row, rebuilt in place). */
+    /** @return HasOne<ConnectorCatalogItemNormalization, $this> */
+    public function normalization(): HasOne
+    {
+        return $this->hasOne(ConnectorCatalogItemNormalization::class, 'connector_catalog_item_id');
     }
 }

@@ -81,6 +81,7 @@ final class RunConnectorCatalogSnapshot extends AuditableAction
         private readonly SecretStore $secrets,
         private readonly ConnectorRegistry $registry,
         private readonly CreateCatalogReviewTasks $reviewTasks,
+        private readonly NormalizeConnectorCatalogItems $normalize,
     ) {
         parent::__construct($audit, $db);
     }
@@ -288,6 +289,12 @@ final class RunConnectorCatalogSnapshot extends AuditableAction
         );
 
         $this->reviewTasks->execute($instance, $connectorKey, $issues);
+
+        // V2 C: interpret what we just captured so the catalog is understandable
+        // straight after a snapshot. Read-model writes only — still no import.
+        if ($result->ok) {
+            $this->normalize->execute($instance, $connectorKey, $library);
+        }
 
         return $run;
     }

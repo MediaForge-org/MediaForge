@@ -8,12 +8,18 @@ use App\Connectors\Sdk\Actions\CreateCatalogReviewTasks;
 use App\Connectors\Sdk\Catalog\CatalogItemQuery;
 use App\Connectors\Sdk\Catalog\CatalogSnapshotStatus;
 use App\Connectors\Sdk\Catalog\ExternalMediaKind;
+use App\Connectors\Sdk\Catalog\NormalizationIssue;
+use App\Connectors\Sdk\Catalog\NormalizationStatus;
 use App\Connectors\Sdk\Models\ConnectorCatalogItem;
+use App\Connectors\Sdk\Models\ConnectorCatalogItemNormalization;
 use App\Connectors\Sdk\Models\ConnectorCatalogSnapshotRun;
 use App\Connectors\Sdk\Models\ConnectorInstance;
 use App\Connectors\Sdk\Models\ConnectorLibrary;
 use App\Connectors\Sdk\Registry\ConnectorRegistry;
 use App\Core\Review\ReviewTask;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 
 /**
  * Read model for the external catalog (V2 A). Produces secret-free view arrays for
@@ -252,7 +258,7 @@ final class CatalogReadModel
         $direction = in_array($q->direction, CatalogItemQuery::DIRECTIONS, true) ? $q->direction : 'asc';
 
         $query = ConnectorCatalogItem::query()
-            ->with(['instance:id,connector_key', 'library:id,name'])
+            ->with(['instance:id,connector_key', 'library:id,name', 'normalization'])
             // Scope by the connector KEY via the relation: a registered connector
             // with no configured instance must yield nothing, not everything.
             ->when(
@@ -260,6 +266,17 @@ final class CatalogReadModel
                 fn ($sub) => $sub->whereHas('instance', fn ($instance) => $instance->where('connector_key', $q->connectorKey)),
             )
             ->when($q->libraryId !== null, fn ($sub) => $sub->where('connector_library_id', $q->libraryId))
+            // V2 C normalization filters. 'all' means "do not filter".
+            ->when(
+                $q->normalization !== 'all' && in_array($q->normalization, NormalizationStatus::values(), true),
+                fn ($sub) => $sub->whereHas('normalization', fn ($n) => $n->where('status', $q->normalization)),
+            )
+            ->when(
+                $q->issue !== null && in_array($q->issue, NormalizationIssue::values(), true),
+                fn ($sub) => $sub->whereHas('normalization', fn ($n) => $n->whereJsonContains('issues', $q->issue)),
+            )
+            // Duplicate suspect = another item shares its normalized identity.
+            ->when($q->duplicates, fn ($sub) => $sub->whereHas('normalization', fn ($n) => $this->whereHasDuplicateSibling($n)))
             ->when(
                 $q->kind !== null && in_array($q->kind, ExternalMediaKind::values(), true),
                 fn ($sub) => $sub->where('media_kind', $q->kind),
@@ -408,6 +425,81 @@ final class CatalogReadModel
         ];
     }
 
+    /**
+     * Narrow a normalization query to rows whose normalized identity (title + kind
+     * + year) is shared by at least one OTHER item. `IS NOT DISTINCT FROM` gives
+     * null-safe year comparison, so two year-less items still pair up.
+     *
+     * Generic on purpose: it is applied both to a standalone normalization query
+     * and to the inner query of a whereHas() on the item relation.
+     *
+     * @template TModel of Model
+     *
+     * @param  Builder<TModel>  $query
+     * @return Builder<TModel>
+     */
+    private function whereHasDuplicateSibling(Builder $query): Builder
+    {
+        $table = 'connector_catalog_item_normalizations';
+
+        return $query->whereExists(function (QueryBuilder $exists) use ($table): void {
+            $exists->selectRaw('1')
+                ->from($table.' as dupe')
+                ->whereColumn('dupe.normalized_title', $table.'.normalized_title')
+                ->whereColumn('dupe.normalized_kind', $table.'.normalized_kind')
+                ->whereRaw("dupe.release_year IS NOT DISTINCT FROM {$table}.release_year")
+                ->whereColumn('dupe.connector_catalog_item_id', '!=', $table.'.connector_catalog_item_id');
+        });
+    }
+
+    /**
+     * V2 C normalization aggregates for a scope (all / connector / library). Reads
+     * stored normalization rows only — no network, no secrets, no import.
+     *
+     * @return array<string, int>
+     */
+    public function normalizationSummary(?string $connectorKey = null, ?string $libraryId = null): array
+    {
+        $counts = $this->scopedNormalizations($connectorKey, $libraryId)
+            ->toBase()
+            ->selectRaw('COUNT(*) AS normalized')
+            ->selectRaw("COUNT(*) FILTER (WHERE status = 'clean') AS clean")
+            ->selectRaw("COUNT(*) FILTER (WHERE status = 'warning') AS warning")
+            ->selectRaw("COUNT(*) FILTER (WHERE status = 'needs_review') AS needs_review")
+            ->selectRaw("COUNT(*) FILTER (WHERE status = 'unsupported') AS unsupported")
+            ->selectRaw("COUNT(*) FILTER (WHERE normalized_kind = 'unknown') AS unknown_kind")
+            ->selectRaw("COUNT(*) FILTER (WHERE issues @> '[\"weak_metadata\"]') AS weak_metadata")
+            ->first();
+
+        $duplicateSuspects = $this->whereHasDuplicateSibling($this->scopedNormalizations($connectorKey, $libraryId))->count();
+
+        return [
+            'normalized' => $this->countProp($counts, 'normalized'),
+            'clean' => $this->countProp($counts, 'clean'),
+            'warning' => $this->countProp($counts, 'warning'),
+            'needs_review' => $this->countProp($counts, 'needs_review'),
+            'unsupported' => $this->countProp($counts, 'unsupported'),
+            'unknown_kind' => $this->countProp($counts, 'unknown_kind'),
+            'weak_metadata' => $this->countProp($counts, 'weak_metadata'),
+            'duplicate_suspects' => $duplicateSuspects,
+        ];
+    }
+
+    /**
+     * Normalization rows scoped to a connector key and/or library.
+     *
+     * @return Builder<ConnectorCatalogItemNormalization>
+     */
+    private function scopedNormalizations(?string $connectorKey, ?string $libraryId): Builder
+    {
+        return ConnectorCatalogItemNormalization::query()
+            ->when(
+                $connectorKey !== null,
+                fn ($sub) => $sub->whereHas('instance', fn ($instance) => $instance->where('connector_key', $connectorKey)),
+            )
+            ->when($libraryId !== null, fn ($sub) => $sub->where('connector_library_id', $libraryId));
+    }
+
     /** @return array<string, mixed> The read-model view of one captured item. */
     private function itemView(ConnectorCatalogItem $item): array
     {
@@ -423,7 +515,57 @@ final class CatalogReadModel
             'library_name' => $item->library?->name,
             'is_present' => $item->is_present,
             'last_seen_at' => $item->last_seen_at?->toIso8601String(),
+            'normalization' => $this->normalizationView($item->normalization),
         ];
+    }
+
+    /**
+     * The item's normalized verdict, or null when it has not been normalized yet
+     * (e.g. captured before V2 C — the UI shows a "not normalized" hint).
+     *
+     * @return array<string, mixed>|null
+     */
+    private function normalizationView(?ConnectorCatalogItemNormalization $normalization): ?array
+    {
+        if ($normalization === null) {
+            return null;
+        }
+
+        return [
+            'kind' => $normalization->normalized_kind,
+            'title' => $normalization->normalized_title,
+            'sort_title' => $normalization->normalized_sort_title,
+            'release_year' => $normalization->release_year,
+            'season_number' => $normalization->season_number,
+            'episode_number' => $normalization->episode_number,
+            'parent_title' => $normalization->parent_title,
+            'runtime_seconds' => $normalization->runtime_seconds,
+            'confidence' => $normalization->confidence,
+            'status' => $normalization->status,
+            'issues' => $this->issueViews($normalization->issues),
+        ];
+    }
+
+    /**
+     * Issue codes → {code, message} for display. Unknown codes are dropped rather
+     * than echoed, so nothing unexpected can reach the UI.
+     *
+     * @param  list<string>  $codes
+     * @return list<array{code: string, message: string}>
+     */
+    private function issueViews(array $codes): array
+    {
+        $views = [];
+
+        foreach ($codes as $code) {
+            $issue = NormalizationIssue::tryFrom($code);
+
+            if ($issue !== null) {
+                $views[] = ['code' => $issue->value, 'message' => $issue->message()];
+            }
+        }
+
+        return $views;
     }
 
     /** @return array{key: string, label: string}|null */

@@ -38,10 +38,15 @@ Route::middleware('auth')->group(function (): void {
     $connectors = ['jellyfin', 'audiobookshelf'];
 
     Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog.index');
+    // Declared before /catalog/{connector} so "matches" is never read as a key.
+    Route::get('/catalog/matches', [CatalogController::class, 'matches'])->name('catalog.matches');
+    Route::post('/catalog/normalize', [CatalogController::class, 'normalize'])->name('catalog.normalize');
     Route::get('/catalog/{connector}', [CatalogController::class, 'connector'])
         ->whereIn('connector', $connectors)->name('catalog.connector');
     Route::get('/catalog/{connector}/libraries/{library}', [CatalogController::class, 'library'])
         ->whereIn('connector', $connectors)->whereUlid('library')->name('catalog.library');
+    Route::post('/catalog/{connector}/libraries/{library}/normalize', [CatalogController::class, 'normalizeLibrary'])
+        ->whereIn('connector', $connectors)->whereUlid('library')->name('catalog.library.normalize');
 
     Route::get('/connectors', [ConnectorController::class, 'index'])->name('connectors.index');
     Route::get('/connectors/{connector}', [ConnectorController::class, 'show'])

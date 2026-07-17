@@ -4,21 +4,26 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Connectors\Sdk\Actions\NormalizeConnectorCatalogItems;
 use App\Connectors\Sdk\Catalog\CatalogItemQuery;
 use App\Connectors\Sdk\Catalog\ExternalMediaKind;
+use App\Connectors\Sdk\Catalog\NormalizationIssue;
+use App\Connectors\Sdk\CatalogMatchPreview;
 use App\Connectors\Sdk\CatalogReadModel;
 use App\Connectors\Sdk\ConnectorCatalog;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
 /**
- * Read-only External Catalog (V2 A/B). Renders the stored connector catalog
- * read-model: an overview, per-connector pages and per-library pages, each with
- * search / filter / sort / pagination over captured external items. Every dynamic
- * query clause is allowlisted (see CatalogItemQuery) and every list is bounded. No
- * network calls, no secrets, no media import, no file operations — these pages only
- * render saved state.
+ * Read-only External Catalog (V2 A/B/C). Renders the stored connector catalog
+ * read-model: an overview, per-connector pages, per-library pages and a matching
+ * preview, each with search / filter / sort / pagination over captured external
+ * items plus their normalized verdict. Every dynamic query clause is allowlisted
+ * (see CatalogItemQuery) and every list is bounded. No network calls, no secrets,
+ * no media import, no file operations, no accepted matches — the GET pages only
+ * render saved state, and the one POST here rebuilds a read-model.
  */
 final class CatalogController extends Controller
 {
@@ -38,6 +43,8 @@ final class CatalogController extends Controller
             'items' => $readModel->items($query),
             'libraryOptions' => $readModel->libraryOptions($connectorKey),
             'kinds' => ExternalMediaKind::values(),
+            'issues' => NormalizationIssue::values(),
+            'normalization' => $readModel->normalizationSummary($connectorKey, $query->libraryId),
             'filters' => $this->filtersPayload($query, $connectorKey),
         ]);
     }
@@ -64,6 +71,8 @@ final class CatalogController extends Controller
             'latestRuns' => $scope['latest_runs'],
             'items' => $readModel->items($query),
             'kinds' => ExternalMediaKind::values(),
+            'issues' => NormalizationIssue::values(),
+            'normalization' => $readModel->normalizationSummary($connector, $query->libraryId),
             'filters' => $this->filtersPayload($query, $connector),
         ]);
     }
@@ -99,8 +108,76 @@ final class CatalogController extends Controller
             'scope' => $readModel->libraryScope($instance, $model),
             'items' => $readModel->items($query),
             'kinds' => ExternalMediaKind::values(),
+            'issues' => NormalizationIssue::values(),
+            'normalization' => $readModel->normalizationSummary($connector, $model->id),
             'filters' => $this->filtersPayload($query, $connector),
         ]);
+    }
+
+    /**
+     * V2 C matching preview: read-only suggestions derived from the normalized
+     * catalog. There is deliberately no accept/import/merge action here — the
+     * import plan arrives in V2 D.
+     */
+    public function matches(Request $request, ConnectorCatalog $catalog, CatalogMatchPreview $preview, CatalogReadModel $readModel): Response
+    {
+        $connectors = $catalog->overview();
+        $connectorKey = $this->validConnectorKey($request, $connectors);
+        $libraryId = $this->requestedLibraryId($request);
+
+        return Inertia::render('Catalog/Matches', [
+            'connectors' => array_map(
+                static fn (array $connector): array => ['key' => $connector['key'], 'label' => $connector['label']],
+                $connectors,
+            ),
+            'preview' => $preview->build($connectorKey, $libraryId),
+            'normalization' => $readModel->normalizationSummary($connectorKey, $libraryId),
+            'libraryOptions' => $readModel->libraryOptions($connectorKey),
+            'filters' => ['connector' => $connectorKey ?? '', 'library' => $libraryId ?? ''],
+        ]);
+    }
+
+    /**
+     * Rebuild the normalized read-model for every configured connector. POST-only:
+     * it writes read-model rows (never media), so it must not be reachable by GET.
+     */
+    public function normalize(ConnectorCatalog $catalog, NormalizeConnectorCatalogItems $action): RedirectResponse
+    {
+        $normalized = 0;
+
+        foreach ($catalog->overview() as $connector) {
+            $key = is_string($connector['key'] ?? null) ? $connector['key'] : null;
+            $instance = $key !== null ? $catalog->instance($key) : null;
+
+            if ($key === null || $instance === null) {
+                continue;
+            }
+
+            $counts = $action->execute($instance, $key);
+            $normalized += $counts['normalized'];
+        }
+
+        return back()->with(
+            'success',
+            "Normalization rebuilt for {$normalized} external ".($normalized === 1 ? 'item' : 'items').'. No media was imported and no match was accepted.',
+        );
+    }
+
+    /** Rebuild the normalized read-model for one library. POST-only. */
+    public function normalizeLibrary(string $connector, string $library, ConnectorCatalog $catalog, CatalogReadModel $readModel, NormalizeConnectorCatalogItems $action): RedirectResponse
+    {
+        $instance = $catalog->instance($connector);
+        abort_if($instance === null, 404);
+
+        $model = $readModel->findLibrary($instance->id, $library);
+        abort_if($model === null, 404);
+
+        $counts = $action->execute($instance, $connector, $model);
+
+        return back()->with(
+            'success',
+            "Normalization rebuilt for {$counts['normalized']} external ".($counts['normalized'] === 1 ? 'item' : 'items').'. No media was imported and no match was accepted.',
+        );
     }
 
     /**
@@ -113,6 +190,8 @@ final class CatalogController extends Controller
         $direction = strtolower($request->string('direction')->toString());
         $status = $request->string('status')->toString();
         $kind = $request->string('kind')->toString();
+        $normalization = $request->string('normalization')->toString();
+        $issue = $request->string('issue')->toString();
 
         return new CatalogItemQuery(
             search: $request->filled('q') ? $request->string('q')->toString() : null,
@@ -123,6 +202,9 @@ final class CatalogController extends Controller
             sort: in_array($sort, CatalogItemQuery::SORTS, true) ? $sort : 'title',
             direction: in_array($direction, CatalogItemQuery::DIRECTIONS, true) ? $direction : 'asc',
             page: max(1, $request->integer('page', 1)),
+            normalization: in_array($normalization, CatalogItemQuery::NORMALIZATIONS, true) ? $normalization : 'all',
+            issue: in_array($issue, NormalizationIssue::values(), true) ? $issue : null,
+            duplicates: $request->boolean('duplicates'),
         );
     }
 
@@ -142,6 +224,9 @@ final class CatalogController extends Controller
             'status' => $query->status,
             'sort' => $query->sort,
             'direction' => $query->direction,
+            'normalization' => $query->normalization,
+            'issue' => $query->issue ?? '',
+            'duplicates' => $query->duplicates ? '1' : '',
         ];
     }
 
