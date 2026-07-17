@@ -23,6 +23,7 @@ $authenticatedPages = [
     '/review' => 'Review/Index',
     '/settings' => 'Settings/Index',
     '/catalog' => 'Catalog/Index',
+    '/catalog/matches' => 'Catalog/Matches',
     '/catalog/jellyfin' => 'Catalog/Connector',
     '/catalog/audiobookshelf' => 'Catalog/Connector',
 ];
@@ -67,8 +68,8 @@ test('logout is POST-only and there is no GET logout route', function () {
 
 test('no registered GET route performs a state-changing action', function () {
     // State-changing verbs (update/store/destroy/test/discover/dry-run/dismiss/
-    // reopen/snapshot) must never be reachable via GET/HEAD.
-    $stateChanging = ['store', 'update', 'destroy', 'delete', 'dismiss', 'reopen', 'dry-run', 'discover', 'selection', 'test', 'snapshot'];
+    // reopen/snapshot/normalize) must never be reachable via GET/HEAD.
+    $stateChanging = ['store', 'update', 'destroy', 'delete', 'dismiss', 'reopen', 'dry-run', 'discover', 'selection', 'test', 'snapshot', 'normalize'];
 
     foreach (Route::getRoutes()->getRoutes() as $route) {
         $isGet = in_array('GET', $route->methods(), true);

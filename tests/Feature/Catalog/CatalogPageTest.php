@@ -751,6 +751,164 @@ test('the catalog search applies explicitly instead of on an unstable timer', fu
         ->not->toContain('setTimeout');
 });
 
+/* ---------------------------------------------------------------------------
+ | V2 C — normalization on the catalog pages
+ * ------------------------------------------------------------------------- */
+
+test('the catalog exposes a normalization summary', function () {
+    $user = User::factory()->create();
+    [$instance, $library] = seedCatalogPageConnector();
+    captureItem($instance, $library, 'jf-1', 'The Matrix');
+    captureItem($instance, $library, 'jf-2', 'The Matrix'); // duplicate identity
+    captureItem($instance, $library, 'jf-3', 'Mystery', 'unknown');
+
+    normalizeConnector($instance);
+
+    $this->actingAs($user)->get('/catalog')
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('normalization.normalized', 3)
+            ->where('normalization.unknown_kind', 1)
+            ->where('normalization.duplicate_suspects', 2)
+            ->has('normalization.clean')
+            ->has('normalization.warning')
+            ->has('normalization.needs_review')
+            ->has('issues'));
+
+    Http::assertNothingSent();
+});
+
+test('the catalog item list carries each item normalized reading', function () {
+    $user = User::factory()->create();
+    [$instance, $library] = seedCatalogPageConnector();
+    captureItem($instance, $library, 'jf-1', '  The   Matrix  ');
+
+    normalizeConnector($instance);
+
+    $this->actingAs($user)->get('/catalog')
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('items.data.0.normalization.title', 'The Matrix')
+            ->where('items.data.0.normalization.kind', 'movie')
+            ->where('items.data.0.normalization.status', 'clean')
+            // captureItem() reports no runtime, so runtime_missing costs 5 — still
+            // comfortably clean, but honestly not a perfect 100.
+            ->where('items.data.0.normalization.confidence', 95)
+            ->where('items.data.0.normalization.issues.0.code', 'runtime_missing')
+            ->has('items.data.0.normalization.issues', 1));
+});
+
+test('an item captured before normalization renders with a null normalization', function () {
+    $user = User::factory()->create();
+    [$instance, $library] = seedCatalogPageConnector();
+    captureItem($instance, $library, 'jf-1', 'The Matrix');
+
+    // Deliberately NOT normalized — the UI must cope rather than crash.
+    $this->actingAs($user)->get('/catalog')
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->has('items.data', 1)
+            ->where('items.data.0.normalization', null)
+            ->where('normalization.normalized', 0));
+});
+
+test('the catalog filters by normalization status', function () {
+    $user = User::factory()->create();
+    [$instance, $library] = seedCatalogPageConnector();
+    captureItem($instance, $library, 'jf-1', 'The Matrix');            // clean
+    captureItem($instance, $library, 'jf-2', 'Mystery', 'unknown');    // warning
+
+    normalizeConnector($instance);
+
+    $this->actingAs($user)->get('/catalog?normalization=clean')
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->has('items.data', 1)
+            ->where('items.data.0.title', 'The Matrix')
+            ->where('filters.normalization', 'clean'));
+
+    $this->actingAs($user)->get('/catalog?normalization=warning')
+        ->assertInertia(fn (Assert $page) => $page
+            ->has('items.data', 1)
+            ->where('items.data.0.title', 'Mystery'));
+});
+
+test('the catalog filters by a normalization issue code', function () {
+    $user = User::factory()->create();
+    [$instance, $library] = seedCatalogPageConnector();
+    captureItem($instance, $library, 'jf-1', 'The Matrix');
+    captureItem($instance, $library, 'jf-2', 'Mystery', 'unknown');
+
+    normalizeConnector($instance);
+
+    $this->actingAs($user)->get('/catalog?issue=unknown_kind')
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->has('items.data', 1)
+            ->where('items.data.0.title', 'Mystery')
+            ->where('filters.issue', 'unknown_kind'));
+});
+
+test('the catalog filters to duplicate suspects only', function () {
+    $user = User::factory()->create();
+    [$instance, $library] = seedCatalogPageConnector();
+    captureItem($instance, $library, 'jf-1', 'The Matrix');
+    captureItem($instance, $library, 'jf-2', 'The Matrix'); // same identity
+    captureItem($instance, $library, 'jf-3', 'Arrival');    // unique
+
+    normalizeConnector($instance);
+
+    $this->actingAs($user)->get('/catalog?duplicates=1')
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->has('items.data', 2)
+            ->where('filters.duplicates', '1'));
+});
+
+test('an invalid normalization status or issue falls back safely', function () {
+    $user = User::factory()->create();
+    [$instance, $library] = seedCatalogPageConnector();
+    captureItem($instance, $library, 'jf-1', 'The Matrix');
+
+    normalizeConnector($instance);
+
+    $this->actingAs($user)->get('/catalog?normalization=DROP+TABLE&issue=nonsense')
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->has('items.data', 1)
+            ->where('filters.normalization', 'all')
+            ->where('filters.issue', ''));
+
+    expect(Schema::hasTable('users'))->toBeTrue();
+});
+
+test('the connector and library catalog pages expose a scoped normalization summary', function () {
+    $user = User::factory()->create();
+    [$jellyfin, $jellyfinLibrary] = seedCatalogPageConnector('jellyfin');
+    [$abs, $absLibrary] = seedCatalogPageConnector('audiobookshelf', 'ABS-NORM');
+    captureItem($jellyfin, $jellyfinLibrary, 'jf-1', 'The Matrix');
+    captureItem($abs, $absLibrary, 'abs-1', 'Dune', 'audiobook');
+
+    normalizeConnector($jellyfin);
+    normalizeConnector($abs, 'audiobookshelf');
+
+    $this->actingAs($user)->get('/catalog/jellyfin')
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('Catalog/Connector')
+            ->where('normalization.normalized', 1)
+            ->has('issues'));
+
+    $this->actingAs($user)->get("/catalog/jellyfin/libraries/{$jellyfinLibrary->id}")
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('Catalog/Library')
+            ->where('normalization.normalized', 1)
+            ->has('issues'));
+
+    Http::assertNothingSent();
+});
+
 test('the connector detail page links to the real catalog library route', function () {
     $user = User::factory()->create();
     [, $library] = seedCatalogPageConnector();
