@@ -47,9 +47,44 @@ See [V1_READINESS.md](V1_READINESS.md) for the readiness checklist and release r
   (`connector_catalog_snapshot_runs`), surfaced on a new `/catalog` page plus the dashboard,
   connector overview and connector detail. Snapshot problems raise deduplicated
   `connector_catalog` review tasks and write sanitized audit entries.
-- **V2 B — Catalog browsing + paginated snapshots** *(current)*: makes the catalog usable —
+- **V2 B — Catalog browsing + paginated snapshots** *(done)*: makes the catalog usable —
   search/filter/sort/pagination over captured items, per-connector and per-library catalog pages,
   and multi-page snapshot reads that replace the rigid 500-item one-shot. Still 100% read-only.
+- **V2 C — Catalog normalization + matching preview** *(current)*: interprets the captured items
+  into a consistent shape with a quality verdict, and previews the match candidates a later import
+  would have to reconcile. Suggests only — accepts nothing.
+
+### V2 C — normalization
+
+- Every captured item gets one read-only row in `connector_catalog_item_normalizations`: cleaned
+  title, derived sort title, classified kind, release year, season/episode numbers, parent title,
+  runtime, plus a verdict (`status` + `confidence` + sanitized `issues`).
+- **Conservative by design.** It only re-reads what the connector reported: no year invented from a
+  title, no season/episode regex-guessed out of free text, no gap filled with a plausible value. An
+  implausible year/runtime is flagged and *dropped*, never "corrected"; a missing field stays
+  missing and becomes a visible issue.
+- **Confidence** falls out of the issues (each has a penalty against 100): `clean` ≥90,
+  `warning` ≥60, `needs_review` below. `unsupported` marks structural containers (folder/playlist)
+  that are not media, so they are reported plainly instead of drowning in media-shaped warnings.
+- Runs **automatically after a successful snapshot**, plus POST-only *Rebuild normalization* on
+  `/catalog` and per library. Bounded: chunked reads + chunked bulk upserts, rebuilt in place.
+- One deduplicated `catalog_normalization` review task per connector carries the issue codes and
+  their counts; a clean rebuild dismisses it. Audit: `catalog.normalization_rebuilt` (sanitized).
+
+### V2 C — matching preview
+
+- **`/catalog/matches`** shows, scoped optionally by connector/library:
+  - **duplicate suspects** — items sharing normalized title + year + kind (null-safe year pairing,
+    so two year-less namesakes still pair, at a lower score),
+  - **episode grouping candidates** — by series + season, reporting unnumbered episodes,
+  - **audiobook/book grouping candidates** — by normalized title (there is no author field in the
+    captured read-model, so we do not pretend to match on one),
+  - **weak metadata** — items with nothing to match on.
+- Each group carries a score and a plain-language reason. Everything is derived at query time from
+  the normalization rows and bounded; there is deliberately **no candidates table**, because a
+  suggestion nobody can accept has no state worth storing.
+- **Preview only.** There is no accept/import/merge button and no route that could perform one —
+  a test asserts both. Nothing is written to MediaForge and no file is touched.
 
 ### V2 B — catalog browsing
 
@@ -85,13 +120,15 @@ See [V1_READINESS.md](V1_READINESS.md) for the readiness checklist and release r
   `(connector_instance_id, external_id)`), so a capped run costs a handful of statements rather than
   two queries per item. `first_seen_at` is insert-only, so a re-captured item keeps its identity.
 
-### V2 A/B boundaries and limits
+### V2 A/B/C boundaries and limits
 
-- **Read-only.** A snapshot READS external items and stores them for display. It is **not** an
-  import: it creates no `media_items`, `media_editions` or `media_files`, performs **no file
-  operations**, changes nothing on Jellyfin/Audiobookshelf, and starts no remote scans.
+- **Read-only.** A snapshot READS external items and stores them for display; normalization
+  interprets them; the match preview suggests. None of it is an import: no `media_items`,
+  `media_editions` or `media_files` are created, **no file operations** happen, nothing changes on
+  Jellyfin/Audiobookshelf, and no remote scans start.
 - **Explicit only.** A snapshot runs only on an explicit `POST` from a connector detail page or a
   catalog library page. There is no automatic, scheduled or background snapshot.
+- **Nothing is accepted.** V2 C suggests matches; it never merges, accepts or writes a match.
 - **Never rendered from the network.** All catalog pages read stored state only.
 - **Vanished items are flagged, never deleted** (`is_present=false` + `missing_since`); a *failed*
   snapshot never flags or wipes previously captured items.
@@ -108,6 +145,20 @@ See [V1_READINESS.md](V1_READINESS.md) for the readiness checklist and release r
 - Only `title`/`kind`/`year`/`index`/`runtime`-level fields are captured — no artwork, no
   descriptions, no file paths, no raw API payloads.
 - Item search covers `title`/`original_title`/`sort_title` only; there is no full-text/fuzzy search.
+
+### Known V2 C limitations
+
+- **Normalization only re-reads reported fields.** A connector that reports a movie with no year and
+  no runtime stays `needs_review` — MediaForge will not infer the year from the title. That is a
+  deliberate trade-off: a wrong guess is worse than an honest gap.
+- **Duplicate detection is exact on the normalized identity** (title + year + kind). It will not
+  catch "The Matrix" vs "Matrix, The (1999) [1080p]" — there is no fuzzy/Levenshtein matching yet.
+- **Audiobook grouping matches on title only**; the captured read-model has no author field, so two
+  different books with the same title group together as suspects.
+- **Duplicate suspects are suspects, not duplicates.** Two libraries legitimately holding the same
+  film look identical here; deciding that is V2 D's job.
+- **Normalization is synchronous** and runs inside the snapshot/rebuild request.
+- Items captured before V2 C show as "Not normalized" until a snapshot or a rebuild runs.
 
 ## What V1/V2 A/B deliberately does NOT include
 
@@ -137,11 +188,13 @@ plugin engine · mobile/desktop app.
 ## Recommended next step
 
 1. Keep all local gates green, commit, push `main`, confirm GitHub CI green.
-2. **V2 C — queued / resumable snapshots**: move the paged read off the request into a queued job so
-   a library larger than the 5000-item cap can be captured across runs, with progress reporting.
-   Still read-only.
-3. Later V2: read-only content strips (recently added / continue watching) on the dashboard —
-   still no writes to media servers, no imports, no file operations.
+2. **V2 D — import plan / import dry run**: turn the V2 C match suggestions into an explicit,
+   reviewable *plan* — what an import WOULD create, which candidate it would pick, and what a human
+   must decide first. Still no real import, no file operations and no writes to the media servers;
+   the plan is a dry run that ends in a decision, not an action.
+3. Later V2: queued / resumable snapshots (so a library beyond the 5000-item cap can be captured
+   across runs), then read-only content strips (recently added / continue watching) on the
+   dashboard — still no writes to media servers, no imports, no file operations.
 
 ## Rules for AI coding agents
 

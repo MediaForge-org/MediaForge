@@ -10,6 +10,43 @@ All notable changes to MediaForge are documented here. The format is based on
 Targeting the first tagged pre-release **`v0.2.0-alpha.1`** (V1 local core, alpha —
 not production-ready). See [docs/MediaForge/V1_READINESS.md](docs/MediaForge/V1_READINESS.md).
 
+### Added — V2 C: catalog normalization and matching preview
+
+- **Normalization**: every captured external item is interpreted into a consistent shape —
+  cleaned title (whitespace collapsed, curly quotes/dashes/NBSP unified), derived sort title
+  (leading article moved aside), classified kind, release year, season/episode numbers, parent
+  title and runtime — stored as a read-only row per item in the new
+  `connector_catalog_item_normalizations` table.
+- **Deliberately conservative**: normalization only re-reads what the connector already reported.
+  It never invents a year from a title, never regex-guesses season/episode numbers out of free text
+  and never fills a gap with a plausible-looking value. An implausible year/runtime is flagged and
+  dropped rather than "corrected"; a missing field stays missing and becomes a visible issue.
+- **Quality verdict**: each item gets sanitized issue codes (`missing_title`, `unknown_kind`,
+  `missing_season_number`, `missing_episode_number`, `missing_year`, `invalid_year`,
+  `runtime_missing`, `invalid_runtime`, `short_title`, `weak_metadata`), a confidence (0–100
+  derived from those issues) and a status (`clean` ≥90, `warning` ≥60, `needs_review` below, plus
+  `unsupported` for structural containers like folders/playlists that are not media at all).
+- **Runs automatically after a snapshot** (only on a successful read) and on demand via POST-only
+  *Rebuild normalization* on `/catalog` and per library. Bounded: items are streamed in chunks and
+  written with chunked bulk upserts.
+- **New `/catalog/matches` page — matching PREVIEW only**: duplicate suspects (items sharing a
+  normalized title+year+kind, with null-safe year pairing), episode grouping candidates (by series
+  + season, reporting how many episodes lack a number), audiobook/book grouping candidates, and
+  items with weak metadata. Every group carries a score and a plain-language reason.
+  **There is deliberately no accept, import or merge action** — and no route that could perform one.
+  The import plan arrives in V2 D.
+- **Catalog UI**: normalization summary cards (each linking into the item list filtered to exactly
+  that count), new filters (normalization status, issue code, duplicate-suspects-only), and a
+  Quality column showing status, confidence and issue count. Items captured before V2 C render as
+  "Not normalized" rather than breaking.
+- Normalization problems raise **one deduplicated `catalog_normalization` review task per connector**
+  carrying issue codes and counts in its evidence (five broken items produce one actionable task,
+  not five); a clean rebuild dismisses it. Audit event `catalog.normalization_rebuilt` is sanitized
+  to counts and issue codes.
+- Still **100% read-only**: no media import, no `media_items`/`media_editions`/`media_files`, no
+  file operations, no accepted matches, no changes on Jellyfin/Audiobookshelf, no network during
+  normalization or render.
+
 ### Added — V2 B: catalog browsing, filters, pagination and paged snapshots
 
 - **Browsable `/catalog`**: search by title, filter by connector / library / media kind /
