@@ -9,9 +9,13 @@ import {
     StatusBadge,
     SyncStatusBadge,
 } from '@/Components/Connectors/ConnectorStatus';
+import {
+    ImportPlanStatusBadge,
+    type ImportPlanStatus,
+} from '@/Components/Imports/ImportPlanStatus';
 import Badge, { type BadgeTone } from '@/Components/UI/Badge';
 import { buttonClasses } from '@/Components/UI/Button';
-import { CatalogIcon, LibraryIcon, ReviewIcon, ServerIcon, SettingsIcon, ShieldIcon, SyncIcon } from '@/Components/UI/Icon';
+import { CatalogIcon, ImportIcon, LibraryIcon, ReviewIcon, ServerIcon, SettingsIcon, ShieldIcon, SyncIcon } from '@/Components/UI/Icon';
 import StatCard, { type StatTone } from '@/Components/UI/StatCard';
 
 interface SyncSummary {
@@ -34,6 +38,18 @@ interface CatalogSummary {
     last_snapshot_at: string | null;
 }
 
+/** V2 D: the latest import dry run. A plan, never an import. */
+interface ImportSummary {
+    plan_count: number;
+    status: ImportPlanStatus;
+    planned_items: number;
+    ready_items: number;
+    warning_items: number;
+    blocked_items: number;
+    created_at: string | null;
+    plan_id: string | null;
+}
+
 interface DashboardPageProps {
     [key: string]: unknown;
     status: string;
@@ -41,6 +57,7 @@ interface DashboardPageProps {
     syncSummary: SyncSummary;
     reviewSummary: ReviewSummary;
     catalogSummary: CatalogSummary;
+    importSummary: ImportSummary;
 }
 
 const REVIEW_STATUS_META: Record<ReviewStatus, { label: string; tone: BadgeTone }> = {
@@ -66,7 +83,7 @@ const ROADMAP: { id: string; label: string; done: boolean }[] = [
 ];
 
 export default function Dashboard() {
-    const { status, connectors, syncSummary, reviewSummary, catalogSummary } = usePage<DashboardPageProps>().props;
+    const { status, connectors, syncSummary, reviewSummary, catalogSummary, importSummary } = usePage<DashboardPageProps>().props;
     const find = (key: string) => connectors.find((c) => c.key === key);
     const libraryTotal = connectors.reduce((sum, c) => sum + c.library_count, 0);
 
@@ -199,6 +216,50 @@ export default function Dashboard() {
                                     );
                                 })}
                             </div>
+                        </div>
+                    </section>
+
+                    {/* Import Plans (V2 D) — dry run only, nothing is imported */}
+                    <section className="mf-col-12 mf-rise" style={{ '--mf-i': 1.4 } as CSSProperties}>
+                        <div className="mf-panel p-6">
+                            <div className="flex flex-wrap items-center justify-between gap-3">
+                                <div className="flex items-center gap-3">
+                                    <span className="grid size-11 place-items-center rounded-[--radius-md] bg-accent/10 text-accent ring-1 ring-inset ring-accent/20">
+                                        <ImportIcon className="size-6" />
+                                    </span>
+                                    <div>
+                                        <div className="flex items-center gap-2">
+                                            <h2 className="text-lg font-semibold tracking-tight">Import Plans</h2>
+                                            <ImportPlanStatusBadge status={importSummary.status} />
+                                        </div>
+                                        <p className="text-xs text-fg-subtle">
+                                            Dry run only. No media is imported and no files are copied, moved, deleted or renamed.
+                                        </p>
+                                    </div>
+                                </div>
+                                <Link className={buttonClasses('secondary', 'sm')} href="/imports">Open import plans</Link>
+                            </div>
+
+                            <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                                {[
+                                    { label: 'Planned items', value: String(importSummary.planned_items), hint: 'Latest dry run' },
+                                    { label: 'Ready', value: String(importSummary.ready_items), hint: 'Unambiguous' },
+                                    { label: 'Warnings / review', value: String(importSummary.warning_items), hint: 'Need a decision' },
+                                    { label: 'Blocked', value: String(importSummary.blocked_items), hint: 'Cannot be planned' },
+                                ].map((item) => (
+                                    <div className="mf-panel p-4" key={item.label}>
+                                        <p className="text-xs uppercase tracking-wide text-fg-subtle">{item.label}</p>
+                                        <p className="mt-1 text-lg font-semibold">{item.value}</p>
+                                        <p className="mt-0.5 text-xs text-fg-muted">{item.hint}</p>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <p className="mt-4 text-xs text-fg-subtle">
+                                {importSummary.plan_count === 0
+                                    ? 'No import dry run has been created yet.'
+                                    : `Last dry run ${formatCheckedAt(importSummary.created_at)} · ${importSummary.plan_count} stored ${importSummary.plan_count === 1 ? 'plan' : 'plans'}`}
+                            </p>
                         </div>
                     </section>
 

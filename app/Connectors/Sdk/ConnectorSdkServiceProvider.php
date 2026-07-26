@@ -12,6 +12,8 @@ use App\Connectors\Sdk\Models\ConnectorLibrary;
 use App\Connectors\Sdk\Models\ConnectorSyncRun;
 use App\Connectors\Sdk\Models\ConnectorSyncRunLibrary;
 use App\Connectors\Sdk\Models\ConnectorSyncState;
+use App\Connectors\Sdk\Models\MediaImportPlan;
+use App\Connectors\Sdk\Models\MediaImportPlanItem;
 use App\Connectors\Sdk\Registry\ConnectorRegistry;
 use App\Connectors\Sdk\Secrets\EncryptedSecretStore;
 use App\Connectors\Sdk\Secrets\SecretStore;
@@ -51,6 +53,9 @@ final class ConnectorSdkServiceProvider extends ServiceProvider
             'connector_catalog_snapshot_run' => ConnectorCatalogSnapshotRun::class,
             'connector_catalog_item' => ConnectorCatalogItem::class,
             'connector_catalog_item_normalization' => ConnectorCatalogItemNormalization::class,
+            // V2 D import dry run: plan rows, not media rows.
+            'media_import_plan' => MediaImportPlan::class,
+            'media_import_plan_item' => MediaImportPlanItem::class,
         ]);
     }
 }

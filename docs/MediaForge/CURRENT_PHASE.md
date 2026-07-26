@@ -2,8 +2,8 @@
 
 ## Current status
 
-**V1 (local core, alpha) is complete. V2 has begun with Package A — read-only connector
-catalog snapshots.**
+**V1 (local core, alpha) is complete. V2 is in progress: packages A–D are done, most recently
+Package D — import plan / import dry run.**
 
 V1 was delivered as eight focused packages (A–H). The application runs locally from a stable
 production build, and all local gates (Pint, PHPStan max, Pest, TypeScript type-check, Vite build)
@@ -50,9 +50,44 @@ See [V1_READINESS.md](V1_READINESS.md) for the readiness checklist and release r
 - **V2 B — Catalog browsing + paginated snapshots** *(done)*: makes the catalog usable —
   search/filter/sort/pagination over captured items, per-connector and per-library catalog pages,
   and multi-page snapshot reads that replace the rigid 500-item one-shot. Still 100% read-only.
-- **V2 C — Catalog normalization + matching preview** *(current)*: interprets the captured items
+- **V2 C — Catalog normalization + matching preview** *(done)*: interprets the captured items
   into a consistent shape with a quality verdict, and previews the match candidates a later import
   would have to reconcile. Suggests only — accepts nothing.
+- **V2 D — Import plan / import dry run** *(current)*: turns the normalized catalog and its match
+  suggestions into an explicit, reviewable **plan** — what an import WOULD create, and what a human
+  must decide first. Still not an import: no media items/editions/files, no file operations, no
+  accepted matches.
+
+### V2 D — import plan / import dry run
+
+- **`/imports`** — the plans overview: the latest dry run with its status
+  (`ready` · `warnings` · `blocked` · `empty`), the counts that matter (planned, ready, needs
+  review, blocked, duplicate suspects, unsupported, warnings) and the recent dry-run history.
+- **`/imports/{plan}`** — one dry run in full: header, the planned target structure aggregated by
+  kind and action, a plain-language "why", and one bounded section per outcome — *Ready to import
+  later*, *Warnings*, *Needs review*, *Blocked*, *Skipped — unsupported*, *Duplicate suspects*.
+- **`POST /imports/dry-run`** with `scope=all|connector|library`, reachable from `/imports`,
+  `/catalog`, `/catalog/{connector}`, `/catalog/{connector}/libraries/{library}` and
+  `/catalog/matches`. An unknown connector, an unconfigured connector or a library that does not
+  belong to it is a **404** — never a silently widened scope.
+- **Plan tables, not media tables.** `media_import_plans` + `media_import_plan_items` hold a
+  *logical* target identity (kind, title, year, season/episode, plus a hashed stable `target_key`)
+  and deliberately **no file path**. There is nothing in a plan to move, copy, delete or rename.
+- **The rules.** Clean movie/audiobook/book → `create_media` (*ready*). Series/season →
+  `create_container`. Episode with a parent + season + episode number → `attach_to_parent`.
+  Missing year → *warning*. Missing season/episode number, unknown kind or weak metadata →
+  *needs review*. Missing title, missing parent, or never normalized → *blocked*. Folder/playlist —
+  and podcast/music, which the first internal import will not cover — → `skip_unsupported`
+  (*skipped*), counted but never treated as errors.
+- **A duplicate suspect is never automatically ready**: it drops to `skip_duplicate` ·
+  *needs review* with a `duplicate_suspect` reason. Nothing is merged; deciding stays a human's job.
+- **Deterministic and bounded.** The planner (`PlanCatalogItemImport`) is pure — no database, no
+  network, no file — so the same stored input always yields the same actions, statuses, reasons and
+  `target_key`. Items are streamed by ULID in chunks; one plan is capped at 5000 items and reports
+  itself `truncated` beyond that.
+- **Review + audit.** One deduplicated `media_import_plan` task per dry-run *scope*, carrying reason
+  codes, counts and a few example titles; a re-run supersedes its predecessor and a clean plan
+  raises none. Audit: `media_import_plan.created` (sanitized to counts, reason codes and scope).
 
 ### V2 C — normalization
 
@@ -120,12 +155,15 @@ See [V1_READINESS.md](V1_READINESS.md) for the readiness checklist and release r
   `(connector_instance_id, external_id)`), so a capped run costs a handful of statements rather than
   two queries per item. `first_seen_at` is insert-only, so a re-captured item keeps its identity.
 
-### V2 A/B/C boundaries and limits
+### V2 A/B/C/D boundaries and limits
 
 - **Read-only.** A snapshot READS external items and stores them for display; normalization
-  interprets them; the match preview suggests. None of it is an import: no `media_items`,
-  `media_editions` or `media_files` are created, **no file operations** happen, nothing changes on
-  Jellyfin/Audiobookshelf, and no remote scans start.
+  interprets them; the match preview suggests; the import dry run plans. None of it is an import: no
+  `media_items`, `media_editions` or `media_files` are created, **no file operations** happen,
+  nothing changes on Jellyfin/Audiobookshelf, and no remote scans start.
+- **A plan is not an action.** V2 D writes only `media_import_plans`, `media_import_plan_items`,
+  review tasks and audit entries. There is deliberately no execute / import now / accept match /
+  merge action anywhere — and no route that could perform one; tests assert both.
 - **Explicit only.** A snapshot runs only on an explicit `POST` from a connector detail page or a
   catalog library page. There is no automatic, scheduled or background snapshot.
 - **Nothing is accepted.** V2 C suggests matches; it never merges, accepts or writes a match.
@@ -160,7 +198,21 @@ See [V1_READINESS.md](V1_READINESS.md) for the readiness checklist and release r
 - **Normalization is synchronous** and runs inside the snapshot/rebuild request.
 - Items captured before V2 C show as "Not normalized" until a snapshot or a rebuild runs.
 
-## What V1/V2 A/B deliberately does NOT include
+### Known V2 D limitations
+
+- **A plan is a snapshot in time.** It is not refreshed when the catalog changes; create a new dry
+  run instead. Plans are never mutated after creation.
+- **Capped at 5000 items per plan.** A larger scope is planned up to the cap and marked truncated;
+  there is no continued/resumable plan yet.
+- **Planning is synchronous** and runs inside the request, like normalization.
+- **Duplicate suspicion is exact** on the normalized identity (title + kind + year) and is evaluated
+  across the whole catalog, not just the plan scope — the same limits as V2 C's matcher apply
+  (no fuzzy matching, audiobooks group on title only).
+- **Podcast and music are counted as unsupported**, because the first internal import (V2 E) will
+  not cover them. That is a scope statement, not a data problem.
+- **Only currently present items are planned.** A vanished item is never planned for import.
+
+## What V1/V2 A/B/C/D deliberately does NOT include
 
 Real media imports · media items / editions / files · file operations (copy/move/delete/rename) ·
 real or automatic sync (dry run only) · automatic/background snapshots · metadata-merge or
@@ -188,10 +240,9 @@ plugin engine · mobile/desktop app.
 ## Recommended next step
 
 1. Keep all local gates green, commit, push `main`, confirm GitHub CI green.
-2. **V2 D — import plan / import dry run**: turn the V2 C match suggestions into an explicit,
-   reviewable *plan* — what an import WOULD create, which candidate it would pick, and what a human
-   must decide first. Still no real import, no file operations and no writes to the media servers;
-   the plan is a dry run that ends in a decision, not an action.
+2. **V2 E — first internal import**: turn a reviewed plan's *ready* lines into real MediaForge
+   media items/editions — the first package that actually writes to the media library. Still no
+   file operations on the user's media and still nothing written back to Jellyfin/Audiobookshelf.
 3. Later V2: queued / resumable snapshots (so a library beyond the 5000-item cap can be captured
    across runs), then read-only content strips (recently added / continue watching) on the
    dashboard — still no writes to media servers, no imports, no file operations.

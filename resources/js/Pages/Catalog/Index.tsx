@@ -58,6 +58,7 @@ export default function CatalogIndex() {
     const { connectors, summary, latestRuns, items, libraryOptions, kinds, issues, normalization, filters, flash } =
         usePage<CatalogPageProps>().props;
     const [rebuilding, setRebuilding] = useState(false);
+    const [planning, setPlanning] = useState(false);
 
     const connectorRefs = connectors.map((connector) => ({ key: connector.key, label: connector.label }));
 
@@ -65,6 +66,15 @@ export default function CatalogIndex() {
     function rebuildNormalization() {
         setRebuilding(true);
         router.post('/catalog/normalize', {}, { preserveScroll: true, onFinish: () => setRebuilding(false) });
+    }
+
+    /**
+     * POST-only: creates an import PLAN describing what a later import would do.
+     * It imports nothing, accepts no match and touches no file.
+     */
+    function createDryRun() {
+        setPlanning(true);
+        router.post('/imports/dry-run', { scope: 'all' }, { onFinish: () => setPlanning(false) });
     }
 
     return (
@@ -88,8 +98,14 @@ export default function CatalogIndex() {
                             <Link className={buttonClasses('secondary', 'sm')} href="/catalog/matches">
                                 View match preview
                             </Link>
+                            <Link className={buttonClasses('secondary', 'sm')} href="/imports">
+                                View import plans
+                            </Link>
                             <Button loading={rebuilding} onClick={rebuildNormalization} size="sm" variant="secondary">
                                 Rebuild normalization
+                            </Button>
+                            <Button loading={planning} onClick={createDryRun} size="sm">
+                                Create import dry run
                             </Button>
                         </div>
                     </header>

@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\Connectors\ConnectorController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ImportPlanController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\SyncController;
@@ -47,6 +48,15 @@ Route::middleware('auth')->group(function (): void {
         ->whereIn('connector', $connectors)->whereUlid('library')->name('catalog.library');
     Route::post('/catalog/{connector}/libraries/{library}/normalize', [CatalogController::class, 'normalizeLibrary'])
         ->whereIn('connector', $connectors)->whereUlid('library')->name('catalog.library.normalize');
+
+    // V2 D — import plan / import dry run. The GET pages render stored plans only;
+    // creating a dry run is POST-only. There is deliberately no execute/import/
+    // accept/merge route: V2 D plans, it never imports.
+    Route::get('/imports', [ImportPlanController::class, 'index'])->name('imports.index');
+    Route::post('/imports/dry-run', [ImportPlanController::class, 'store'])->name('imports.dry-run');
+    // Declared after /imports/dry-run so "dry-run" is never read as a plan id.
+    Route::get('/imports/{plan}', [ImportPlanController::class, 'show'])
+        ->whereUlid('plan')->name('imports.show');
 
     Route::get('/connectors', [ConnectorController::class, 'index'])->name('connectors.index');
     Route::get('/connectors/{connector}', [ConnectorController::class, 'show'])

@@ -345,11 +345,14 @@ test('the match preview never renders a stored secret', function () {
 test('the match preview offers no accept, import or merge action', function () {
     $source = file_get_contents(resource_path('js/Pages/Catalog/Matches.tsx'));
 
-    // The real invariant: the preview issues NO write of any kind. Accepting,
-    // importing or merging would all need one, so their absence is what matters —
-    // not the wording. (Scanning for the words "accept"/"merge" would only flag the
-    // page's own disclaimer, which is exactly the text we want to keep.)
-    foreach (['router.post', 'router.put', 'router.patch', 'router.delete', 'useForm', '<form'] as $write) {
+    // The invariant: the preview never COMMITS a suggestion. V2 D added exactly one
+    // write to this page — creating an import DRY RUN, which only writes plan rows —
+    // so the assertion pins that single POST target instead of banning writes
+    // outright. Anything else that could accept, merge or import stays forbidden.
+    expect(substr_count($source, 'router.post'))->toBe(1)
+        ->and($source)->toContain("router.post('/imports/dry-run'");
+
+    foreach (['router.put', 'router.patch', 'router.delete', 'useForm', '<form'] as $write) {
         expect($source)->not->toContain($write);
     }
 
@@ -361,14 +364,23 @@ test('the match preview offers no accept, import or merge action', function () {
     // And it states the boundary out loud.
     expect($source)->toContain('Matching preview only');
 
-    // No route exists anywhere that could accept/import/merge a match.
+    // No route exists anywhere that could accept/merge/execute a match. The only
+    // "import"-shaped routes are the V2 D dry-run plan routes, which import nothing.
+    $importRoutes = [];
+
     foreach (Route::getRoutes()->getRoutes() as $route) {
-        foreach (['import', 'merge', 'accept'] as $needle) {
+        foreach (['merge', 'accept', 'execute', 'import-now', 'commit'] as $needle) {
             expect(str_contains($route->uri(), $needle))->toBeFalse(
-                "Route {$route->uri()} suggests an import/merge action, which V2 C must not have."
+                "Route {$route->uri()} suggests an accept/merge action, which must not exist."
             );
         }
+
+        if (str_contains($route->uri(), 'import')) {
+            $importRoutes[] = $route->uri();
+        }
     }
+
+    expect(array_unique($importRoutes))->toEqualCanonicalizing(['imports', 'imports/dry-run', 'imports/{plan}']);
 });
 
 test('the catalog pages reference no forbidden routes', function () {

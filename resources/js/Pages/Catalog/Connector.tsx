@@ -1,4 +1,5 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import { useState } from 'react';
 
 import CatalogFilterBar from '@/Components/Catalog/CatalogFilterBar';
 import CatalogItemsTable from '@/Components/Catalog/CatalogItemsTable';
@@ -19,7 +20,7 @@ import {
     StatusBadge,
 } from '@/Components/Connectors/ConnectorStatus';
 import Badge from '@/Components/UI/Badge';
-import { buttonClasses } from '@/Components/UI/Button';
+import Button, { buttonClasses } from '@/Components/UI/Button';
 import EmptyState from '@/Components/UI/EmptyState';
 import { LibraryIcon, ShieldIcon } from '@/Components/UI/Icon';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
@@ -58,6 +59,17 @@ export default function CatalogConnectorPage() {
     const { catalog } = connector;
     const basePath = `/catalog/${connector.key}`;
     const libraryOptions = libraries.map((library) => ({ id: library.id, name: library.name }));
+    const [planning, setPlanning] = useState(false);
+
+    /** POST-only: plans this connector's catalog. Imports nothing, moves nothing. */
+    function createDryRun() {
+        setPlanning(true);
+        router.post(
+            '/imports/dry-run',
+            { scope: 'connector', connector: connector.key },
+            { onFinish: () => setPlanning(false) },
+        );
+    }
 
     return (
         <>
@@ -79,9 +91,15 @@ export default function CatalogConnectorPage() {
                                 Read-only external items captured for {connector.label}. No media import, no file operations.
                             </p>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-2">
                             <StatusBadge status={connector.status} />
                             <CatalogStatusBadge status={catalog.status} />
+                            <Link className={buttonClasses('secondary', 'sm')} href="/imports">
+                                View import plans
+                            </Link>
+                            <Button disabled={!connector.configured} loading={planning} onClick={createDryRun} size="sm">
+                                Create import dry run for connector
+                            </Button>
                         </div>
                     </header>
 

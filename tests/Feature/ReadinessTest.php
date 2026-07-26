@@ -26,6 +26,7 @@ $authenticatedPages = [
     '/catalog/matches' => 'Catalog/Matches',
     '/catalog/jellyfin' => 'Catalog/Connector',
     '/catalog/audiobookshelf' => 'Catalog/Connector',
+    '/imports' => 'Imports/Index',
 ];
 
 test('every primary authenticated page renders for a logged-in user', function () use ($authenticatedPages) {
@@ -89,8 +90,8 @@ test('no registered GET route performs a state-changing action', function () {
 test('the sidebar navigation links only to registered GET routes', function () {
     $layout = file_get_contents(resource_path('js/Layouts/AuthenticatedLayout.tsx'));
 
-    // Every real nav item delivered so far (V1 + the V2 external catalog).
-    $navHrefs = ['/dashboard', '/connectors', '/catalog', '/sync', '/review', '/settings'];
+    // Every real nav item delivered so far (V1 + the V2 catalog and import plans).
+    $navHrefs = ['/dashboard', '/connectors', '/catalog', '/imports', '/sync', '/review', '/settings'];
 
     $getUris = collect(Route::getRoutes()->getRoutes())
         ->filter(fn ($route) => in_array('GET', $route->methods(), true))
@@ -147,7 +148,7 @@ test('every href in the frontend resolves to a registered GET route', function (
     // Guard against a vacuous pass: the scanner must really see the app's links,
     // including the parameterised catalog/connector ones.
     expect(count($checked))->toBeGreaterThan(10)
-        ->and($checked)->toContain('/dashboard', '/catalog', '/catalog/*', '/catalog/*/libraries/*', '/connectors/*');
+        ->and($checked)->toContain('/dashboard', '/catalog', '/catalog/*', '/catalog/*/libraries/*', '/connectors/*', '/imports', '/imports/*');
 });
 
 test('no frontend source references a forbidden or non-existent route', function () {

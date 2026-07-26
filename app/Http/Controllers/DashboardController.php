@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Connectors\Sdk\CatalogReadModel;
 use App\Connectors\Sdk\ConnectorCatalog;
+use App\Connectors\Sdk\ImportPlanReadModel;
 use App\Connectors\Sdk\ReviewCenterCatalog;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -17,8 +18,12 @@ use Inertia\Response;
  */
 final class DashboardController extends Controller
 {
-    public function index(ConnectorCatalog $catalog, ReviewCenterCatalog $reviewCenter, CatalogReadModel $catalogReadModel): Response
-    {
+    public function index(
+        ConnectorCatalog $catalog,
+        ReviewCenterCatalog $reviewCenter,
+        CatalogReadModel $catalogReadModel,
+        ImportPlanReadModel $importPlans,
+    ): Response {
         $connectors = $catalog->overview();
         $openTaskCount = $reviewCenter->openTaskCount();
 
@@ -31,6 +36,8 @@ final class DashboardController extends Controller
                 'open_task_count' => $openTaskCount,
             ],
             'catalogSummary' => $catalogReadModel->dashboardSummary($connectors),
+            // V2 D: the latest import dry run. A plan, never an import.
+            'importSummary' => $importPlans->dashboardSummary(),
         ]);
     }
 

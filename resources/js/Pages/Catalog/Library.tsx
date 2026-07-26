@@ -56,6 +56,7 @@ export default function CatalogLibraryPage() {
     const { connector, library, scope, items, kinds, issues, normalization, filters, flash } = usePage<CatalogLibraryProps>().props;
     const [snapshotting, setSnapshotting] = useState(false);
     const [rebuilding, setRebuilding] = useState(false);
+    const [planning, setPlanning] = useState(false);
     const basePath = `/catalog/${connector.key}/libraries/${library.id}`;
     const lastRun = scope.last_run;
     const canSnapshot = connector.configured && library.discovery_status !== 'missing';
@@ -73,6 +74,16 @@ export default function CatalogLibraryPage() {
     function rebuildNormalization() {
         setRebuilding(true);
         router.post(`${basePath}/normalize`, {}, { preserveScroll: true, onFinish: () => setRebuilding(false) });
+    }
+
+    /** POST-only: plans this library's catalog. Imports nothing, moves no file. */
+    function createDryRun() {
+        setPlanning(true);
+        router.post(
+            '/imports/dry-run',
+            { scope: 'library', connector: connector.key, library: library.id },
+            { onFinish: () => setPlanning(false) },
+        );
     }
 
     return (
@@ -112,6 +123,12 @@ export default function CatalogLibraryPage() {
                             </Button>
                             <Button loading={rebuilding} onClick={rebuildNormalization} variant="secondary">
                                 Rebuild normalization
+                            </Button>
+                            <Link className={buttonClasses('secondary', 'sm')} href="/imports">
+                                View import plans
+                            </Link>
+                            <Button loading={planning} onClick={createDryRun}>
+                                Create import dry run for library
                             </Button>
                         </div>
                     </header>

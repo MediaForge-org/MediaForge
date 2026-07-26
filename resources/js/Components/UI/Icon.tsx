@@ -199,6 +199,16 @@ export function CatalogIcon(props: IconProps) {
     );
 }
 
+export function ImportIcon(props: IconProps) {
+    return (
+        <svg {...base(props)}>
+            <path d="M12 3v10" />
+            <path d="m8 11 4 4 4-4" />
+            <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
+        </svg>
+    );
+}
+
 export function ReviewIcon(props: IconProps) {
     return (
         <svg {...base(props)}>

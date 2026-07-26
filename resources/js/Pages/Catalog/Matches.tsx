@@ -1,5 +1,5 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import type { ReactNode } from 'react';
+import { type ReactNode, useState } from 'react';
 
 import {
     type CatalogLibraryOption,
@@ -12,8 +12,9 @@ import {
     type NormalizationSummary,
     mediaKindLabel,
 } from '@/Components/Connectors/ConnectorStatus';
+import Alert from '@/Components/UI/Alert';
 import Badge from '@/Components/UI/Badge';
-import { buttonClasses } from '@/Components/UI/Button';
+import Button, { buttonClasses } from '@/Components/UI/Button';
 import EmptyState from '@/Components/UI/EmptyState';
 import { CatalogIcon, ShieldIcon } from '@/Components/UI/Icon';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
@@ -152,6 +153,23 @@ function GroupCard({
 
 export default function CatalogMatches() {
     const { connectors, preview, normalization, libraryOptions, filters } = usePage<MatchesPageProps>().props;
+    const [planning, setPlanning] = useState(false);
+
+    /**
+     * POST-only: creates an import PLAN so the operator can see how these
+     * suggestions would land. It accepts no match, merges nothing and imports
+     * nothing — V2 D plans, it never executes.
+     */
+    function createDryRun() {
+        setPlanning(true);
+        const payload = filters.library
+            ? { scope: 'library', connector: filters.connector, library: filters.library }
+            : filters.connector
+              ? { scope: 'connector', connector: filters.connector }
+              : { scope: 'all' };
+
+        router.post('/imports/dry-run', payload, { onFinish: () => setPlanning(false) });
+    }
 
     const hasAnything =
         preview.duplicate_suspects.length > 0 ||
@@ -221,11 +239,28 @@ export default function CatalogMatches() {
                                     </select>
                                 </label>
                             )}
-                            <Link className={buttonClasses('secondary', 'sm')} href="/catalog">
+                            <Link className={buttonClasses('secondary', 'sm')} href="/imports">
+                                View import plans
+                            </Link>
+                            <Button loading={planning} onClick={createDryRun} size="sm">
+                                Create import dry run
+                            </Button>
+                            <Link className={buttonClasses('ghost', 'sm')} href="/catalog">
                                 Back to catalog
                             </Link>
                         </div>
                     </header>
+
+                    {/*
+                      * The bridge to V2 D. These are still suggestions: the dry run
+                      * SHOWS how they would land, it does not accept or merge them.
+                      */}
+                    <section className="mf-col-12">
+                        <Alert tone="info" title="Import dry run">
+                            Use import dry run to see how these suggestions would affect a future import. Dry run only. No media
+                            is imported and no files are copied, moved, deleted or renamed — nothing here is accepted or merged.
+                        </Alert>
+                    </section>
 
                     {/* The read-only promise, stated where the suggestions are. */}
                     <section className="mf-col-12">

@@ -10,6 +10,48 @@ All notable changes to MediaForge are documented here. The format is based on
 Targeting the first tagged pre-release **`v0.2.0-alpha.1`** (V1 local core, alpha —
 not production-ready). See [docs/MediaForge/V1_READINESS.md](docs/MediaForge/V1_READINESS.md).
 
+### Added — V2 D: import plan / import dry run
+
+- **New `/imports` page**: import plans overview with the latest dry run, its status
+  (`ready` · `warnings` · `blocked` · `empty`), the counts that matter (planned, ready, needs
+  review, blocked, duplicate suspects, unsupported, warnings) and the recent dry-run history.
+- **New `/imports/{plan}` page**: one dry run in full — plan header, the planned target structure
+  aggregated by kind and action, a plain-language "why", and one bounded section per outcome
+  (*Ready to import later*, *Warnings*, *Needs review*, *Blocked*, *Skipped — unsupported*,
+  *Duplicate suspects*), each row showing title, planned kind, planned action, status, confidence,
+  reasons and the source connector/library.
+- **POST-only `/imports/dry-run`** with a scope (`all` · `connector` · `library`), reachable from
+  `/imports`, `/catalog`, `/catalog/{connector}`, `/catalog/{connector}/libraries/{library}` and
+  `/catalog/matches`. An unknown connector, an unconfigured connector or a library that does not
+  belong to it is a 404 — never a silently widened scope.
+- **New plan tables** `media_import_plans` and `media_import_plan_items` (CHECK-constrained,
+  indexed, rollback-safe). These are **plan** tables, not media tables: they hold a logical target
+  identity (kind, title, year, season/episode plus a hashed stable key) and deliberately **no file
+  path**, so there is nothing in a plan to move, copy, delete or rename.
+- **Planning rules**: a clean movie/audiobook/book → `create_media` · *ready*; a series/season →
+  `create_container`; an episode with a parent, a season number and an episode number →
+  `attach_to_parent`; a missing year → *warning*; a missing season/episode number, an unknown kind
+  or weak metadata → *needs review*; a missing title, a missing parent or an item that was never
+  normalized → *blocked*; folders/playlists (and podcast/music, which the first internal import
+  will not cover) → `skip_unsupported` · *skipped*, counted but never treated as errors.
+- **Duplicate suspects are never automatically ready**: an item sharing a normalized identity with
+  another captured item drops to `skip_duplicate` · *needs review* with a `duplicate_suspect`
+  reason. Nothing is merged and no duplicate is ever resolved automatically.
+- **Deterministic and bounded**: the pure `PlanCatalogItemImport` makes the same stored input
+  always produce the same actions, statuses, reasons and `target_key`; items are streamed by ULID
+  in chunks and one plan is capped at 5000 items, beyond which it reports itself `truncated`.
+- One **deduplicated `media_import_plan` review task per dry-run scope** carries the reason codes,
+  their counts and a few example titles; a re-run supersedes its predecessor and a clean plan
+  raises none at all. Audit event `media_import_plan.created` is sanitized to counts, reason codes
+  and scope.
+- **Dashboard** gains an Import Plans panel (status + planned/ready/warning/blocked) and the
+  sidebar gains an **Import Plans** entry.
+- **Still not an import.** V2 D writes only plan rows, review tasks and audit entries. It creates
+  no `media_items`, `media_editions` or `media_files`, performs and plans **no file operation**,
+  makes no network call while planning or rendering, changes nothing on Jellyfin/Audiobookshelf and
+  accepts no match. There is deliberately no execute / import / accept / merge action — and no
+  route that could perform one. The first real internal import arrives in V2 E.
+
 ### Added — V2 C: catalog normalization and matching preview
 
 - **Normalization**: every captured external item is interpreted into a consistent shape —
