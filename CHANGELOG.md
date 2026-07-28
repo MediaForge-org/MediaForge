@@ -10,6 +10,24 @@ All notable changes to MediaForge are documented here. The format is based on
 Targeting the first tagged pre-release **`v0.2.0-alpha.1`** (V1 local core, alpha —
 not production-ready). See [docs/MediaForge/V1_READINESS.md](docs/MediaForge/V1_READINESS.md).
 
+### Fixed — double-submitted review task creation no longer crashes
+
+- **A rapidly repeated snapshot, dry run, import or normalization could 500.** Every one of those
+  actions reconciles a single review task through the same check-then-insert: look for an already
+  open task for the (task_type, subject), reuse it if found, otherwise create one. Two requests
+  close enough together — a double-submitted button, a retried request, two open tabs — could both
+  pass the "no open task yet" check before either committed, so the second insert then hit the
+  `review_tasks_no_duplicate_open` partial unique index and surfaced as an unhandled
+  `UniqueConstraintViolationException`. `CreateReviewTask` now catches that violation and re-fetches
+  the task the other request just won instead of letting it crash — the same "loser re-fetches the
+  winner" pattern already used for import idempotency in `ExecuteMediaImportPlan`. Every caller
+  (`CreateCatalogReviewTasks`, `CreateSyncReviewTasks`, `CreateNormalizationReviewTasks`,
+  `CreateImportPlanReviewTasks`, `CreateMediaImportReviewTasks`) goes through this one action, so
+  the fix covers all of them.
+- Every action-triggering button in the UI already disabled itself and showed a loading state for
+  the duration of its request (`Button`'s `loading`/`disabled` prop, used consistently across
+  Connectors, Catalog, Imports, Sync and Review Center) — verified, not changed, by this fix.
+
 ### Fixed — V2 E.1: duplicate suspicion withheld real media
 
 - **A re-scanned item was blocked as a duplicate of its own vanished predecessor.**

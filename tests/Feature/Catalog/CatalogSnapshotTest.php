@@ -487,6 +487,33 @@ test('repeated snapshot problems do not duplicate the review task and a clean sn
         ->and(ReviewTask::query()->where('task_type', 'connector_catalog')->where('status', 'dismissed')->count())->toBe(1);
 });
 
+test('a snapshot reuses an already-open connector_catalog review task instead of crashing on a duplicate request', function () {
+    $user = User::factory()->create();
+    [$instance, $library] = seedCatalogConnector();
+
+    // Simulate a task another (near-simultaneous) failed snapshot already opened —
+    // the exact state a double-submitted "Create read-only snapshot" click leaves
+    // behind, and the shape the partial unique index would otherwise crash on.
+    $existing = ReviewTask::query()->create([
+        'task_type' => 'connector_catalog',
+        'subject_type' => 'connector_instance',
+        'subject_id' => $instance->id,
+        'status' => 'open',
+        'priority' => 'high',
+        'evidence' => ['connector' => 'jellyfin', 'issues' => []],
+        'created_by' => 'connector:jellyfin',
+    ]);
+
+    Http::fake(['*/Items*' => Http::response([], 500)]);
+
+    $this->actingAs($user)->post("/connectors/jellyfin/libraries/{$library->id}/snapshot")
+        ->assertSessionHas('error');
+
+    // Reused, not duplicated — no 500, and the unique index still holds exactly one.
+    expect(ReviewTask::query()->where('task_type', 'connector_catalog')->count())->toBe(1)
+        ->and(ReviewTask::query()->sole()->id)->toBe($existing->id);
+});
+
 test('a snapshot creates no media items, editions or files and touches no connector libraries', function () {
     $user = User::factory()->create();
     [, $library] = seedCatalogConnector();
