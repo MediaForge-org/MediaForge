@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Connectors\Sdk\Actions\CreateMediaImportPlan;
 use App\Connectors\Sdk\Import\ImportPlanScope;
+use App\Connectors\Sdk\Models\ConnectorInstance;
 use App\Connectors\Sdk\Models\ConnectorLibrary;
 use App\Connectors\Sdk\Models\MediaImportPlan;
 use App\Connectors\Sdk\Models\MediaImportPlanItem;
@@ -230,7 +231,7 @@ test('folders and playlists are skipped as unsupported, not treated as errors', 
     }
 });
 
-test('a duplicate suspect never becomes ready and is never merged', function () {
+test('a duplicated item keeps one plannable copy and flags the extra, never merging', function () {
     [$instance, $library] = seedNormalizationConnector();
     seedNormalizationItem($instance, $library, 'jf-1', 'The Matrix');
     seedNormalizationItem($instance, $library, 'jf-2', 'The Matrix'); // same identity
@@ -239,21 +240,280 @@ test('a duplicate suspect never becomes ready and is never merged', function () 
 
     $plan = createImportPlan();
 
-    expect($plan->duplicate_count)->toBe(2)
-        ->and($plan->ready_count)->toBe(1)   // only the unique item stays ready
-        ->and($plan->review_count)->toBe(2)
+    // Two captures of one film must produce ONE film, not zero. The first copy by
+    // ULID is elected; only the EXTRA copy is held back for a human.
+    expect($plan->duplicate_count)->toBe(1)
+        ->and($plan->ready_count)->toBe(2)   // the elected copy + the unique item
+        ->and($plan->review_count)->toBe(1)
         ->and($plan->status)->toBe('warnings');
 
-    foreach (['jf-1', 'jf-2'] as $externalId) {
-        $item = planItemFor($plan, $externalId);
-        expect($item->status)->toBe('needs_review')
-            ->and($item->planned_action)->toBe('skip_duplicate')
-            ->and($item->reasons)->toContain('duplicate_suspect')
-            ->and($item->reasons)->not->toContain('ready_to_import');
-    }
+    $elected = planItemFor($plan, 'jf-1');
+    expect($elected->status)->toBe('ready')
+        ->and($elected->planned_action)->toBe('create_media')
+        ->and($elected->reasons)->not->toContain('duplicate_suspect');
 
-    // Both suspects survive as separate plan lines — nothing was merged away.
+    $extra = planItemFor($plan, 'jf-2');
+    expect($extra->status)->toBe('needs_review')
+        ->and($extra->planned_action)->toBe('skip_duplicate')
+        ->and($extra->reasons)->toContain('duplicate_suspect')
+        ->and($extra->reasons)->not->toContain('ready_to_import');
+
+    // Both copies survive as separate plan lines — nothing was merged away.
     expect(MediaImportPlanItem::query()->where('media_import_plan_id', $plan->id)->count())->toBe(3);
+});
+
+test('electing which copy survives is deterministic across repeated dry runs', function () {
+    [$instance, $library] = seedNormalizationConnector();
+    seedNormalizationItem($instance, $library, 'jf-1', 'The Matrix');
+    seedNormalizationItem($instance, $library, 'jf-2', 'The Matrix');
+    normalizeConnector($instance);
+
+    $first = createImportPlan();
+    $second = createImportPlan();
+
+    foreach ([$first, $second] as $plan) {
+        expect(planItemFor($plan, 'jf-1')->status)->toBe('ready')
+            ->and(planItemFor($plan, 'jf-2')->status)->toBe('needs_review');
+    }
+});
+
+/* ---------------------------------------------------------------------------
+ | V2 E.1 — a duplicate needs a shared PARENT context, not just a shared title
+ * ------------------------------------------------------------------------- */
+
+/**
+ * One show with a numbered season and episodes. Seasons are deliberately titled
+ * "Staffel 1" so the tests prove a generic container title cannot merge two shows.
+ *
+ * @param  list<array{0: string, 1: int}>  $episodes  [title, episode number]
+ */
+function seedShow(
+    ConnectorInstance $instance,
+    ConnectorLibrary $library,
+    string $prefix,
+    string $showTitle,
+    int $year,
+    array $episodes,
+    int $season = 1,
+): void {
+    seedNormalizationItem($instance, $library, $prefix, $showTitle, 'series', [
+        'year' => $year, 'runtime_seconds' => null,
+    ]);
+    seedNormalizationItem($instance, $library, "{$prefix}-s{$season}", "Staffel {$season}", 'season', [
+        'external_parent_id' => $prefix, 'index_number' => $season, 'year' => null, 'runtime_seconds' => null,
+    ]);
+
+    foreach ($episodes as [$title, $number]) {
+        seedNormalizationItem($instance, $library, "{$prefix}-s{$season}e{$number}", $title, 'episode', [
+            'external_parent_id' => "{$prefix}-s{$season}",
+            'parent_index_number' => $season,
+            'index_number' => $number,
+            'year' => $year,
+        ]);
+    }
+}
+
+test('an item is never treated as a duplicate of its own vanished predecessor', function () {
+    // THE regression that produced the reported flood. When a server reissues its
+    // ids (a library rebuild), the old capture is kept as vanished and the new one
+    // is captured fresh. The duplicate scan used to look at every stored row
+    // regardless of presence, so each re-scanned item was flagged as a duplicate of
+    // its own dead predecessor — and then withheld from the import.
+    [$instance, $library] = seedNormalizationConnector();
+    seedShow($instance, $library, 'sup', 'Supernatural', 2005, [['Die Frau in Weiß', 1]]);
+
+    // The same episode under the same parent, captured under an older id and since
+    // gone. It is not there to import, so it must not block the one that is.
+    seedNormalizationItem($instance, $library, 'sup-s1e1-old', 'Die Frau in Weiß', 'episode', [
+        'external_parent_id' => 'sup-s1',
+        'parent_index_number' => 1,
+        'index_number' => 1,
+        'year' => 2005,
+        'is_present' => false,
+        'missing_since' => now(),
+    ]);
+    normalizeConnector($instance);
+
+    $plan = createImportPlan();
+
+    expect($plan->duplicate_count)->toBe(0);
+
+    $live = planItemFor($plan, 'sup-s1e1');
+    expect($live->status)->toBe('ready')
+        ->and($live->planned_action)->toBe('attach_to_parent')
+        ->and($live->reasons)->not->toContain('duplicate_suspect');
+
+    // The vanished capture is not planned at all — it is not there to import.
+    expect(planItemFor($plan, 'sup-s1e1-old'))->toBeNull();
+});
+
+test('different episodes of the same season are never duplicates of each other', function () {
+    [$instance, $library] = seedNormalizationConnector();
+    seedShow($instance, $library, 'sup', 'Supernatural', 2005, [
+        ['Die Frau in Weiß', 1],
+        ['Wendigo', 2],
+        ['Tod im Wasser', 3],
+        ['Phantom-Reisende', 4],
+        ['Bloody Mary', 5],
+    ]);
+    normalizeConnector($instance);
+
+    $plan = createImportPlan();
+
+    // The regression this pins: these are five ordinary, different episodes.
+    expect($plan->duplicate_count)->toBe(0);
+
+    foreach ([1, 2, 3, 4, 5] as $number) {
+        $item = planItemFor($plan, "sup-s1e{$number}");
+        expect($item->status)->toBe('ready')
+            ->and($item->planned_action)->toBe('attach_to_parent')
+            ->and($item->reasons)->not->toContain('duplicate_suspect');
+    }
+});
+
+test('the same season number in two different shows is not a duplicate', function () {
+    [$instance, $library] = seedNormalizationConnector();
+    seedShow($instance, $library, 'sup', 'Supernatural', 2005, [['Die Frau in Weiß', 1]]);
+    seedShow($instance, $library, 'cher', 'Chernobyl', 2019, [['1:23:45', 1]]);
+    normalizeConnector($instance);
+
+    $plan = createImportPlan();
+
+    // Both seasons are called "Staffel 1"; only their parents tell them apart.
+    expect($plan->duplicate_count)->toBe(0)
+        ->and(planItemFor($plan, 'sup-s1')->status)->toBe('ready')
+        ->and(planItemFor($plan, 'cher-s1')->status)->toBe('ready')
+        ->and(planItemFor($plan, 'sup-s1')->reasons)->not->toContain('duplicate_suspect')
+        ->and(planItemFor($plan, 'cher-s1')->reasons)->not->toContain('duplicate_suspect');
+});
+
+test('S01E01 of two different shows is not a duplicate', function () {
+    [$instance, $library] = seedNormalizationConnector();
+    seedShow($instance, $library, 'sup', 'Supernatural', 2005, [['Die Frau in Weiß', 1]]);
+    seedShow($instance, $library, 'got', 'Game of Thrones', 2011, [['Der Winter naht', 1]]);
+    normalizeConnector($instance);
+
+    $plan = createImportPlan();
+
+    expect($plan->duplicate_count)->toBe(0)
+        ->and(planItemFor($plan, 'sup-s1e1')->status)->toBe('ready')
+        ->and(planItemFor($plan, 'got-s1e1')->status)->toBe('ready');
+});
+
+test('identically numbered episodes with a generic title in two shows stay separate', function () {
+    [$instance, $library] = seedNormalizationConnector();
+    // The worst case for a title-based rule: same title, same numbers, two shows.
+    seedShow($instance, $library, 'a', 'Show A', 2010, [['Episode 1', 1], ['Episode 2', 2]]);
+    seedShow($instance, $library, 'b', 'Show B', 2010, [['Episode 1', 1], ['Episode 2', 2]]);
+    normalizeConnector($instance);
+
+    $plan = createImportPlan();
+
+    expect($plan->duplicate_count)->toBe(0);
+
+    foreach (['a-s1e1', 'a-s1e2', 'b-s1e1', 'b-s1e2'] as $externalId) {
+        expect(planItemFor($plan, $externalId)->status)->toBe('ready');
+    }
+});
+
+test('a truly repeated episode keeps one copy and holds the extra for review', function () {
+    [$instance, $library] = seedNormalizationConnector();
+    seedShow($instance, $library, 'sup', 'Supernatural', 2005, [['Die Frau in Weiß', 1]]);
+    // The same episode captured a second time under the SAME season and number —
+    // this is what a real duplicate looks like.
+    seedNormalizationItem($instance, $library, 'sup-s1e1-copy', 'Die Frau in Weiß', 'episode', [
+        'external_parent_id' => 'sup-s1',
+        'parent_index_number' => 1,
+        'index_number' => 1,
+        'year' => 2005,
+    ]);
+    normalizeConnector($instance);
+
+    $plan = createImportPlan();
+
+    expect($plan->duplicate_count)->toBe(1)
+        ->and(planItemFor($plan, 'sup-s1e1')->status)->toBe('ready')
+        ->and(planItemFor($plan, 'sup-s1e1-copy')->status)->toBe('needs_review')
+        ->and(planItemFor($plan, 'sup-s1e1-copy')->planned_action)->toBe('skip_duplicate')
+        ->and(planItemFor($plan, 'sup-s1e1-copy')->reasons)->toContain('duplicate_suspect');
+});
+
+test('an episode missing its season or episode number is never blocked as a duplicate', function () {
+    [$instance, $library] = seedNormalizationConnector();
+    // Two unnumbered episodes under one show: too weak to call them the same thing.
+    foreach (['x1', 'x2'] as $id) {
+        seedNormalizationItem($instance, $library, $id, 'Unnumbered', 'episode', [
+            'external_parent_id' => 'sup',
+            'parent_index_number' => null,
+            'index_number' => null,
+        ]);
+    }
+    seedNormalizationItem($instance, $library, 'sup', 'Supernatural', 'series', [
+        'year' => 2005, 'runtime_seconds' => null,
+    ]);
+    normalizeConnector($instance);
+
+    $plan = createImportPlan();
+
+    // They need review for missing numbers — but never for being "duplicates".
+    expect($plan->duplicate_count)->toBe(0);
+
+    foreach (['x1', 'x2'] as $id) {
+        expect(planItemFor($plan, $id)->reasons)->not->toContain('duplicate_suspect');
+    }
+});
+
+test('two same-named films without a year are reported, not blocked as duplicates', function () {
+    [$instance, $library] = seedNormalizationConnector();
+    seedNormalizationItem($instance, $library, 'm1', 'Unknown Feature', 'movie', ['year' => null]);
+    seedNormalizationItem($instance, $library, 'm2', 'Unknown Feature', 'movie', ['year' => null]);
+    normalizeConnector($instance);
+
+    $plan = createImportPlan();
+
+    // Without a year there is nothing solid to tell two same-named works apart, so
+    // the honest answer is a warning about the missing year — not a duplicate block.
+    expect($plan->duplicate_count)->toBe(0);
+
+    foreach (['m1', 'm2'] as $id) {
+        $item = planItemFor($plan, $id);
+        expect($item->reasons)->not->toContain('duplicate_suspect')
+            ->and($item->reasons)->toContain('missing_year');
+    }
+});
+
+test('two same-named films sharing a year are still caught as duplicates', function () {
+    [$instance, $library] = seedNormalizationConnector();
+    seedNormalizationItem($instance, $library, 'm1', 'The Thing', 'movie', ['year' => 1982]);
+    seedNormalizationItem($instance, $library, 'm2', 'The Thing', 'movie', ['year' => 1982]);
+    // A remake is a different work and must not be swept in.
+    seedNormalizationItem($instance, $library, 'm3', 'The Thing', 'movie', ['year' => 2011]);
+    normalizeConnector($instance);
+
+    $plan = createImportPlan();
+
+    expect($plan->duplicate_count)->toBe(1)
+        ->and(planItemFor($plan, 'm1')->status)->toBe('ready')
+        ->and(planItemFor($plan, 'm2')->status)->toBe('needs_review')
+        ->and(planItemFor($plan, 'm3')->status)->toBe('ready')
+        ->and(planItemFor($plan, 'm3')->reasons)->not->toContain('duplicate_suspect');
+});
+
+test('the same title in two different connector instances is not blocked', function () {
+    [$jellyfin, $jfLibrary] = seedNormalizationConnector('jellyfin');
+    [$abs, $absLibrary] = seedNormalizationConnector('audiobookshelf', 'ABS-TOKEN');
+    seedNormalizationItem($jellyfin, $jfLibrary, 'jf-1', 'Dune', 'movie', ['year' => 2021]);
+    seedNormalizationItem($abs, $absLibrary, 'abs-1', 'Dune', 'movie', ['year' => 2021]);
+    normalizeConnector($jellyfin);
+    normalizeConnector($abs, 'audiobookshelf');
+
+    $plan = createImportPlan();
+
+    // Two servers each holding a copy are two external items, not one work. Deciding
+    // they are the same is a matching question, not a reason to withhold an import.
+    expect($plan->duplicate_count)->toBe(0)
+        ->and(planItemFor($plan, 'jf-1')->status)->toBe('ready')
+        ->and(planItemFor($plan, 'abs-1')->status)->toBe('ready');
 });
 
 test('an item captured before normalization is blocked rather than planned blindly', function () {

@@ -244,7 +244,10 @@ See [V1_READINESS.md](V1_READINESS.md) for the readiness checklist and release r
 - **Audiobook grouping matches on title only**; the captured read-model has no author field, so two
   different books with the same title group together as suspects.
 - **Duplicate suspects are suspects, not duplicates.** Two libraries legitimately holding the same
-  film look identical here; deciding that is V2 D's job.
+  film look identical here; deciding that is V2 D's job. Note this preview groups more loosely than
+  the import does — since V2 E.1 the *blocking* rule requires a shared parent context (see
+  [V2 E.1](#v2-e1--duplicate-suspicion-corrected)), so an item shown here as a suspect is not
+  necessarily withheld from an import.
 - **Normalization is synchronous** and runs inside the snapshot/rebuild request.
 - Items captured before V2 C show as "Not normalized" until a snapshot or a rebuild runs.
 
@@ -261,6 +264,38 @@ See [V1_READINESS.md](V1_READINESS.md) for the readiness checklist and release r
 - **Podcast and music are counted as unsupported**, because the first internal import (V2 E) will
   not cover them. That is a scope statement, not a data problem.
 - **Only currently present items are planned.** A vanished item is never planned for import.
+
+### V2 E.1 — duplicate suspicion, corrected
+
+Duplicate suspicion decides that an item is *not safe to import*, so a false positive silently
+withholds real media. Two defects did exactly that, and both are fixed:
+
+- **Presence.** The scan compared against every stored normalization row, including items already
+  marked vanished, while the plan only ever plans items still present. A server that reissues its
+  ids therefore made every fresh capture look like a duplicate of the row it replaced. Detection now
+  runs over the same scope the plan does.
+- **Context.** The identity was `title + kind + year`, which cannot tell one show from another.
+  `DuplicateIdentity` now requires a shared parent:
+
+  | kind | identity |
+  | --- | --- |
+  | episode | connector instance + parent container + season number + episode number (**title ignored**) |
+  | season | connector instance + show + season number |
+  | series / movie / book / audiobook | connector instance + normalized title + a **real** release year |
+  | folder, playlist, podcast, music, unknown | never blockable |
+
+  The parent is the connector's own `external_parent_id` when present (exact), falling back to the
+  parent title only when that title is specific — a parent called "Staffel 1" identifies nothing.
+  Generic titles (`1`, `1:23:45`, `Episode 2`, `Staffel 3`) are never duplicate evidence on their own.
+
+**One copy always survives.** Blocking every copy of a duplicated identity meant the media never
+arrived at all. The lowest ULID is elected and stays importable; the extra copies become
+`needs_review` + `duplicate_suspect`. The election is deterministic, so a repeated dry run agrees
+with the first. This is presentation, not merging — the extra copies keep their own rows, receive no
+mapping, and remain open for a human to decide differently.
+
+The rule is deliberately biased toward **under-blocking**: a missed duplicate is a visible extra
+row a human can merge later, while a false duplicate is media that silently never appears.
 
 ### Known V2 E limitations
 

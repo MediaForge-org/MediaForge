@@ -176,7 +176,7 @@ test('an unsupported item stays skipped as unsupported', function () {
     }
 });
 
-test('a duplicate suspect is skipped as a duplicate and never merged', function () {
+test('a duplicated item imports once and the extra copy is skipped, never merged', function () {
     [$instance, $library] = seedNormalizationConnector();
     seedNormalizationItem($instance, $library, 'jf-1', 'The Matrix');
     seedNormalizationItem($instance, $library, 'jf-2', 'The Matrix');
@@ -184,14 +184,22 @@ test('a duplicate suspect is skipped as a duplicate and never merged', function 
 
     $execution = executeImportPlan(createImportPlan());
 
-    expect(MediaItem::query()->count())->toBe(0)
-        ->and($execution->skipped_count)->toBe(2);
+    // Two captures of one film produce exactly ONE film — not zero, and not two.
+    expect(MediaItem::query()->count())->toBe(1)
+        ->and($execution->imported_count)->toBe(1)
+        ->and($execution->skipped_count)->toBe(1);
 
-    foreach (['jf-1', 'jf-2'] as $externalId) {
-        $line = executionItemFor($execution, $externalId);
-        expect($line->action)->toBe('skipped_duplicate')
-            ->and($line->reason_codes)->toContain('duplicate_not_imported');
-    }
+    expect(executionItemFor($execution, 'jf-1')->action)->toBe('created');
+
+    $extra = executionItemFor($execution, 'jf-2');
+    expect($extra->action)->toBe('skipped_duplicate')
+        ->and($extra->reason_codes)->toContain('duplicate_not_imported')
+        // The extra copy was never given a media item of its own.
+        ->and($extra->media_item_id)->toBeNull();
+
+    // Nothing was merged: the skipped copy is still its own external item with no
+    // mapping, so a human can still decide differently later.
+    expect(MediaExternalMapping::query()->count())->toBe(1);
 });
 
 test('weak metadata is never imported', function () {

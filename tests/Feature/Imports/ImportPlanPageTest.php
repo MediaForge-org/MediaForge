@@ -203,7 +203,7 @@ test('a plan detail page groups items into ready, warning, review, blocked and s
     Http::assertNothingSent();
 });
 
-test('a plan detail page lists duplicate suspects separately', function () {
+test('a plan detail page lists the extra copies of a duplicate separately', function () {
     $user = User::factory()->create();
     [$instance, $library] = seedNormalizationConnector();
     seedNormalizationItem($instance, $library, 'jf-1', 'The Matrix');
@@ -212,12 +212,14 @@ test('a plan detail page lists duplicate suspects separately', function () {
 
     $plan = createImportPlan();
 
+    // One copy stays importable; only the EXTRA copy is listed for a decision.
     $this->actingAs($user)->get("/imports/{$plan->id}")
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
-            ->where('duplicates.total', 2)
-            ->has('duplicates.data', 2)
-            ->where('duplicates.data.0.planned_action', 'skip_duplicate'));
+            ->where('duplicates.total', 1)
+            ->has('duplicates.data', 1)
+            ->where('duplicates.data.0.planned_action', 'skip_duplicate')
+            ->where('plan.ready_count', 1));
 });
 
 test('a plan detail page explains why the plan came out the way it did', function () {

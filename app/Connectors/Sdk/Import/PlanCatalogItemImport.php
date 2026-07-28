@@ -318,6 +318,11 @@ final class PlanCatalogItemImport
      * drops to `skip_duplicate` + `needs_review`; an item that is already blocked or
      * skipped keeps its worse verdict and just gains the reason. Nothing is merged,
      * and no duplicate is ever resolved automatically.
+     *
+     * Since V2 E.1 the caller only sets this for the EXTRA copies of an identity —
+     * one copy of each duplicated thing stays plannable (see
+     * CreateMediaImportPlan::extraCopies), so a duplicated episode yields one
+     * episode plus a review note, instead of nothing at all.
      */
     private function withDuplicateSuspicion(PlannedImportItem $planned): PlannedImportItem
     {

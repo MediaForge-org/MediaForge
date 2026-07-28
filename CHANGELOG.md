@@ -10,6 +10,32 @@ All notable changes to MediaForge are documented here. The format is based on
 Targeting the first tagged pre-release **`v0.2.0-alpha.1`** (V1 local core, alpha —
 not production-ready). See [docs/MediaForge/V1_READINESS.md](docs/MediaForge/V1_READINESS.md).
 
+### Fixed — V2 E.1: duplicate suspicion withheld real media
+
+- **A re-scanned item was blocked as a duplicate of its own vanished predecessor.**
+  The duplicate scan read every stored normalization row regardless of presence, while the plan
+  itself only ever plans items that are still there. So when a server reissued its ids (a library
+  rebuild), each fresh capture was paired with the dead row it replaced and held back from the
+  import. On the development catalog this silently withheld **327 of 415 episodes** — whole seasons
+  of Supernatural, and a series, reported as `skipped_duplicate`. Duplicate detection now runs over
+  the same scope the plan does, so an item that is gone can no longer block the one that replaced it.
+- **Duplicate identity now requires a shared parent, not just a shared title.** The old key was
+  `title + kind + year`, which had no notion of which show an episode belonged to. The new
+  `DuplicateIdentity` keys an **episode** on connector instance + parent container + season number +
+  episode number and ignores the title entirely; a **season** on instance + show + season number;
+  and a **series/movie/book/audiobook** on instance + title + a real release year. Consequences:
+  two episodes of one season can never collide because both are called "Episode 1"; "Season 1" of
+  Supernatural and of Chernobyl are different seasons; S01E01 of two shows are different episodes;
+  and two same-named films without a year are reported as missing a year rather than blocked.
+- **A duplicate no longer means nothing gets imported.** Previously every copy of a duplicated
+  identity was withheld, so two captures of one episode produced *zero* episodes. Now one copy is
+  elected (lowest ULID — deterministic, so repeated dry runs agree) and stays importable, while the
+  extra copies are flagged `needs_review` + `duplicate_suspect` for a human. Nothing is merged: the
+  extra copies keep their own rows and get no mapping, so the decision stays open.
+- Duplicate identity is scoped to one connector instance. The same film on two servers is two
+  external items; deciding they are one work is a matching question, not grounds for withholding
+  an import.
+
 ### Added — V2 E: first internal import
 
 - **The first package that writes real MediaForge media records.** `POST

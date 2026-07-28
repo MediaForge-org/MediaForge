@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Connectors\Sdk\Actions;
 
+use App\Connectors\Sdk\Import\DuplicateIdentity;
 use App\Connectors\Sdk\Import\ImportPlanItemStatus;
 use App\Connectors\Sdk\Import\ImportPlannedAction;
 use App\Connectors\Sdk\Import\ImportPlanReason;
@@ -154,12 +155,15 @@ final class CreateMediaImportPlan extends AuditableAction
         /** @var array<string, list<string>> $examples */
         $examples = [];
 
+        // Which items are the EXTRA copies of something the plan already covers.
+        // Computed once over the whole scope, because two captures of the same
+        // episode can easily land in different chunks.
+        $extraCopies = $this->extraCopies($instance, $library);
+
         $this->scopedItems($instance, $library)
             ->with('normalization')
             ->orderBy('id')
-            ->chunkById(self::CHUNK, function ($items) use ($planId, $now, &$rows, &$counts, &$reasonCounts, &$examples): bool {
-                $duplicates = $this->duplicateIdentities($items);
-
+            ->chunkById(self::CHUNK, function ($items) use ($planId, $now, $extraCopies, &$rows, &$counts, &$reasonCounts, &$examples): bool {
                 foreach ($items as $item) {
                     if (count($rows) >= self::MAX_ITEMS_PER_PLAN) {
                         return false; // (K) bounded: the plan is reported as truncated
@@ -169,7 +173,7 @@ final class CreateMediaImportPlan extends AuditableAction
 
                     $planned = $normalization === null
                         ? $this->planner->planUnnormalized($item->title)
-                        : $this->planner->plan($normalization, isset($duplicates[$this->identity($normalization)]));
+                        : $this->planner->plan($normalization, isset($extraCopies[$item->id]));
 
                     $counts[$planned->status->value]++;
 
@@ -203,54 +207,69 @@ final class CreateMediaImportPlan extends AuditableAction
     }
 
     /**
-     * Which of these items share a normalized identity (title + kind + year) with at
-     * least one other captured item. Evaluated across the WHOLE catalog, not just
-     * the plan scope, because a film held twice in two libraries is exactly the case
-     * a later import has to decide about. Bounded by the chunk's distinct titles.
+     * The EXTRA copies: items that share a strong duplicate identity
+     * (DuplicateIdentity) with another item the same plan covers, and that are not
+     * the one copy elected to represent it.
      *
-     * @param  iterable<ConnectorCatalogItem>  $items
-     * @return array<string, true>
+     * Why elect one at all: blocking every copy means the media never arrives, which
+     * is the worst possible answer — two captures of one episode should produce one
+     * episode, not zero. So the FIRST copy by ULID stays plannable and the rest are
+     * flagged for a human. That is a presentation choice, not a merge: nothing is
+     * combined, the extra copies keep their own rows, and a later decision can still
+     * go the other way.
+     *
+     * The election is deterministic (lowest ULID wins), so the same catalog always
+     * elects the same copy and a repeated dry run plans identically.
+     *
+     * @return array<string, true> connector_catalog_item id => is an extra copy
      */
-    private function duplicateIdentities(iterable $items): array
+    private function extraCopies(?ConnectorInstance $instance, ?ConnectorLibrary $library): array
     {
-        $titles = [];
+        /** @var array<string, string> $keyByItem */
+        $keyByItem = [];
+        /** @var array<string, int> $groupSize */
+        $groupSize = [];
+        /** @var array<string, string> $elected */
+        $elected = [];
 
-        foreach ($items as $item) {
-            if ($item->normalization !== null) {
-                $titles[$item->normalization->normalized_title] = true;
+        $this->scopedItems($instance, $library)
+            ->with('normalization')
+            ->orderBy('id')
+            ->chunkById(self::CHUNK, function ($items) use (&$keyByItem, &$groupSize, &$elected): void {
+                foreach ($items as $item) {
+                    $normalization = $item->normalization;
+
+                    if ($normalization === null) {
+                        continue;
+                    }
+
+                    $key = DuplicateIdentity::for($item, $normalization);
+
+                    // null means "never blockable as a duplicate" — weak data, a
+                    // generic title, or a kind with no reliable identity.
+                    if ($key === null) {
+                        continue;
+                    }
+
+                    $keyByItem[$item->id] = $key;
+                    $groupSize[$key] = ($groupSize[$key] ?? 0) + 1;
+
+                    if (!isset($elected[$key]) || strcmp($item->id, $elected[$key]) < 0) {
+                        $elected[$key] = $item->id;
+                    }
+                }
+            });
+
+        /** @var array<string, true> $extra */
+        $extra = [];
+
+        foreach ($keyByItem as $itemId => $key) {
+            if (($groupSize[$key] ?? 0) > 1 && $elected[$key] !== $itemId) {
+                $extra[$itemId] = true;
             }
         }
 
-        if ($titles === []) {
-            return [];
-        }
-
-        $groups = ConnectorCatalogItemNormalization::query()
-            ->toBase()
-            ->select('normalized_title', 'normalized_kind')
-            ->selectRaw('COALESCE(release_year, -1) AS year_key')
-            ->whereIn('normalized_title', array_keys($titles))
-            ->groupByRaw('normalized_title, normalized_kind, COALESCE(release_year, -1)')
-            ->havingRaw('COUNT(*) > 1')
-            ->get();
-
-        /** @var array<string, true> $out */
-        $out = [];
-
-        foreach ($groups as $group) {
-            $title = is_string($group->normalized_title) ? $group->normalized_title : '';
-            $kind = is_string($group->normalized_kind) ? $group->normalized_kind : 'unknown';
-            $year = is_numeric($group->year_key ?? null) ? (int) $group->year_key : -1;
-
-            $out[$title."\0".$kind."\0".$year] = true;
-        }
-
-        return $out;
-    }
-
-    private function identity(ConnectorCatalogItemNormalization $normalization): string
-    {
-        return $normalization->normalized_title."\0".$normalization->normalized_kind."\0".($normalization->release_year ?? -1);
+        return $extra;
     }
 
     /**
