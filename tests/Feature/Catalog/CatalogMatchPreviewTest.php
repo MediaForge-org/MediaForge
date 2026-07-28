@@ -364,12 +364,13 @@ test('the match preview offers no accept, import or merge action', function () {
     // And it states the boundary out loud.
     expect($source)->toContain('Matching preview only');
 
-    // No route exists anywhere that could accept/merge/execute a match. The only
-    // "import"-shaped routes are the V2 D dry-run plan routes, which import nothing.
+    // No route exists anywhere that could accept or merge a match. The
+    // "import"-shaped routes are the V2 D dry-run routes plus the V2 E execution,
+    // which writes MediaForge database records and never accepts a suggestion.
     $importRoutes = [];
 
     foreach (Route::getRoutes()->getRoutes() as $route) {
-        foreach (['merge', 'accept', 'execute', 'import-now', 'commit'] as $needle) {
+        foreach (['merge', 'accept', 'import-now', 'commit'] as $needle) {
             expect(str_contains($route->uri(), $needle))->toBeFalse(
                 "Route {$route->uri()} suggests an accept/merge action, which must not exist."
             );
@@ -380,7 +381,13 @@ test('the match preview offers no accept, import or merge action', function () {
         }
     }
 
-    expect(array_unique($importRoutes))->toEqualCanonicalizing(['imports', 'imports/dry-run', 'imports/{plan}']);
+    expect(array_unique($importRoutes))->toEqualCanonicalizing([
+        'imports',
+        'imports/dry-run',
+        'imports/runs/{run}',
+        'imports/{plan}',
+        'imports/{plan}/execute-ready',
+    ]);
 });
 
 test('the catalog pages reference no forbidden routes', function () {

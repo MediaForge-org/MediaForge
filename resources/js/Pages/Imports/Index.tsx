@@ -3,6 +3,12 @@ import { useState } from 'react';
 
 import { formatCheckedAt } from '@/Components/Connectors/ConnectorStatus';
 import {
+    ImportExecutionStatusBadge,
+    type ImportExecutionView,
+    INTERNAL_IMPORT_SAFETY_NOTE,
+    type InternalMediaSummary,
+} from '@/Components/Imports/ImportExecutionStatus';
+import {
     IMPORT_SAFETY_NOTE,
     ImportPlanStatusBadge,
     type ImportPlanStatus,
@@ -36,11 +42,16 @@ interface ImportsPageProps {
     latestPlan: ImportPlanView | null;
     plans: ImportPlanView[];
     connectors: { key: string; label: string; configured: boolean }[];
+    /** V2 E: plan id => how many internal imports it already had. */
+    executionCounts: Record<string, number>;
+    executions: ImportExecutionView[];
+    internalMedia: InternalMediaSummary;
     flash: { success: string | null; error: string | null };
 }
 
 export default function ImportsIndex() {
-    const { summary, latestPlan, plans, connectors, flash } = usePage<ImportsPageProps>().props;
+    const { summary, latestPlan, plans, connectors, executionCounts, executions, internalMedia, flash } =
+        usePage<ImportsPageProps>().props;
     const [running, setRunning] = useState(false);
 
     /** POST-only: creates a plan row. It imports nothing and touches no file. */
@@ -102,10 +113,56 @@ export default function ImportsIndex() {
 
                     {/* The promise, stated before anything else on the page. */}
                     <section className="mf-col-12">
-                        <Alert tone="info" title="Import dry run">
-                            {IMPORT_SAFETY_NOTE} Nothing is accepted, merged or written to the media library, and nothing
-                            changes on Jellyfin or Audiobookshelf.
+                        <Alert tone="info" title="Dry run, then a database-only import">
+                            {IMPORT_SAFETY_NOTE} {INTERNAL_IMPORT_SAFETY_NOTE} Importing a plan's ready lines creates MediaForge
+                            database records only — nothing is accepted, merged, or written to Jellyfin or Audiobookshelf.
                         </Alert>
+                    </section>
+
+                    {/* V2 E — what actually made it into the internal catalog. */}
+                    <section className="mf-col-12">
+                        <div className="mf-panel p-5">
+                            <div className="flex flex-wrap items-center justify-between gap-3">
+                                <div>
+                                    <h2 className="text-lg font-semibold tracking-tight">Internal media</h2>
+                                    <p className="mt-1 text-sm text-fg-muted">
+                                        MediaForge database records created by an internal import. No file was touched to
+                                        produce any of them.
+                                    </p>
+                                </div>
+                                {internalMedia.latest_execution && (
+                                    <Link
+                                        className={buttonClasses('secondary', 'sm')}
+                                        href={`/imports/runs/${internalMedia.latest_execution.id}`}
+                                    >
+                                        Open latest run
+                                    </Link>
+                                )}
+                            </div>
+
+                            <dl className="mt-4 grid gap-3 sm:grid-cols-3 xl:grid-cols-6">
+                                {[
+                                    ['Media items', internalMedia.media_items],
+                                    ['Movies', internalMedia.movies],
+                                    ['Series', internalMedia.series],
+                                    ['Seasons', internalMedia.seasons],
+                                    ['Episodes', internalMedia.episodes],
+                                    ['Books', internalMedia.books],
+                                ].map(([label, value]) => (
+                                    <div className="mf-card px-4 py-3 text-center" key={label}>
+                                        <dt className="text-xs uppercase tracking-wide text-fg-subtle">{label}</dt>
+                                        <dd className="mt-1 text-xl font-semibold">{value}</dd>
+                                    </div>
+                                ))}
+                            </dl>
+
+                            <p className="mt-3 text-xs text-fg-subtle">
+                                {internalMedia.execution_count} internal{' '}
+                                {internalMedia.execution_count === 1 ? 'import run' : 'import runs'} ·{' '}
+                                {internalMedia.plans_needing_review}{' '}
+                                {internalMedia.plans_needing_review === 1 ? 'plan needs' : 'plans need'} review
+                            </p>
+                        </div>
                     </section>
 
                     {/* Summary cards */}
@@ -180,6 +237,40 @@ export default function ImportsIndex() {
                             )}
                         </div>
 
+                        {/* V2 E — the internal import runs. */}
+                        <div>
+                            <h2 className="mb-3 text-lg font-semibold tracking-tight">Latest internal imports</h2>
+                            {executions.length === 0 ? (
+                                <EmptyState
+                                    description="No plan has been imported yet. Open a plan with ready items and use “Import ready items into MediaForge”. It writes database records only."
+                                    icon={<ImportIcon className="size-5" />}
+                                    title="No internal imports yet"
+                                />
+                            ) : (
+                                <div className="mf-panel divide-y divide-[var(--panel-border)]">
+                                    {executions.map((execution) => (
+                                        <Link
+                                            className="flex flex-wrap items-center justify-between gap-3 p-4 transition-colors hover:text-accent"
+                                            href={`/imports/runs/${execution.id}`}
+                                            key={execution.id}
+                                        >
+                                            <span className="min-w-0">
+                                                <span className="flex flex-wrap items-center gap-2 font-medium">
+                                                    {execution.imported_count} imported
+                                                    <ImportExecutionStatusBadge status={execution.status} />
+                                                </span>
+                                                <span className="mt-1 block text-xs text-fg-subtle">
+                                                    {execution.already_existing_count} already imported ·{' '}
+                                                    {execution.skipped_count} skipped · {execution.failed_count} failed
+                                                </span>
+                                            </span>
+                                            <span className="text-xs text-fg-subtle">{formatCheckedAt(execution.created_at)}</span>
+                                        </Link>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
                         <div>
                             <h2 className="mb-3 text-lg font-semibold tracking-tight">Recent dry runs</h2>
                             {plans.length === 0 ? (
@@ -200,6 +291,9 @@ export default function ImportsIndex() {
                                                 <span className="flex flex-wrap items-center gap-2 font-medium">
                                                     {scopeLabel(plan)}
                                                     <ImportPlanStatusBadge status={plan.status} />
+                                                    {(executionCounts[plan.id] ?? 0) > 0 && (
+                                                        <Badge tone="success">Imported</Badge>
+                                                    )}
                                                 </span>
                                                 <span className="mt-1 block text-xs text-fg-subtle">
                                                     {plan.ready_count} ready · {plan.warning_count} warnings ·{' '}

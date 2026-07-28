@@ -12,6 +12,9 @@ use App\Connectors\Sdk\Models\ConnectorLibrary;
 use App\Connectors\Sdk\Models\ConnectorSyncRun;
 use App\Connectors\Sdk\Models\ConnectorSyncRunLibrary;
 use App\Connectors\Sdk\Models\ConnectorSyncState;
+use App\Connectors\Sdk\Models\MediaExternalMapping;
+use App\Connectors\Sdk\Models\MediaImportExecution;
+use App\Connectors\Sdk\Models\MediaImportExecutionItem;
 use App\Connectors\Sdk\Models\MediaImportPlan;
 use App\Connectors\Sdk\Models\MediaImportPlanItem;
 use App\Connectors\Sdk\Registry\ConnectorRegistry;
@@ -56,6 +59,10 @@ final class ConnectorSdkServiceProvider extends ServiceProvider
             // V2 D import dry run: plan rows, not media rows.
             'media_import_plan' => MediaImportPlan::class,
             'media_import_plan_item' => MediaImportPlanItem::class,
+            // V2 E first internal import: execution provenance + external identity.
+            'media_import_execution' => MediaImportExecution::class,
+            'media_import_execution_item' => MediaImportExecutionItem::class,
+            'media_external_mapping' => MediaExternalMapping::class,
         ]);
     }
 }

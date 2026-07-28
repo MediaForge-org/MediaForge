@@ -3,18 +3,23 @@
 declare(strict_types=1);
 
 use App\Connectors\Sdk\Actions\CreateMediaImportPlan;
+use App\Connectors\Sdk\Actions\ExecuteMediaImportPlan;
 use App\Connectors\Sdk\Actions\NormalizeConnectorCatalogItems;
 use App\Connectors\Sdk\Import\ImportPlanScope;
 use App\Connectors\Sdk\Models\ConnectorCatalogItem;
 use App\Connectors\Sdk\Models\ConnectorCatalogItemNormalization;
 use App\Connectors\Sdk\Models\ConnectorInstance;
 use App\Connectors\Sdk\Models\ConnectorLibrary;
+use App\Connectors\Sdk\Models\MediaExternalMapping;
+use App\Connectors\Sdk\Models\MediaImportExecution;
+use App\Connectors\Sdk\Models\MediaImportExecutionItem;
 use App\Connectors\Sdk\Models\MediaImportPlan;
 use App\Connectors\Sdk\Models\MediaImportPlanItem;
 use App\Connectors\Sdk\Secrets\SecretStore;
 use App\Core\Audit\AuditLog;
 use App\Core\Jobs\CheckpointStore;
 use App\Core\Jobs\ResumableJob;
+use App\Core\Media\MediaItem;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Tests\TestCase;
@@ -255,4 +260,70 @@ function planItemFor(MediaImportPlan $plan, string $externalId): ?MediaImportPla
         ->where('media_import_plan_id', $plan->id)
         ->whereHas('catalogItem', fn ($query) => $query->where('external_id', $externalId))
         ->first();
+}
+
+/*
+|--------------------------------------------------------------------------
+| Internal import harness (V2 E)
+|--------------------------------------------------------------------------
+| Runs the first internal import straight through the action — no HTTP, no
+| network, and no file operation of any kind.
+*/
+
+/** Execute a plan's ready lines into the MediaForge database. */
+function executeImportPlan(MediaImportPlan $plan, ?string $createdBy = null): MediaImportExecution
+{
+    return app(ExecuteMediaImportPlan::class)->execute($plan, $createdBy);
+}
+
+/** The internal record imported for one captured external item, or null. */
+function importedMediaItemFor(ConnectorInstance $instance, string $externalId): ?MediaItem
+{
+    $mapping = MediaExternalMapping::query()
+        ->where('connector_instance_id', $instance->id)
+        ->where('external_id', $externalId)
+        ->first();
+
+    return $mapping === null ? null : MediaItem::query()->find($mapping->media_item_id);
+}
+
+/** What the execution recorded for one captured external item, or null. */
+function executionItemFor(MediaImportExecution $execution, string $externalId): ?MediaImportExecutionItem
+{
+    return MediaImportExecutionItem::query()
+        ->where('media_import_execution_id', $execution->id)
+        ->whereHas('catalogItem', fn ($query) => $query->where('external_id', $externalId))
+        ->first();
+}
+
+/**
+ * A connector holding one fully-numbered series → season → episode chain plus a
+ * movie: the happy path the internal import is built for.
+ *
+ * @return array{0: ConnectorInstance, 1: ConnectorLibrary}
+ */
+function seedImportableCatalog(string $token = 'IMPORT-TOKEN'): array
+{
+    [$instance, $library] = seedNormalizationConnector('jellyfin', $token);
+
+    seedNormalizationItem($instance, $library, 'series-1', 'Severance', 'series', [
+        'year' => 2022,
+        'runtime_seconds' => null,
+    ]);
+    seedNormalizationItem($instance, $library, 'season-1', 'Season 2', 'season', [
+        'external_parent_id' => 'series-1',
+        'index_number' => 2,
+        'year' => null,
+        'runtime_seconds' => null,
+    ]);
+    seedNormalizationItem($instance, $library, 'ep-1', 'Good News About Hell', 'episode', [
+        'external_parent_id' => 'season-1',
+        'parent_index_number' => 2,
+        'index_number' => 5,
+    ]);
+    seedNormalizationItem($instance, $library, 'movie-1', 'The Matrix', 'movie', ['year' => 1999]);
+
+    normalizeConnector($instance);
+
+    return [$instance, $library];
 }

@@ -233,7 +233,7 @@ final class CatalogReadModel
     private function latestItems(?string $instanceId = null, ?string $libraryId = null): array
     {
         return array_values(ConnectorCatalogItem::query()
-            ->with(['instance:id,connector_key', 'library:id,name'])
+            ->with(['instance:id,connector_key', 'library:id,name', 'normalization', 'externalMapping:id,connector_catalog_item_id,media_item_id'])
             ->where('is_present', true)
             ->when($instanceId !== null, fn ($query) => $query->where('connector_instance_id', $instanceId))
             ->when($libraryId !== null, fn ($query) => $query->where('connector_library_id', $libraryId))
@@ -258,7 +258,7 @@ final class CatalogReadModel
         $direction = in_array($q->direction, CatalogItemQuery::DIRECTIONS, true) ? $q->direction : 'asc';
 
         $query = ConnectorCatalogItem::query()
-            ->with(['instance:id,connector_key', 'library:id,name', 'normalization'])
+            ->with(['instance:id,connector_key', 'library:id,name', 'normalization', 'externalMapping:id,connector_catalog_item_id,media_item_id'])
             // Scope by the connector KEY via the relation: a registered connector
             // with no configured instance must yield nothing, not everything.
             ->when(
@@ -516,7 +516,29 @@ final class CatalogReadModel
             'is_present' => $item->is_present,
             'last_seen_at' => $item->last_seen_at?->toIso8601String(),
             'normalization' => $this->normalizationView($item->normalization),
+            // V2 E: does this external item already have an internal record?
+            'import_status' => $this->importStatus($item),
         ];
+    }
+
+    /**
+     * Whether the internal import has taken this item yet. `imported` is the
+     * presence of an external mapping — the same fact the import itself keys on, so
+     * the badge can never disagree with the database. `needs_review` is the
+     * normalization verdict that keeps an item out of a plan's ready set in the
+     * first place; everything else is simply not imported yet.
+     */
+    private function importStatus(ConnectorCatalogItem $item): string
+    {
+        if ($item->externalMapping !== null) {
+            return 'imported';
+        }
+
+        if ($item->normalization?->status === NormalizationStatus::NeedsReview->value) {
+            return 'needs_review';
+        }
+
+        return 'not_imported';
     }
 
     /**

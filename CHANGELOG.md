@@ -10,6 +10,50 @@ All notable changes to MediaForge are documented here. The format is based on
 Targeting the first tagged pre-release **`v0.2.0-alpha.1`** (V1 local core, alpha —
 not production-ready). See [docs/MediaForge/V1_READINESS.md](docs/MediaForge/V1_READINESS.md).
 
+### Added — V2 E: first internal import
+
+- **The first package that writes real MediaForge media records.** `POST
+  /imports/{plan}/execute-ready` turns a V2 D plan's **ready** lines into rows in the canonical
+  `media_items` table — the foundation catalog that has stood empty since V1, whose own migration
+  said the ingest pipeline would arrive in V2. V2 E is that pipeline.
+- **New `/imports/runs/{run}` page**: one internal import in full — status, counts (imported ·
+  linked existing · skipped · failed), a plain-language "why", and one bounded section per outcome
+  (*Created media items*, *Linked existing*, *Skipped*, *Failed*) showing title, what happened,
+  status, reasons and the source connector/library.
+- **Real parent structure**: series → season → episode is built as an actual `parent_id` chain.
+  Containers are imported before the things that hang under them (series → seasons → episodes →
+  movies → audiobooks/books), so one pass always finds its parents.
+- **Parents are resolved exactly, never guessed**: through the external parent id via an existing
+  mapping (works across runs), or through the plan's own `target_parent_key` for something created
+  moments earlier in the same run. If the two disagree the parent is *ambiguous*; if neither
+  answers, or the candidate is the wrong kind, it is *missing*. Either way the line is skipped with
+  a reason instead of being attached to a guess.
+- **Idempotent by construction**: the new `media_external_mappings` table carries a unique
+  `(connector_instance_id, external_id)`, so importing the same plan again **links** the existing
+  record rather than creating a second one — and never overwrites it, so a human's edits survive.
+- **Only ready lines are imported.** Needs-review, blocked, warning, skipped, duplicate-suspect,
+  weak-metadata, unknown-kind, folder, playlist, podcast and music lines are all recorded as
+  skipped with a reason. Every decision is made in one pure, testable gate.
+- **New tables**: `media_import_executions`, `media_import_execution_items`,
+  `media_external_mappings`, plus import provenance on `media_items` (`source`,
+  `created_by_import_execution_id`, `metadata`, `season_number`, `episode_number`) and plausibility
+  CHECKs on year/runtime/season/episode.
+- **Vocabulary bridge**: the connector read-model's `series`/`book` map onto the foundation
+  catalog's `show`/`ebook`, stated once in `ImportableMediaKind` so no other file has to know.
+- One deduplicated **`media_import_execution` review task per plan** carries the reason codes,
+  counts and example titles; a re-import supersedes it and a clean run raises none. Audit events
+  `media_import.execution_completed` / `.execution_empty` / `.execution_failed`, all sanitized.
+- **UI**: `/imports` gains an internal-media summary and a run list; `/imports/{plan}` gains the
+  *Import ready items into MediaForge* button (only when ready lines exist, labelled **DB only**)
+  and its run history; the dashboard gains an Internal Media panel; the catalog table gains an
+  **Imported / Not imported / Needs review** column.
+- **Still no file operations, still nothing leaves the machine.** The import copies, moves, deletes
+  or renames no file, stores no file path (no path-like column exists in any imported table — a
+  test reads the live schema to prove it), creates no `media_files` and no `media_editions`, and
+  sends no request to Jellyfin or Audiobookshelf — no write, no scan, no library refresh. It
+  accepts no match and merges no duplicate. A run is wrapped in one transaction, so a failure rolls
+  back whole and records itself without a stack trace or a message.
+
 ### Added — V2 D: import plan / import dry run
 
 - **New `/imports` page**: import plans overview with the latest dry run, its status

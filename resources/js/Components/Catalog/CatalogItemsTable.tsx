@@ -8,6 +8,7 @@ import {
     mediaKindLabel,
     NormalizationStatusBadge,
 } from '@/Components/Connectors/ConnectorStatus';
+import { CatalogImportStatusBadge } from '@/Components/Imports/ImportExecutionStatus';
 import Badge from '@/Components/UI/Badge';
 import EmptyState from '@/Components/UI/EmptyState';
 import { LibraryIcon } from '@/Components/UI/Icon';
@@ -53,7 +54,7 @@ export default function CatalogItemsTable({
         return <EmptyState description={emptyDescription} icon={<LibraryIcon className="size-5" />} title={emptyTitle} />;
     }
 
-    const columnCount = 4 + (showConnector ? 1 : 0) + (showLibrary ? 1 : 0);
+    const columnCount = 5 + (showConnector ? 1 : 0) + (showLibrary ? 1 : 0);
 
     return (
         <div className="mf-panel overflow-hidden">
@@ -64,6 +65,7 @@ export default function CatalogItemsTable({
                             <th className="px-4 py-3 font-medium">Title</th>
                             <th className="px-4 py-3 font-medium">Kind</th>
                             <th className="px-4 py-3 font-medium">Quality</th>
+                            <th className="px-4 py-3 font-medium">Import</th>
                             {showConnector && <th className="px-4 py-3 font-medium">Connector</th>}
                             {showLibrary && <th className="px-4 py-3 font-medium">Library</th>}
                             <th className="px-4 py-3 font-medium">Last seen</th>
@@ -111,6 +113,14 @@ export default function CatalogItemsTable({
                                         ) : (
                                             <span className="text-xs text-fg-subtle">Not normalized</span>
                                         )}
+                                    </td>
+                                    {/*
+                                      * V2 E: read-only status. Importing happens
+                                      * through the plan → dry run → execute flow,
+                                      * never straight from this table.
+                                      */}
+                                    <td className="px-4 py-3">
+                                        <CatalogImportStatusBadge status={item.import_status} />
                                     </td>
                                     {showConnector && <td className="px-4 py-3 text-fg-muted">{item.connector?.label ?? '—'}</td>}
                                     {showLibrary && <td className="px-4 py-3 text-fg-muted">{item.library_name ?? '—'}</td>}

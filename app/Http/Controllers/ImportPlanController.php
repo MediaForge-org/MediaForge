@@ -5,11 +5,15 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Connectors\Sdk\Actions\CreateMediaImportPlan;
+use App\Connectors\Sdk\Actions\ExecuteMediaImportPlan;
 use App\Connectors\Sdk\ConnectorCatalog;
+use App\Connectors\Sdk\Import\ImportExecutionStatus;
 use App\Connectors\Sdk\Import\ImportPlanScope;
 use App\Connectors\Sdk\ImportPlanReadModel;
+use App\Connectors\Sdk\MediaImportReadModel;
 use App\Connectors\Sdk\Models\ConnectorInstance;
 use App\Connectors\Sdk\Models\ConnectorLibrary;
+use App\Connectors\Sdk\Models\MediaImportExecution;
 use App\Connectors\Sdk\Models\MediaImportPlan;
 use App\Connectors\Sdk\Registry\ConnectorRegistry;
 use Illuminate\Http\RedirectResponse;
@@ -18,28 +22,43 @@ use Inertia\Inertia;
 use Inertia\Response;
 
 /**
- * Import plan / import dry run (V2 D).
+ * Import plan / import dry run (V2 D) and its internal execution (V2 E).
  *
- * The GET pages render STORED plan rows only: no network call, no snapshot run, no
- * normalization rebuild. The single POST creates a new dry run — a plan describing
- * what a LATER import would create.
+ * The GET pages render STORED rows only: no network call, no snapshot run, no
+ * normalization rebuild, no plan creation and no import. Two POSTs change state —
+ * one creates a dry run, one executes a plan's READY lines into the MediaForge
+ * database.
  *
- * V2 D performs no import. It writes no media_items, media_editions or media_files,
- * copies/moves/deletes/renames no file, changes nothing on Jellyfin or
- * Audiobookshelf, and accepts no match. There is deliberately no execute/import/
- * accept/merge endpoint here for the UI to call.
+ * The execution is DATABASE-ONLY. It copies, moves, deletes or renames no file,
+ * stores no file path, creates no media_files row, writes nothing to Jellyfin or
+ * Audiobookshelf (no scan, no library refresh), accepts no match and merges no
+ * duplicate. There is deliberately no endpoint that could do any of those.
  */
 final class ImportPlanController extends Controller
 {
-    /** Import plans overview: the latest dry run plus recent plans. */
-    public function index(ConnectorCatalog $catalog, ImportPlanReadModel $readModel): Response
+    /** Import plans overview: the latest dry run, recent plans and recent runs. */
+    public function index(ConnectorCatalog $catalog, ImportPlanReadModel $readModel, MediaImportReadModel $imports): Response
     {
         $overview = $readModel->overview();
+
+        /** @var list<array<string, mixed>> $plans */
+        $plans = $overview['plans'];
+        $planIds = [];
+
+        foreach ($plans as $plan) {
+            if (is_string($plan['id'] ?? null)) {
+                $planIds[] = $plan['id'];
+            }
+        }
 
         return Inertia::render('Imports/Index', [
             'summary' => $overview['summary'],
             'latestPlan' => $overview['latestPlan'],
-            'plans' => $overview['plans'],
+            'plans' => $plans,
+            // V2 E: which plans have already been imported, and what the runs did.
+            'executionCounts' => $imports->executionCountsByPlan($planIds),
+            'executions' => $imports->recentExecutions(),
+            'internalMedia' => $imports->internalMediaSummary(),
             'connectors' => array_map(
                 static fn (array $connector): array => [
                     'key' => is_string($connector['key'] ?? null) ? $connector['key'] : '',
@@ -52,7 +71,74 @@ final class ImportPlanController extends Controller
     }
 
     /** One import dry run in full: header, planned targets and every outcome list. */
-    public function show(string $plan, ImportPlanReadModel $readModel): Response
+    public function show(string $plan, ImportPlanReadModel $readModel, MediaImportReadModel $imports): Response
+    {
+        $model = $this->findPlan($plan);
+
+        return Inertia::render('Imports/Show', [
+            ...$readModel->planDetail($model),
+            // V2 E: has this plan been imported, and may it be?
+            'executions' => $imports->executionsForPlan($model),
+            'importableKinds' => $imports->importableKinds(),
+        ]);
+    }
+
+    /**
+     * One internal import run in full. Reads stored execution rows only — it never
+     * re-runs the import and never touches a file.
+     */
+    public function run(string $run, MediaImportReadModel $imports): Response
+    {
+        $execution = MediaImportExecution::query()->with('plan')->find($run);
+
+        abort_if($execution === null, 404);
+
+        return Inertia::render('Imports/Run', $imports->executionDetail($execution));
+    }
+
+    /**
+     * Execute a plan's READY lines into the MediaForge database. POST-only: it is
+     * the one route in the application that creates media records, so it must never
+     * be reachable by GET.
+     *
+     * Database only. Nothing is copied, moved, deleted or renamed, nothing is sent
+     * to Jellyfin or Audiobookshelf, and needs-review / blocked / skipped /
+     * duplicate / unsupported lines are refused, not imported.
+     */
+    public function executeReady(Request $request, string $plan, ExecuteMediaImportPlan $action): RedirectResponse
+    {
+        $model = $this->findPlan($plan);
+        $user = $request->user();
+
+        $execution = $action->execute($model, $user !== null ? 'user:'.$user->id : null);
+
+        if ($execution->status === ImportExecutionStatus::Failed->value) {
+            return to_route('imports.runs.show', ['run' => $execution->id])->with(
+                'error',
+                'The internal import was rolled back and nothing was created. No files were touched.',
+            );
+        }
+
+        return to_route('imports.runs.show', ['run' => $execution->id])->with(
+            'success',
+            $this->executionMessage($execution),
+        );
+    }
+
+    private function executionMessage(MediaImportExecution $execution): string
+    {
+        if ($execution->status === ImportExecutionStatus::Empty->value) {
+            return 'No ready items to import. Nothing was created and no files were touched.';
+        }
+
+        $imported = $execution->imported_count;
+        $linked = $execution->already_existing_count;
+        $skipped = $execution->skipped_count;
+
+        return "Imported ready items into MediaForge database: {$imported} created, {$linked} already imported, {$skipped} skipped. No files were touched.";
+    }
+
+    private function findPlan(string $plan): MediaImportPlan
     {
         $model = MediaImportPlan::query()
             ->with(['instance:id,connector_key', 'library:id,name'])
@@ -60,7 +146,7 @@ final class ImportPlanController extends Controller
 
         abort_if($model === null, 404);
 
-        return Inertia::render('Imports/Show', $readModel->planDetail($model));
+        return $model;
     }
 
     /**

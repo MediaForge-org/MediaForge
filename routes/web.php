@@ -54,9 +54,16 @@ Route::middleware('auth')->group(function (): void {
     // accept/merge route: V2 D plans, it never imports.
     Route::get('/imports', [ImportPlanController::class, 'index'])->name('imports.index');
     Route::post('/imports/dry-run', [ImportPlanController::class, 'store'])->name('imports.dry-run');
-    // Declared after /imports/dry-run so "dry-run" is never read as a plan id.
+    // V2 E — the internal import. Executing is POST-only: it is the one route that
+    // creates media records. It writes to the MediaForge database only — no file is
+    // copied, moved, deleted or renamed and nothing is sent to a media server.
+    Route::get('/imports/runs/{run}', [ImportPlanController::class, 'run'])
+        ->whereUlid('run')->name('imports.runs.show');
+    // Declared after the literal segments so neither is read as a plan id.
     Route::get('/imports/{plan}', [ImportPlanController::class, 'show'])
         ->whereUlid('plan')->name('imports.show');
+    Route::post('/imports/{plan}/execute-ready', [ImportPlanController::class, 'executeReady'])
+        ->whereUlid('plan')->name('imports.execute-ready');
 
     Route::get('/connectors', [ConnectorController::class, 'index'])->name('connectors.index');
     Route::get('/connectors/{connector}', [ConnectorController::class, 'show'])

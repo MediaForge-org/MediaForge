@@ -178,33 +178,59 @@ test('the import pages never render a stored secret', function () {
  | No execute / import / accept / merge anywhere
  * ------------------------------------------------------------------------- */
 
-test('no route can execute an import, accept a match or merge a duplicate', function () {
-    $forbidden = ['execute', 'accept', 'merge', 'import-now', 'commit'];
+test('no route can accept a match or merge a duplicate, and only one route imports', function () {
+    // V2 E added exactly ONE state-changing import route, and it writes database
+    // records only. Accepting a match and merging a duplicate remain impossible —
+    // there is still no route that could perform either.
+    $forbidden = ['accept', 'merge', 'import-now', 'commit'];
+    $executeRoutes = [];
 
     foreach (Route::getRoutes()->getRoutes() as $route) {
         foreach ($forbidden as $needle) {
             expect(str_contains($route->uri(), $needle))->toBeFalse(
-                "Route {$route->uri()} looks like it performs an import (matched '{$needle}')."
+                "Route {$route->uri()} looks like it accepts or merges (matched '{$needle}')."
             );
         }
+
+        if (str_contains($route->uri(), 'execute')) {
+            $executeRoutes[] = $route;
+        }
     }
+
+    expect($executeRoutes)->toHaveCount(1);
+    expect($executeRoutes[0]->uri())->toBe('imports/{plan}/execute-ready')
+        ->and($executeRoutes[0]->methods())->toContain('POST')
+        ->and($executeRoutes[0]->methods())->not->toContain('GET');
 });
 
-test('the import plan pages offer no execute, import, accept or merge action', function () {
+test('the import plan pages offer no accept, merge or file action', function () {
+    // V2 E added one import action (database-only, on the plan page). Everything
+    // that would touch a file, a media server or a match decision stays absent.
     foreach (['Index', 'Show'] as $component) {
         $source = file_get_contents(resource_path("js/Pages/Imports/{$component}.tsx"));
 
-        foreach (['Execute', 'Import now', 'Accept match', 'Merge', 'Move files', 'Rename'] as $label) {
+        foreach ([
+            'Execute full import', 'Import now all', 'Accept match', 'Merge', 'Move files', 'Rename',
+            'Sync to Jellyfin', 'Sync to Audiobookshelf', 'Delete',
+        ] as $label) {
             expect(str_contains($source, $label))->toBeFalse("Imports/{$component}.tsx offers a '{$label}' action.");
         }
 
-        // The safety promise is stated on both pages.
+        // The dry-run promise is stated on both pages.
         expect($source)->toContain('IMPORT_SAFETY_NOTE');
     }
 
-    // And the promise itself still says what it must.
+    // The plan page's one action is the DB-only import, clearly labelled as such.
+    $show = file_get_contents(resource_path('js/Pages/Imports/Show.tsx'));
+    expect($show)->toContain('Import ready items into MediaForge')
+        ->toContain('DB only')
+        ->toContain('INTERNAL_IMPORT_SAFETY_NOTE');
+
+    // And the promises themselves still say what they must.
     expect(file_get_contents(resource_path('js/Components/Imports/ImportPlanStatus.tsx')))
         ->toContain('Dry run only. No media is imported and no files are copied, moved, deleted or renamed.');
+    expect(file_get_contents(resource_path('js/Components/Imports/ImportExecutionStatus.tsx')))
+        ->toContain('Internal import only. No files are copied, moved, deleted or renamed.');
 });
 
 test('the import pages link only to existing, allowed routes', function () {

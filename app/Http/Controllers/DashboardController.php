@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use App\Connectors\Sdk\CatalogReadModel;
 use App\Connectors\Sdk\ConnectorCatalog;
 use App\Connectors\Sdk\ImportPlanReadModel;
+use App\Connectors\Sdk\MediaImportReadModel;
 use App\Connectors\Sdk\ReviewCenterCatalog;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -23,6 +24,7 @@ final class DashboardController extends Controller
         ReviewCenterCatalog $reviewCenter,
         CatalogReadModel $catalogReadModel,
         ImportPlanReadModel $importPlans,
+        MediaImportReadModel $internalImports,
     ): Response {
         $connectors = $catalog->overview();
         $openTaskCount = $reviewCenter->openTaskCount();
@@ -38,6 +40,9 @@ final class DashboardController extends Controller
             'catalogSummary' => $catalogReadModel->dashboardSummary($connectors),
             // V2 D: the latest import dry run. A plan, never an import.
             'importSummary' => $importPlans->dashboardSummary(),
+            // V2 E: what actually lives in the internal catalog. Database records
+            // only — no file was ever touched to produce these.
+            'internalMedia' => $internalImports->internalMediaSummary(),
         ]);
     }
 

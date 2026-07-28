@@ -15,6 +15,12 @@ evaluation only. It performs **no** media import, **no** file operations, and **
 sync. Do not expose it to the public internet; run it on a trusted local network behind your own
 reverse proxy and TLS if you must reach it remotely.
 
+V2 is under way on top of that foundation: a read-only external catalog, normalization, a matching
+preview, a reviewable import plan, and — since V2 E — a **database-only internal import** that
+turns an approved plan into MediaForge records. It still performs **no file operations** (nothing
+is copied, moved, deleted or renamed) and writes **nothing** back to Jellyfin or Audiobookshelf.
+See [docs/MediaForge/CURRENT_PHASE.md](docs/MediaForge/CURRENT_PHASE.md) for the active phase.
+
 The delivered V1 packages are tracked in
 [docs/MediaForge/V1_READINESS.md](docs/MediaForge/V1_READINESS.md) and
 [docs/MediaForge/CURRENT_PHASE.md](docs/MediaForge/CURRENT_PHASE.md).

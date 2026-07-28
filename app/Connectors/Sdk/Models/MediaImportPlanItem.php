@@ -75,6 +75,17 @@ class MediaImportPlanItem extends Model
         return $this->belongsTo(ConnectorCatalogItem::class, 'connector_catalog_item_id');
     }
 
+    /**
+     * The normalized reading this line was planned from (V2 C). The internal import
+     * (V2 E) reads runtime and sort title from here — stored state, never the network.
+     *
+     * @return BelongsTo<ConnectorCatalogItemNormalization, $this>
+     */
+    public function normalization(): BelongsTo
+    {
+        return $this->belongsTo(ConnectorCatalogItemNormalization::class, 'connector_catalog_item_normalization_id');
+    }
+
     /** @return BelongsTo<ConnectorInstance, $this> */
     public function instance(): BelongsTo
     {

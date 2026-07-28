@@ -10,6 +10,10 @@ import {
     SyncStatusBadge,
 } from '@/Components/Connectors/ConnectorStatus';
 import {
+    ImportExecutionStatusBadge,
+    type InternalMediaSummary,
+} from '@/Components/Imports/ImportExecutionStatus';
+import {
     ImportPlanStatusBadge,
     type ImportPlanStatus,
 } from '@/Components/Imports/ImportPlanStatus';
@@ -58,6 +62,8 @@ interface DashboardPageProps {
     reviewSummary: ReviewSummary;
     catalogSummary: CatalogSummary;
     importSummary: ImportSummary;
+    /** V2 E: what the internal import has actually created. */
+    internalMedia: InternalMediaSummary;
 }
 
 const REVIEW_STATUS_META: Record<ReviewStatus, { label: string; tone: BadgeTone }> = {
@@ -83,7 +89,8 @@ const ROADMAP: { id: string; label: string; done: boolean }[] = [
 ];
 
 export default function Dashboard() {
-    const { status, connectors, syncSummary, reviewSummary, catalogSummary, importSummary } = usePage<DashboardPageProps>().props;
+    const { status, connectors, syncSummary, reviewSummary, catalogSummary, importSummary, internalMedia } =
+        usePage<DashboardPageProps>().props;
     const find = (key: string) => connectors.find((c) => c.key === key);
     const libraryTotal = connectors.reduce((sum, c) => sum + c.library_count, 0);
 
@@ -260,6 +267,60 @@ export default function Dashboard() {
                                     ? 'No import dry run has been created yet.'
                                     : `Last dry run ${formatCheckedAt(importSummary.created_at)} · ${importSummary.plan_count} stored ${importSummary.plan_count === 1 ? 'plan' : 'plans'}`}
                             </p>
+                        </div>
+                    </section>
+
+                    {/* Internal Media (V2 E) — database records, no files touched */}
+                    <section className="mf-col-12 mf-rise" style={{ '--mf-i': 1.45 } as CSSProperties}>
+                        <div className="mf-panel p-6">
+                            <div className="flex flex-wrap items-center justify-between gap-3">
+                                <div className="flex items-center gap-3">
+                                    <span className="grid size-11 place-items-center rounded-[--radius-md] bg-accent/10 text-accent ring-1 ring-inset ring-accent/20">
+                                        <LibraryIcon className="size-6" />
+                                    </span>
+                                    <div>
+                                        <div className="flex flex-wrap items-center gap-2">
+                                            <h2 className="text-lg font-semibold tracking-tight">Internal Media</h2>
+                                            {internalMedia.latest_execution && (
+                                                <ImportExecutionStatusBadge status={internalMedia.latest_execution.status} />
+                                            )}
+                                        </div>
+                                        <p className="text-xs text-fg-subtle">
+                                            Internal import only. No files are copied, moved, deleted or renamed.
+                                        </p>
+                                    </div>
+                                </div>
+                                <Link className={buttonClasses('secondary', 'sm')} href="/imports">Open import plans</Link>
+                            </div>
+
+                            <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                                {[
+                                    { label: 'Media items', value: String(internalMedia.media_items), hint: 'In the internal catalog' },
+                                    { label: 'Last internal import', value: formatCheckedAt(internalMedia.latest_execution?.created_at ?? null), hint: `${internalMedia.execution_count} ${internalMedia.execution_count === 1 ? 'run' : 'runs'}` },
+                                    { label: 'Plans needing review', value: String(internalMedia.plans_needing_review), hint: 'Before more can be imported' },
+                                    { label: 'Imported records', value: String(internalMedia.imported_items), hint: 'Created by a connector import' },
+                                ].map((item) => (
+                                    <div className="mf-panel p-4" key={item.label}>
+                                        <p className="text-xs uppercase tracking-wide text-fg-subtle">{item.label}</p>
+                                        <p className="mt-1 text-lg font-semibold">{item.value}</p>
+                                        <p className="mt-0.5 text-xs text-fg-muted">{item.hint}</p>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="mt-4 grid gap-2 sm:grid-cols-4">
+                                {[
+                                    ['Movies', internalMedia.movies],
+                                    ['Series', internalMedia.series],
+                                    ['Episodes', internalMedia.episodes],
+                                    ['Books', internalMedia.books],
+                                ].map(([label, value]) => (
+                                    <div className="flex items-center justify-between gap-3 rounded-[--radius-md] bg-[var(--nav-hover-bg)] px-3.5 py-2.5 text-sm" key={label}>
+                                        <span className="text-fg-muted">{label}</span>
+                                        <span className="font-semibold">{value}</span>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     </section>
 

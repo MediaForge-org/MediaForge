@@ -11,14 +11,30 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * Canonical catalog entry (typed, self-hierarchical). Not populated in V1 (no
- * ingest/scan yet); the model is part of the foundation contract.
+ * Canonical catalog entry (typed, self-hierarchical).
+ *
+ * Empty throughout V1 by design; the first internal import (V2 E) is what finally
+ * populates it, from an approved import plan. A row here is a DATABASE RECORD and
+ * nothing more: it holds no file path, owns no file, and creating one copies,
+ * moves, deletes or renames nothing. `source` says where it came from and
+ * `created_by_import_execution_id` which run created it.
  *
  * @property string $id
  * @property string|null $library_id
  * @property string $media_type
  * @property string|null $parent_id
+ * @property int|null $sort_index
  * @property string $title
+ * @property string|null $sort_title
+ * @property string|null $original_title
+ * @property int|null $year
+ * @property int|null $runtime_ms
+ * @property int|null $season_number
+ * @property int|null $episode_number
+ * @property string $presence
+ * @property string $source
+ * @property string|null $created_by_import_execution_id
+ * @property array<string, mixed> $metadata
  */
 class MediaItem extends Model
 {
@@ -37,6 +53,10 @@ class MediaItem extends Model
             'release_date' => 'date',
             'runtime_ms' => 'integer',
             'metadata_locked_fields' => 'array',
+            // V2 E import provenance.
+            'season_number' => 'integer',
+            'episode_number' => 'integer',
+            'metadata' => 'array',
         ];
     }
 

@@ -2,15 +2,17 @@
 
 ## Current status
 
-**V1 (local core, alpha) is complete. V2 is in progress: packages A–D are done, most recently
-Package D — import plan / import dry run.**
+**V1 (local core, alpha) is complete. V2 is in progress: packages A–E are done, most recently
+Package E — the first internal import.**
 
 V1 was delivered as eight focused packages (A–H). The application runs locally from a stable
 production build, and all local gates (Pint, PHPStan max, Pest, TypeScript type-check, Vite build)
 are green.
 
-MediaForge remains **local alpha software — not production-ready**. It performs **no media import**,
-**no file operations**, and **no automatic sync or background snapshots**.
+MediaForge remains **local alpha software — not production-ready**. Since V2 E it performs a
+**database-only internal import** from an approved plan; it still performs **no file operations**
+(nothing is copied, moved, deleted or renamed), makes **no writes to Jellyfin/Audiobookshelf**, and
+runs **no automatic sync or background snapshots**.
 
 ## Confirmed stack
 
@@ -53,10 +55,51 @@ See [V1_READINESS.md](V1_READINESS.md) for the readiness checklist and release r
 - **V2 C — Catalog normalization + matching preview** *(done)*: interprets the captured items
   into a consistent shape with a quality verdict, and previews the match candidates a later import
   would have to reconcile. Suggests only — accepts nothing.
-- **V2 D — Import plan / import dry run** *(current)*: turns the normalized catalog and its match
+- **V2 D — Import plan / import dry run** *(done)*: turns the normalized catalog and its match
   suggestions into an explicit, reviewable **plan** — what an import WOULD create, and what a human
   must decide first. Still not an import: no media items/editions/files, no file operations, no
   accepted matches.
+- **V2 E — First internal import** *(current)*: executes a plan's **ready** lines into real
+  MediaForge database records, including the series → season → episode hierarchy. Database only:
+  no file operations, no writes to the media servers, no accepted matches, no merged duplicates.
+
+### V2 E — first internal import
+
+- **`POST /imports/{plan}/execute-ready`** imports a plan's ready lines. It is the only route in
+  the application that creates media records, and it is POST-only and auth-guarded.
+- **`/imports/runs/{run}`** shows one run in full: status, counts (imported · linked existing ·
+  skipped · failed), a plain-language "why", and one bounded section per outcome — *Created media
+  items*, *Linked existing*, *Skipped*, *Failed*.
+- **It populates the canonical `media_items`.** That table has existed since V1 and was left empty
+  on purpose; its migration says the ingest pipeline arrives in V2. V2 E is that pipeline, so it
+  fills the foundation catalog rather than inventing a parallel one. The columns it needed and the
+  foundation lacked (`source`, `created_by_import_execution_id`, `metadata`, `season_number`,
+  `episode_number`) were added, along with plausibility CHECKs on year/runtime/season/episode.
+- **Two vocabularies, one bridge.** The connector read-model says `series` and `book`; the
+  foundation catalog has always said `show` and `ebook`. `ImportableMediaKind` states the mapping
+  once. A kind with no honest counterpart is simply not importable.
+- **Only `ready` is imported.** `ImportPlanItemGate` — pure, no database, no network — allows a line
+  only when the plan marked it ready, its action is create_media / create_container /
+  attach_to_parent, its kind is one of movie · series · season · episode · audiobook · book, and
+  the action matches the kind. Everything else (needs-review, blocked, warning, skipped, duplicate
+  suspect, weak metadata, unknown kind, folder, playlist, podcast, music) is recorded as skipped
+  with a reason code.
+- **Parents are resolved, never guessed.** Two exact sources: the external parent id via an
+  existing mapping (works across runs), and the plan's `target_parent_key` for something created
+  earlier in the same run. Disagreement ⇒ `ambiguous_parent`; nothing, or a candidate of the wrong
+  kind ⇒ `missing_parent`. Both skip the line. Containers are imported before their children, so a
+  single pass can always find them.
+- **Idempotent.** `media_external_mappings` carries a unique `(connector_instance_id, external_id)`.
+  A repeated import links what already exists — it never duplicates and never overwrites, so a
+  human's later edit survives. A concurrent run that loses the race is caught on the unique index
+  and reported as "already imported", not as an error.
+- **Transactional.** The execution row, every media item and mapping, every execution line and the
+  audit entry commit together or not at all. There is no state in which a mapping exists without
+  its media item. A fatal error rolls the run back and records a `failed` execution carrying an
+  error *type* — never a message, a stack trace or a path.
+- **Review + audit.** One deduplicated `media_import_execution` task per plan, carrying reason
+  codes, counts and example titles; a re-import supersedes it, a clean run raises none. Audit:
+  `media_import.execution_completed` / `.execution_empty` / `.execution_failed` (sanitized).
 
 ### V2 D — import plan / import dry run
 
@@ -155,15 +198,22 @@ See [V1_READINESS.md](V1_READINESS.md) for the readiness checklist and release r
   `(connector_instance_id, external_id)`), so a capped run costs a handful of statements rather than
   two queries per item. `first_seen_at` is insert-only, so a re-captured item keeps its identity.
 
-### V2 A/B/C/D boundaries and limits
+### V2 A/B/C/D/E boundaries and limits
 
-- **Read-only.** A snapshot READS external items and stores them for display; normalization
-  interprets them; the match preview suggests; the import dry run plans. None of it is an import: no
-  `media_items`, `media_editions` or `media_files` are created, **no file operations** happen,
-  nothing changes on Jellyfin/Audiobookshelf, and no remote scans start.
+- **Everything up to the plan is read-only.** A snapshot READS external items and stores them;
+  normalization interprets them; the match preview suggests; the dry run plans. None of that is an
+  import — and none of it creates a media record.
 - **A plan is not an action.** V2 D writes only `media_import_plans`, `media_import_plan_items`,
-  review tasks and audit entries. There is deliberately no execute / import now / accept match /
-  merge action anywhere — and no route that could perform one; tests assert both.
+  review tasks and audit entries.
+- **The internal import is database-only.** V2 E writes `media_items`,
+  `media_external_mappings`, `media_import_executions`, `media_import_execution_items`, review
+  tasks and audit entries — and nothing else. It performs **no file operation** (no copy, move,
+  delete or rename), stores **no file path** (no imported table has a path-like column; a test
+  reads the live schema to prove it), creates **no `media_files`** and **no `media_editions`**, and
+  sends **no request to Jellyfin or Audiobookshelf** — no write, no scan, no library refresh.
+- **Nothing is ever accepted or merged.** There is no accept-match and no merge action anywhere,
+  and no route that could perform one; tests assert both. Duplicate suspects are refused by the
+  import, not resolved by it.
 - **Explicit only.** A snapshot runs only on an explicit `POST` from a connector detail page or a
   catalog library page. There is no automatic, scheduled or background snapshot.
 - **Nothing is accepted.** V2 C suggests matches; it never merges, accepts or writes a match.
@@ -212,7 +262,24 @@ See [V1_READINESS.md](V1_READINESS.md) for the readiness checklist and release r
   not cover them. That is a scope statement, not a data problem.
 - **Only currently present items are planned.** A vanished item is never planned for import.
 
-## What V1/V2 A/B/C/D deliberately does NOT include
+### Known V2 E limitations
+
+- **Only ready lines are imported.** Anything a plan flagged is skipped with a reason, so a catalog
+  full of warnings imports very little until a human works through the review queue.
+- **A cross-run parent needs an external parent id.** If a connector reports no parent id, a season
+  or episode can only find its parent inside the same run; otherwise it is skipped as
+  `missing_parent`. Nothing is guessed from titles.
+- **Nothing is un-imported.** There is no rollback of a completed run and no delete UI yet —
+  removing an imported record is a later package (import safety / rollback).
+- **Imported records are never updated.** A re-import links; it does not refresh a title, year or
+  runtime that changed on the remote. Metadata reconciliation is a later package.
+- **No media item browsing.** `media_items` is populated but there is no `/media` route yet, so the
+  run page shows what it created without linking to a detail page that does not exist.
+- **The import is synchronous** and capped at 5000 lines per run, like the plan it executes.
+- **`podcast` and `music` are out of scope** and counted as unsupported — a scope statement, not a
+  data problem.
+
+## What V1/V2 A/B/C/D/E deliberately does NOT include
 
 Real media imports · media items / editions / files · file operations (copy/move/delete/rename) ·
 real or automatic sync (dry run only) · automatic/background snapshots · metadata-merge or
@@ -240,9 +307,10 @@ plugin engine · mobile/desktop app.
 ## Recommended next step
 
 1. Keep all local gates green, commit, push `main`, confirm GitHub CI green.
-2. **V2 E — first internal import**: turn a reviewed plan's *ready* lines into real MediaForge
-   media items/editions — the first package that actually writes to the media library. Still no
-   file operations on the user's media and still nothing written back to Jellyfin/Audiobookshelf.
+2. **V2 readiness / V3 — import safety and internal browsing**: rollback of an internal import,
+   a `/media` browsing surface for what was imported, conflict hardening when a remote item changes
+   after import, and metadata protection so a re-import can never clobber a human's edit. Still no
+   file operations and still nothing written back to Jellyfin/Audiobookshelf.
 3. Later V2: queued / resumable snapshots (so a library beyond the 5000-item cap can be captured
    across runs), then read-only content strips (recently added / continue watching) on the
    dashboard — still no writes to media servers, no imports, no file operations.

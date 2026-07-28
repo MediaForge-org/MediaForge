@@ -69,8 +69,8 @@ test('logout is POST-only and there is no GET logout route', function () {
 
 test('no registered GET route performs a state-changing action', function () {
     // State-changing verbs (update/store/destroy/test/discover/dry-run/dismiss/
-    // reopen/snapshot/normalize) must never be reachable via GET/HEAD.
-    $stateChanging = ['store', 'update', 'destroy', 'delete', 'dismiss', 'reopen', 'dry-run', 'discover', 'selection', 'test', 'snapshot', 'normalize'];
+    // reopen/snapshot/normalize/execute) must never be reachable via GET/HEAD.
+    $stateChanging = ['store', 'update', 'destroy', 'delete', 'dismiss', 'reopen', 'dry-run', 'discover', 'selection', 'test', 'snapshot', 'normalize', 'execute'];
 
     foreach (Route::getRoutes()->getRoutes() as $route) {
         $isGet = in_array('GET', $route->methods(), true);
@@ -148,7 +148,7 @@ test('every href in the frontend resolves to a registered GET route', function (
     // Guard against a vacuous pass: the scanner must really see the app's links,
     // including the parameterised catalog/connector ones.
     expect(count($checked))->toBeGreaterThan(10)
-        ->and($checked)->toContain('/dashboard', '/catalog', '/catalog/*', '/catalog/*/libraries/*', '/connectors/*', '/imports', '/imports/*');
+        ->and($checked)->toContain('/dashboard', '/catalog', '/catalog/*', '/catalog/*/libraries/*', '/connectors/*', '/imports', '/imports/*', '/imports/runs/*');
 });
 
 test('no frontend source references a forbidden or non-existent route', function () {

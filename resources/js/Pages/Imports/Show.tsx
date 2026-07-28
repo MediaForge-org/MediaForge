@@ -1,7 +1,12 @@
-import { Head, Link, usePage } from '@inertiajs/react';
-import type { ReactNode } from 'react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
+import { type ReactNode, useState } from 'react';
 
 import { episodeLabel, formatCheckedAt, mediaKindLabel } from '@/Components/Connectors/ConnectorStatus';
+import {
+    ImportExecutionStatusBadge,
+    type ImportExecutionView,
+    INTERNAL_IMPORT_SAFETY_NOTE,
+} from '@/Components/Imports/ImportExecutionStatus';
 import {
     IMPORT_SAFETY_NOTE,
     type ImportPlanItemView,
@@ -15,7 +20,7 @@ import {
 } from '@/Components/Imports/ImportPlanStatus';
 import Alert from '@/Components/UI/Alert';
 import Badge from '@/Components/UI/Badge';
-import { buttonClasses } from '@/Components/UI/Button';
+import Button, { buttonClasses } from '@/Components/UI/Button';
 import EmptyState from '@/Components/UI/EmptyState';
 import { ImportIcon, ShieldIcon } from '@/Components/UI/Icon';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
@@ -32,6 +37,10 @@ interface ImportPlanShowProps {
     };
     duplicates: ImportPlanSection;
     targets: ImportPlanTarget[];
+    /** V2 E: the internal import runs of this plan, newest first. */
+    executions: ImportExecutionView[];
+    /** V2 E: the kinds an internal import covers. */
+    importableKinds: string[];
     flash: { success: string | null; error: string | null };
 }
 
@@ -118,7 +127,19 @@ function PlanSection({
 }
 
 export default function ImportPlanShow() {
-    const { plan, sections, duplicates, targets, flash } = usePage<ImportPlanShowProps>().props;
+    const { plan, sections, duplicates, targets, executions, importableKinds, flash } = usePage<ImportPlanShowProps>().props;
+    const [importing, setImporting] = useState(false);
+
+    const canImport = plan.ready_count > 0;
+
+    /**
+     * POST-only: writes MediaForge database records for the plan's READY lines.
+     * It touches no file and sends nothing to Jellyfin or Audiobookshelf.
+     */
+    function importReadyItems() {
+        setImporting(true);
+        router.post(`/imports/${plan.id}/execute-ready`, {}, { onFinish: () => setImporting(false) });
+    }
 
     return (
         <>
@@ -164,9 +185,72 @@ export default function ImportPlanShow() {
 
                     <section className="mf-col-12">
                         <Alert tone="info" title="Import dry run">
-                            {IMPORT_SAFETY_NOTE} This page is a preview: there is no execute, import, accept or merge action in
-                            it, and no media item, edition or file exists as a result of this plan.
+                            {IMPORT_SAFETY_NOTE} The plan itself changes nothing; importing its ready lines creates MediaForge
+                            database records only, and never accepts a match or merges a duplicate.
                         </Alert>
+                    </section>
+
+                    {/* V2 E — the one action on this page: a database-only import. */}
+                    <section className="mf-col-12">
+                        <div className="mf-panel p-5">
+                            <div className="flex flex-wrap items-start justify-between gap-4">
+                                <div className="min-w-0">
+                                    <h2 className="flex flex-wrap items-center gap-2 text-lg font-semibold tracking-tight">
+                                        Import into MediaForge
+                                        <Badge tone="accent">DB only</Badge>
+                                    </h2>
+                                    <p className="mt-2 max-w-2xl text-sm text-fg-muted">
+                                        {INTERNAL_IMPORT_SAFETY_NOTE} Only the {plan.ready_count} ready{' '}
+                                        {plan.ready_count === 1 ? 'line' : 'lines'} are imported — needs-review, blocked,
+                                        duplicate and unsupported items are skipped. Nothing is written to Jellyfin or
+                                        Audiobookshelf.
+                                    </p>
+                                    <p className="mt-2 text-xs text-fg-subtle">
+                                        Covers {importableKinds.join(', ')}. Running it again links what already exists instead
+                                        of creating a second copy.
+                                    </p>
+                                </div>
+                                <div className="shrink-0">
+                                    {canImport ? (
+                                        <Button loading={importing} onClick={importReadyItems}>
+                                            Import ready items into MediaForge
+                                        </Button>
+                                    ) : (
+                                        <span className="mf-status-pill">No ready items to import.</span>
+                                    )}
+                                </div>
+                            </div>
+
+                            {executions.length > 0 && (
+                                <div className="mt-5 border-t border-[var(--panel-border)] pt-4">
+                                    <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-fg-subtle">
+                                        Already imported
+                                    </h3>
+                                    <ul className="divide-y divide-[var(--panel-border)]">
+                                        {executions.map((execution) => (
+                                            <li key={execution.id}>
+                                                <Link
+                                                    className="flex flex-wrap items-center justify-between gap-3 py-3 text-sm transition-colors hover:text-accent first:pt-0"
+                                                    href={`/imports/runs/${execution.id}`}
+                                                >
+                                                    <span className="flex flex-wrap items-center gap-2">
+                                                        <ImportExecutionStatusBadge status={execution.status} />
+                                                        <span className="text-xs text-fg-subtle">
+                                                            {execution.imported_count} created ·{' '}
+                                                            {execution.already_existing_count} already imported ·{' '}
+                                                            {execution.skipped_count} skipped
+                                                        </span>
+                                                    </span>
+                                                    <span className="text-xs text-fg-subtle">
+                                                        {formatCheckedAt(execution.created_at)}
+                                                    </span>
+                                                </Link>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+                        </div>
                     </section>
 
                     {/* Plan header facts */}

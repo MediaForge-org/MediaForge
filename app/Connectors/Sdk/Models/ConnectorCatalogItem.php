@@ -88,4 +88,15 @@ class ConnectorCatalogItem extends Model
     {
         return $this->hasOne(ConnectorCatalogItemNormalization::class, 'connector_catalog_item_id');
     }
+
+    /**
+     * The V2 E link to the internal MediaForge record, if this external item has
+     * been imported. Its presence is what "Imported" means in the catalog UI.
+     *
+     * @return HasOne<MediaExternalMapping, $this>
+     */
+    public function externalMapping(): HasOne
+    {
+        return $this->hasOne(MediaExternalMapping::class, 'connector_catalog_item_id');
+    }
 }

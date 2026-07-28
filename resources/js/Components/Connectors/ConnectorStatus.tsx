@@ -145,6 +145,8 @@ export interface CatalogItemRow {
     last_seen_at: string | null;
     /** null when the item predates normalization (not yet rebuilt). */
     normalization: ItemNormalization | null;
+    /** V2 E: whether this external item already has an internal record. */
+    import_status: 'imported' | 'not_imported' | 'needs_review';
 }
 
 export interface PaginationMeta {
