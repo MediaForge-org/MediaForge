@@ -31,5 +31,6 @@ Choose the smallest matching authority:
 - Disc → `modules/disc-engine.md` + `modules/disc-verification-policy.md`
 - Audio enhancement → `modules/audio-upscaler.md`
 - UI visual system → `ui-ux/UI_IMPLEMENTATION_PROMPT.md` + relevant image(s)
+- Governance/execution vocabulary and module boundaries → `01-governance-audit/GOVERNANCE_DOMAIN_MODEL.md` + `01-governance-audit/GOVERNANCE_BOUNDARIES.md`
 
 Do not reread `MediaForge_Master_Engineering.md` unless the prompt lists it or a cross-domain ambiguity cannot be resolved by a smaller authority.

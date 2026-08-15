@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "description": "Durable, versioned risk register for Track 01 (governance, repository audit and execution discipline). A repo artifact, not a database table: static governance state with no runtime access pattern, so P0004 keeps it as reviewable, git-diffable JSON per the target architecture's own bias against unneeded persistence layers.",
+  "entries": [
+    {
+      "id": "RISK-0001",
+      "title": "Dependency cycle in PROMPT_CATALOG.json across tracks 23-29",
+      "severity": "high",
+      "status": "open",
+      "found_by": "P0003",
+      "found_at_commit": "acbf6d5",
+      "affected_prompt_range": ["P0441", "P0580"],
+      "affected_prompt_count": 140,
+      "affected_tracks": [
+        "23-adult-analysis",
+        "24-disc-iso",
+        "25-audio-enhancement",
+        "26-video-engine",
+        "27-adult-engine",
+        "28-audio-engine",
+        "29-rust-media-tools"
+      ],
+      "evidence": "Tarjan strongly-connected-components analysis over the depends_on graph in PROMPT_CATALOG.json finds exactly one cyclic component, size 140, spanning P0441 through P0580. Cause: every prompt in 23-adult-analysis (P0441-P0460) declares a direct dependency on P0580 (the gate prompt of 29-rust-media-tools), while each of tracks 24-29 additionally declares its first prompt dependent on the immediately preceding track's last prompt (e.g. P0461.depends_on includes P0460), chaining 24->25->26->27->28->29 back onto P0580 and closing the loop onto P0441. Full derivation recorded in GOVERNANCE_BOUNDARIES.md under 'Testable dependency direction'.",
+      "recommended_fix": "Drop the track-initial 'depends on previous track's last prompt' edges for tracks 24-29 and rely solely on each track's explicit capability dependency (e.g. P0580, P0240), which already expresses the real constraint ('needs Rust MediaTools done', 'needs the target monorepo done') without also implying 'immediately after the previous track finishes'.",
+      "scope_note": "All affected prompts are P2 priority and far behind CURRENT_PHASE.md; this does not block any prompt on the current execution path (P0001-P0020 and beyond, up to wherever CURRENT_PHASE.md actually is). Not fixed by P0003 or P0004: repairing a 720-prompt catalog is outside both prompts' declared scope and was not requested.",
+      "gate_condition": {
+        "blocks": ["P0020"],
+        "rule": "Track 01's own gate prompt (P0020, 01-governance-audit/P0020_gate.md, once read at that step) must not pass while this entry's status is 'open'. A prompt-dependency graph with any cycle is not a valid execution schedule for the prompt system this track governs."
+      },
+      "resolution": null
+    }
+  ]
+}
