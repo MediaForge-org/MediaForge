@@ -10,7 +10,7 @@ Diese Datei ist die zentrale technische Spezifikation für MediaForge.
 
 ## Über dieses Dokument
 
-Dieses Handbuch ist die verbindliche Engineering-Spezifikation für MediaForge, eine vollständig lokale Enhancement Suite für Jellyfin und Audiobookshelf. Es richtet sich an Senior Developer, die das System ohne weiteren mündlichen Kontext implementieren können sollen. Jedes Kapitel ist so geschrieben, dass Architekturentscheidungen nachvollziehbar begründet, Datenmodelle vollständig als PostgreSQL-DDL spezifiziert und Laravel-Klassen bis auf Interface-Ebene ausdefiniert sind.
+Dieses Handbuch ist die verbindliche Engineering-Spezifikation für MediaForge, eine vollständig lokale, einheitliche Medienanwendung mit einer einzigen MediaForge-Oberfläche und austauschbaren spezialisierten Media-Engines. Es richtet sich an Senior Developer, die das System ohne weiteren mündlichen Kontext implementieren können sollen. Jedes Kapitel ist so geschrieben, dass Architekturentscheidungen nachvollziehbar begründet, Datenmodelle vollständig als PostgreSQL-DDL spezifiziert und Laravel-Klassen bis auf Interface-Ebene ausdefiniert sind.
 
 Die Masterdatei — dieses Dokument — ist die einzige Einstiegsdatei. Sie enthält die Vision, den Technologie-Stack samt Begründung, die Gesamtarchitektur, die verbindlichen Architekturregeln, die Analyse der Referenzprojekte, die Dokumentkonventionen, das Glossar sowie das vollständige Inhaltsverzeichnis über alle Modul-Spezifikationen. Die eigentlichen Tiefenkapitel liegen in Unterordnern und sind aus dem Inhaltsverzeichnis am Ende dieser Datei verlinkt. Es existiert keine zweite Masterdatei und wird auch nie eine geben; dieses Dokument wird ausschließlich erweitert, nie ersetzt.
 
@@ -22,31 +22,36 @@ Wer das System implementieren will, liest in dieser Reihenfolge: zuerst diese Ma
 
 ### Offizielles Projektziel
 
-MediaForge ist das offizielle Projekt. Das Projekt baut keine neue Medienplattform, keinen Jellyfin-Klon und keinen Audiobookshelf-Klon. MediaForge ist eine vollständig lokale Super-Erweiterung für bestehende Open-Source-Mediensysteme. Die Kernsysteme bleiben Jellyfin und Audiobookshelf; MediaForge erweitert sie, verbindet sie und stellt darüber professionelle lokale Verwaltung, Analyse, Automatisierung, Suche, Metadatenpflege, Backups, Health Checks, AI-Funktionen und UI-/UX-Verbesserungen bereit.
 
-Die Zielarchitektur ist damit eindeutig:
+MediaForge ist das offizielle Produkt und die **einzige sichtbare Anwendung** für den Benutzer. Es vereinigt Filme, Serien, Musik, Hörbücher, Podcasts, Disc-Images und — nur nach expliziter Entsperrung — Adult-Medien unter einer gemeinsamen React-/TypeScript-Oberfläche.
+
+Jellyfin, Audiobookshelf und der spätere Stash-derived Adult-Stack werden langfristig nicht als getrennte Benutzeroberflächen verstanden, sondern als spezialisierte **Engines** hinter stabilen MediaForge-Verträgen. In frühen Phasen dürfen bestehende Installationen über Connectoren angebunden bleiben. Diese Connector-Phase ist ein risikoarmer Migrationspfad; sie definiert nicht die endgültige Produktgrenze. Direkte Fork-/Bundling-Arbeit bleibt bewusst eine späte Engineering-Phase.
+
+Die kanonische Identität und der systemübergreifende Zustand liegen in MediaForge/PostgreSQL. Eine Engine darf intern ihre eigene Implementierung und während Übergangsphasen ihre eigene Datenhaltung besitzen, aber sie ist nicht Eigentümer der MediaForge-Identität.
 
 ```mermaid
 flowchart TB
-    U["MediaForge: Local Enhancement Suite"]
-    U --> D["Unified Dashboard"]
-    U --> UX["UI / UX Enhancement"]
-    U --> S["Unified Search"]
-    U --> M["Unified Metadata Engine"]
-    U --> A["AI Engine"]
-    U --> H["Health Center"]
-    U --> ST["Storage Analytics"]
-    U --> R["Rule Engine"]
-    U --> W["Workflow Engine"]
-    U --> B["Backup Center"]
-    U --> P["Plugin / Extension SDK"]
-    U --> DEV["Developer Center"]
-    U --> JF["Jellyfin"]
-    U --> ABS["Audiobookshelf"]
-    JF --> MOV["Movies / Series / Music / Live TV"]
-    JF --> AD["Adult libraries"]
-    ABS --> AUD["Audiobooks / Podcasts"]
+    UI["MediaForge — einzige sichtbare UI"]
+    CORE["MediaForge Core / Control Plane"]
+    PG[("PostgreSQL — kanonischer Katalog")]
+    VIDEO["Video/TV Engine\nJellyfin-compatible / später Fork"]
+    ADULT["Adult Engine\nStash-derived / später Fork"]
+    AUDIO["Audiobook/Podcast Engine\nAudiobookshelf-compatible / später Fork"]
+    DISC["Disc Engine\nISO / BDMV / VIDEO_TS"]
+    TOOLS["Media Tools / FFmpeg / native Worker"]
+
+    UI --> CORE
+    CORE --> PG
+    CORE --> VIDEO
+    CORE --> ADULT
+    CORE --> AUDIO
+    CORE --> DISC
+    VIDEO --> TOOLS
+    ADULT --> TOOLS
+    DISC --> TOOLS
 ```
+
+**Produktregel:** Ein Benutzer wechselt niemals sichtbar in die originale Jellyfin-, Audiobookshelf- oder Stash-Weboberfläche, um normale MediaForge-Funktionen zu benutzen. Diese Oberflächen dürfen während Entwicklung/Debugging erreichbar bleiben, sind aber kein Teil des finalen normalen Workflows.
 
 ### Lokal bedeutet lokal
 
@@ -54,9 +59,20 @@ Alle Kernfunktionen müssen ohne Cloudpflicht, ohne SaaS-Abhängigkeit und ohne 
 
 ### Systemgrenzen
 
-Jellyfin bleibt zuständig für Filme, Serien, Musik, Live TV, normale Videobibliotheken, Adult-Bibliotheken, Playback, Transcoding, Client-Zugriff und Jellyfin-seitige Bibliotheksverwaltung. Audiobookshelf bleibt zuständig für Hörbücher, Podcasts, Kapitel, Fortschritt, Wiedergabe und Audiobookshelf-seitige Bibliotheksverwaltung. MediaForge verbessert beide Systeme, ersetzt sie aber nicht.
 
-Stash ist kein Pflichtsystem. Stash wird nur noch als optionale Inspirationsquelle, optionale lokale Datenquelle, optionaler Importer oder optionale Migrationsquelle beschrieben. Der zentrale Adult-Bereich entsteht primär aus Jellyfin-Bibliotheken plus MediaForge Adult Enhancement.
+MediaForge besitzt die sichtbare Produktgrenze, den kanonischen Katalog, Benutzer-/Berechtigungsmodell, Suche, Collections, Review/Matching, Metadaten-Provenienz, Health, Automation, Audit und die systemübergreifende UI.
+
+Die spezialisierten Engines besitzen ihre jeweiligen technischen Stärken:
+
+- **Video/TV Engine:** Streaming, Transcoding, Client-/Codec-Logik und klassische Movie/Series-Wiedergabe; zunächst über Jellyfin-Connector, später optional als gebündelter/maintaineter Fork.
+- **Audiobook/Podcast Engine:** Audio-Playback, Kapitel-/Progress-Integration und Audiobook-spezifische Clientlogik; zunächst Audiobookshelf-Connector, später optional Fork/Bundling.
+- **Adult Engine:** Stash-derived Media-Core für lokale Scene-Dateien, Fingerprints, FFmpeg, Previews, Sprites und Adult-Library-Verarbeitung; langfristig als MediaForge-Komponente/Fork. StashDB/TPDB/FansDB sowie Studio-/Creator-/relevante offizielle Tube-Quellen sind Metadatenquellen, nicht die kanonische Datenbank.
+- **Disc Engine:** ISO/BDMV/VIDEO_TS-Strukturanalyse und später Disc-Menü-/episodengenauer Playback-Bridge.
+- **MediaForge Core:** koordiniert Engines über stabile Verträge; Fachidentität wird nicht durch Engine-IDs bestimmt.
+
+Der Core darf während früher Phasen weiterhin Laravel 12 + PostgreSQL + Redis nutzen. Eine Engine darf in ihrer nativen Sprache bleiben (z. B. C#/.NET, Go, Node). „Eine App“ bedeutet eine Produktoberfläche und einen integrierten Lebenszyklus, **nicht** zwangsläufig eine einzige Programmiersprache oder Binary.
+
+**PostgreSQL ist dauerhaft der kanonische Persistenzspeicher von MediaForge.** Der aktuelle Alpha-Stand verwendet PostgreSQL 17. Ein Upgrade auf eine neuere unterstützte Major-Version (Zielpfad: PostgreSQL 18.x) erfolgt als eigener Infrastruktur-Schritt nach Backup-/Restore- und Migrationstests; es wird nicht mit fachlichen V2-Änderungen vermischt.
 
 ### Ausgangslage
 
@@ -72,38 +88,44 @@ Drittens die **Enhancement-Lücke**. Es gibt kein lokales System, das die Spezia
 
 ### Was MediaForge ist
 
-Normativ formuliert ist MediaForge ein **Enhancement Layer**. MediaForge besitzt lokale Referenzen, Metadaten-Overrides, Analyseergebnisse, Health Scores, Workflows, Regeln, Plugin-Daten, Audit-Logs, UI-Einstellungen, Adult-Erweiterungsdaten und Suchindexdaten. MediaForge besitzt nicht zwingend die Medienhoheit und übernimmt nicht die Rolle der Player- und Streaming-Systeme.
 
-Zu den verbindlichen Enhancement-Bereichen gehören Unified Dashboard, Unified Search, Unified Metadata Engine, UI-/UX-Enhancements für Jellyfin und Audiobookshelf, Adult Enhancement, Health Center, Storage Analytics, AI Engine, Rule Engine, Workflow Engine, Backup Center, Developer Center sowie Plugin SDK und Extension SDK.
+Normativ ist MediaForge eine **Unified Media Application mit Engine-Architektur**. Die gegenwärtige Connector-/Enhancement-Phase ist eine Implementierungsstufe, nicht das Endprodukt.
 
-MediaForge ist eine lokal betreibbare Web-Anwendung auf Basis von Laravel 12, React mit TypeScript, Inertia.js und Tailwind CSS, mit PostgreSQL als primärem lokalen Persistenzspeicher, Redis für Queues und Caching, und Docker Compose als Deployment-Einheit. Funktional umfasst der Produktumfang:
+MediaForge besitzt dauerhaft:
+- eine einzige sichtbare App-Shell und Design-Sprache;
+- einen kanonischen PostgreSQL-Katalog mit eigenen ULIDs;
+- engine-unabhängige Media-, Edition-, File- und Mapping-Identitäten;
+- Benutzer, Rollen, Private-/Adult-Mode und Zero-Leak-Policies;
+- Suche, Collections, Watch-/Listen-State-Koordination, Reviews, Audit und Health;
+- Source History und feldgranulare Metadaten-Provenienz;
+- Engine Registry und stabile Verträge für Library, Playback, Artwork, Progress und Search;
+- spätere Disc-/ISO- und Enhancement-Engines.
 
-* **Lokaler Enhancement-Katalog als Koordinations- und Referenzschicht**: ein kanonisches Datenmodell für lokale Referenzen, Filme, Serien, Episoden, Hörbücher, Musik, Fotos, Comics und E-Books, mit Editions-/Versions-Modell, Provider-ID-Mapping und vollständigem Audit-Trail.
-* **Blu-ray/DVD/UHD-Engine**: Modellierung von Disc-Images (ISO, BDMV, VIDEO_TS) bis auf Playlist-, Clip- und Segment-Ebene, Episoden-Mapping mit Confidence-Modell und Review-Workflow, Watch-State und Resume-Position pro Episode innerhalb einer Disc, Disc-Menü-Playback über externe Player.
-* **Hörbuch-Kapitel-Assembler**: Zusammenführung fragmentierter Hörbuch-Ordner zu sauber gekapitelten Werken, CUE- und M4B-Erzeugung, Abgleich mit offiziellen Kapitelquellen, Audiobookshelf-kompatibler Export.
-* **AI Audio Upscaler**: optionale, nachvollziehbar dokumentierte Klangverbesserung verlustbehafteter Quellen in neue Artefakte (FLAC/WAV/M4B), niemals destruktiv, immer mit Modell-, Parameter- und Metrik-Protokoll.
-* **Connector-Schicht**: bidirektionale bzw. lesende lokale Integrationen zu Jellyfin und Audiobookshelf, optionale Integrationen zu Sonarr, Radarr, Readarr, Lidarr, Prowlarr und Immich sowie ein optionaler Stash-Import/Connector — alle auf Basis eines gemeinsamen Connector SDK.
-* **Automatisierung**: Workflow Engine für mehrstufige Verarbeitungsketten, Rule Engine für deklarative Bibliotheksregeln, AI Engine als kontrollierte Schnittstelle zu ML-Modellen.
-* **Qualitätssicherung**: Datenqualitätsbewertung, Dublettenerkennung, Audio-/Video-Fingerprinting, semantische Suche, Knowledge Graph.
-* **Betrieb**: Admin-Dashboard, Health Monitoring, Backup/Restore, rollenbasierte Security, vollständige Auditierbarkeit jeder Änderung.
+Die existierenden Spezialprojekte sind technische Engines und Referenzimplementierungen. MediaForge darf sie zunächst per API integrieren und später als Forks bündeln, ohne seine UI- oder Katalogverträge zu ändern.
+
+Der Runtime-Core bleibt vorerst Laravel 12 + React/TypeScript + Inertia + PostgreSQL + Redis, weil der aktuelle Code darauf aufbaut. CPU-/Media-intensive Arbeit bleibt in nativen Engines/Tools. Ein späterer Engine-Fork muss nicht in PHP neu geschrieben werden.
 
 ### Was MediaForge nicht ist
 
-Zusätzlich gilt: MediaForge ist kein Jellyfin-Fork als Pflichtarchitektur, kein Audiobookshelf-Fork als Pflichtarchitektur, kein Cloudservice, keine internetzentrierte Streaming-Plattform und kein Monolith, der bewährte Open-Source-Projekte neu implementiert. Wenn später eine tiefe Änderung an Jellyfin oder Audiobookshelf sinnvoll wäre, wird sie als optionale Plugin-, Upstream-, Pull-Request- oder Fork-Strategie dokumentiert, nicht als Voraussetzung für MediaForge.
 
-Ebenso wichtig wie der Umfang sind die Nicht-Ziele, weil sie Architekturentscheidungen begründen:
+MediaForge ist **kein** iframe-/Link-Hub, der nur drei fremde Web-UIs nebeneinander öffnet. Die finale normale Bedienung findet in MediaForge statt.
 
-* **Kein Streaming-Server.** MediaForge transkodiert nicht in Echtzeit und streamt nicht an TV-Clients. Playback delegiert MediaForge an Jellyfin (Streaming), Audiobookshelf (Hörbücher) oder externe Player (Disc-Menüs). MediaForge hält den Zustand, nicht den Videostrom. Damit entfallen die kompliziertesten und wartungsintensivsten Teile eines Media-Servers (Transcoding-Pipeline, Client-Kompatibilitätsmatrix, DLNA), und die Spezialisten dürfen tun, was sie am besten können.
-* **Kein Downloader und kein Indexer.** Beschaffung bleibt bei der *arr-Familie und Prowlarr. MediaForge steuert und beobachtet diese Systeme über Connectoren, implementiert aber selbst keine Usenet-/Torrent-Logik.
-* **Kein Photo-Backup-Dienst.** Immich bleibt für Foto-Ingestion von Mobilgeräten zuständig; MediaForge integriert Immich über eine Referenzarchitektur (Katalog-Spiegelung, keine Binärdaten-Übernahme).
-* **Kein Cloud-Dienst.** MediaForge ist ausschließlich self-hosted. Es gibt keine Telemetrie nach außen, keine verpflichtenden externen Dienste; Metadaten-Provider und KI-Modelle sind optionale, konfigurierbare Abhängigkeiten.
-* **Kein DRM-Umgehungswerkzeug.** MediaForge verarbeitet vorhandene, bereits entschlüsselte Disc-Images und Ordnerstrukturen. Ripping und Entschlüsselung sind ausdrücklich außerhalb des Produktumfangs; die Disc-Engine setzt lesbare Strukturen (BDMV, VIDEO_TS) voraus.
+MediaForge ist außerdem:
+- kein Cloud-Zwang und kein SaaS;
+- kein DRM-Umgehungs- oder Ripping-Werkzeug; Disc-Verarbeitung setzt rechtmäßig lesbare/entschlüsselte Strukturen voraus;
+- kein Grund, Jellyfin, Audiobookshelf oder Stash vollständig in PHP neu zu implementieren;
+- kein System, das unsichere Metadaten oder Disc-Episoden-Mappings errät;
+- kein System, das Originaldateien ungefragt überschreibt oder umbenennt.
+
+Live-Streaming und Transcoding können technisch weiterhin von spezialisierten Engines ausgeführt werden. Aus Benutzersicht gehören sie trotzdem zur MediaForge-App. Die technische Engine-Grenze darf niemals als sichtbare Produktgrenze durchscheinen.
+
+Forks sind ein spätes Ziel: Erst müssen Core, Katalog, Security, UI, Matching, Health und normale Medienabläufe brauchbar und stabil sein. Das gleiche gilt für Disc-/ISO-Automation und AI-Audio-Restauration.
 
 ### Leitszenarien
 
 Vier Szenarien ziehen sich als Prüfsteine durch alle Modulkapitel. Jede Architekturentscheidung muss sich an ihnen messen lassen.
 
-**Szenario 1 — Die Serien-Blu-ray.** Ein Benutzer legt `Staffel_3_Disc_2.iso` in eine überwachte Bibliothek. MediaForge erkennt das Image, parst die BDMV-Struktur, findet acht Playlists, identifiziert davon sechs als Episodenkandidaten (Laufzeit ~43 min) und eine als Play-All-Playlist (Laufzeit ~258 min), gleicht die Laufzeiten gegen die Episodendauern des Provider-Katalogs ab und schlägt ein Mapping „Playlist 00003 → S03E05" bis „Playlist 00008 → S03E10" vor. Zwei Zuordnungen haben Confidence unter dem Schwellwert; MediaForge erzeugt einen Review-Task statt zu raten. Der Benutzer bestätigt das Mapping im Review-UI. Später schaut er über einen externen Player Folge S03E07 über das Disc-Menü; der Player meldet Playback-Positionen zurück, MediaForge mappt sie über das Segment-Modell auf die Episode und markiert genau S03E07 als gesehen. Die Disc selbst zeigt den abgeleiteten Status „teilweise gesehen (3/6)". Niemals wird die Disc als Ganzes automatisch „gesehen", weil eine einzelne Folge lief.
+**Szenario 1 — Die Serien-Blu-ray.** Ein Benutzer legt `Staffel_3_Disc_2.iso` in eine überwachte Bibliothek. MediaForge analysiert die BDMV-Struktur und misst jede Playlist mit der technisch verfügbaren Präzision. Die Engine darf Kandidaten klassifizieren, **aber sie darf keine Episode allein anhand von Reihenfolge, ähnlicher Minutenlaufzeit oder eines Confidence-Scores automatisch zuordnen**. Für ein automatisches Mapping müssen die Regeln aus [modules/disc-verification-policy.md](modules/disc-verification-policy.md) vollständig erfüllt sein: korrekte Edition/Disc, sekundengenaue Laufzeitreferenz aus autoritativer oder mehrfach bestätigter externer Quelle, eindeutiger Kandidat und kein Widerspruch. Bei jeder Mehrdeutigkeit bleibt das Mapping `unresolved`; MediaForge rät nicht. Erst ein `verified` Mapping darf Playback auf Episodebene verbuchen. Das Disc-Feature wird erst implementiert, wenn die normale MediaForge-Kernanwendung bereits brauchbar ist.
 
 **Szenario 2 — Das fragmentierte Hörbuch.** Ein Ordner enthält drei Unterordner `CD1`, `CD2`, `CD3` mit insgesamt 97 MP3s, deren Tags leer und deren Dateinamen generisch sind (`Track01.mp3`). MediaForge erkennt den Ordner als Hörbuch-Kandidaten, ordnet die Tracks über CD-Ordner und Tracknummern in eine Gesamtsequenz, findet über die Provider-Suche das Werk und eine offizielle Kapitelliste mit 31 Kapiteln, verteilt die Kapitelmarken per Laufzeit-Alignment auf die Tracksequenz, erzeugt eine CUE-Datei sowie optional ein M4B mit eingebetteten Kapiteln — als neue Artefakte neben den unveränderten Originalen — und exportiert die Struktur Audiobookshelf-kompatibel. Findet MediaForge keine offizielle Kapitelquelle, darf die KI eine Kapitelstruktur vorschlagen (Stilleanalyse, Sprecherwechsel), aber das Ergebnis trägt dauerhaft die Kennzeichnung „nicht offiziell" und wird nie stillschweigend als bestätigter Stand aktiviert.
 
@@ -302,6 +324,15 @@ Diese Regeln gelten in jedem Modul und jedem Kapitel dieses Handbuchs. Sie sind 
 
 **Regel 11 (fachliche Kernregel der Disc-Engine) — Watch-State ist episodenbasiert.** Der Wiedergabestatus lebt auf der Episode, nie auf der Disc. Der Disc-Status (ungesehen/teilweise/gesehen) ist ein abgeleiteter, nicht direkt setzbarer Wert. Enthält eine Disc sechs Folgen und wurde nur Folge 2 geschaut, ist genau Folge 2 gesehen und die Disc „teilweise gesehen". Bei unsicherem Episoden-Mapping wird ein Review erzeugt; niemals wird aus Playback auf einer ungemappten oder unsicher gemappten Playlist automatisch ein „gesehen" für irgendetwas abgeleitet, und niemals wird die ganze Disc automatisch als gesehen markiert, weil eine Teilmenge lief. *Durchsetzung:* Es existiert schlicht keine Schreiboperation für Disc-Watch-State; das Schema kennt nur episodenbezogene Zustände plus eine abgeleitete Sicht ([modules/disc-engine.md](modules/disc-engine.md)).
 
+**Regel 12 — Adult Zero Leak.** Solange Private-/Adult-Mode nicht entsperrt ist, darf Adult aus Sicht eines normalen Clients nicht existieren: keine Navigation, keine Home-Kachel, keine Suche, kein Autocomplete, keine Empfehlungen, kein Verlauf, keine Notifications, keine Browser-Titel, keine Thumbnail-Preloads und keine unterscheidbaren „existiert aber verboten"-API-Antworten. Die Filterung geschieht serverseitig vor Query-/Response-Aufbau. *Durchsetzung:* Policy-/Query-Scopes, Response-Tests, Search-/Notification-/preload Regressionstests und Security-Review.
+
+**Regel 13 — Engine-Abstraktion statt UI-Wechsel.** Das MediaForge-Frontend spricht MediaForge-Verträge. Eine Engine-ID oder ein Engine-spezifischer API-Pfad darf nicht bestimmen, wie Benutzer zwischen Medienbereichen navigieren. Debug-UIs fremder Engines sind ausschließlich Advanced/Developer-Funktionen. *Durchsetzung:* Engine Registry + Contract-Tests; keine normalen Links auf fremde Web-UIs.
+
+**Regel 14 — Disc-Mapping ist verified-only.** Confidence darf Vorschläge sortieren, aber niemals allein ein Episoden-Mapping autorisieren. Auto-Mapping ist ausschließlich bei erfüllter Verifikationspolicy zulässig; sonst bleibt `unresolved`. Wenn zwei Kandidaten möglich sind, wenn Quellen widersprechen oder nur minutenrunde Laufzeiten vorliegen, gibt es kein Auto-Mapping. *Durchsetzung:* [modules/disc-verification-policy.md](modules/disc-verification-policy.md), Datenbankstatus `unresolved|verified|manual`, Negativtests für jede Ambiguitätsklasse.
+
+**Regel 15 — PostgreSQL bleibt kanonisch.** Engine-interne IDs oder Übergangsdatenbanken ersetzen niemals MediaForge-ULIDs und Provider-/Engine-Mappingtabellen. PostgreSQL ist die dauerhafte Source of Truth für den MediaForge-Katalog und systemübergreifenden Zustand. *Durchsetzung:* Provider-/Engine-IDs nur in Mappingtabellen; kein Foreign Key aus Core-Identität auf fremde Datenbanken.
+
+
 ---
 
 ## Referenzprojekt-Analyse
@@ -338,10 +369,13 @@ Kodi ist die einzige verbreitete Software, die Blu-ray- und DVD-Menüs aus ISO/B
 
 ### Stash
 
-Stash demonstriert konsequentes Datei-Fingerprinting (Hashes, perceptual Hashes) als Identitätsanker, ein flexibles Tag-/Performer-Modell und eine Plugin-Architektur mit externen Scrapern. 
 
-*MediaForge übernimmt:* Fingerprinting als Identitätsfundament ([modules/dedup-fingerprinting.md](modules/dedup-fingerprinting.md)); die Trennung Scraper/Core.  
-*MediaForge macht anders:* GraphQL wird nicht übernommen (REST + Inertia genügen und halten die API-Fläche klein); Stash ist kein Pflichtsystem und wird nur optional als lokale Datenquelle, Importer oder Migrationsquelle integriert ([connectors/stash.md](connectors/stash.md)).
+Stash ist die fachliche und technische Referenz für den späteren Adult-Media-Core: Go, lokale Library-Verarbeitung, FFmpeg, Fingerprinting, Previews/Sprites, GraphQL, Performer/Studio/Scene-Domäne und Scraper-Ökosystem.
+
+*MediaForge übernimmt:* den Media-Core als Basis eines späteren **direkten, AGPL-kompatiblen Forks**, statt dessen Kernfunktionen neu zu implementieren; Scene/File-Trennung, Fingerprinting, Scraper- und Media-Pipeline-Ideen.
+*MediaForge macht anders:* Eine komplett neue MediaForge-UI, PostgreSQL als kanonische MediaForge-Datenbank, strengere Source-Provenienz, library-driven Performer-Sync, historische Quellen, Coverage, Zero-Leak-Adult-Mode und die Einbindung in die gemeinsame MediaForge-App. Stash-GraphQL darf innerhalb des Adult-Engine-Forks bestehen; der MediaForge-Core ist nicht verpflichtet, sein gesamtes öffentliches API-Modell auf GraphQL umzustellen.
+
+Der direkte Fork/Bundling-Schritt bleibt spät in der Roadmap. Bis dahin kann ein Connector/Adapter als Integrations- und Migrationspfad dienen. „Stash optional“ bedeutet daher nur für frühe Laufzeitphasen optional — **nicht**, dass Stash langfristig bloß eine lose Inspirationsquelle bleiben soll.
 
 ### Sonarr, Radarr, Readarr, Lidarr
 
@@ -479,6 +513,17 @@ Dieses Inhaltsverzeichnis ist der verbindliche Bauplan des Handbuchs über alle 
 | Dashboard UX | [ui-ux/dashboard.md](ui-ux/dashboard.md) | ✅ |
 | Accessibility | [ui-ux/accessibility.md](ui-ux/accessibility.md) | ✅ |
 | Performance | [ui-ux/performance.md](ui-ux/performance.md) | ✅ |
+
+### Verbindliche Produkt-/Engine-Ergänzungen
+
+| Kapitel | Datei | Status |
+|---|---|---|
+| Unified Application | [architecture/unified-application.md](architecture/unified-application.md) | ✅ |
+| Engine Contracts | [architecture/engine-contracts.md](architecture/engine-contracts.md) | ✅ |
+| PostgreSQL Source of Truth | [architecture/postgresql-source-of-truth.md](architecture/postgresql-source-of-truth.md) | ✅ |
+| Adult Engine Target | [modules/adult-engine-target.md](modules/adult-engine-target.md) | ✅ |
+| Disc Verification Policy | [modules/disc-verification-policy.md](modules/disc-verification-policy.md) | ✅ |
+| Unified Interface | [ui-ux/unified-interface.md](ui-ux/unified-interface.md) | ✅ |
 
 ### Fundament
 

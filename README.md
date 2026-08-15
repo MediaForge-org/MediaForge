@@ -1,10 +1,39 @@
 # MediaForge
 
+MediaForge is an open-source, local-first **unified media application**.
+
+The long-term product has **one MediaForge interface** for movies, series, music, audiobooks, podcasts, discs and private adult media. During the early engineering phases MediaForge integrates existing Jellyfin and Audiobookshelf installations through connectors. Later phases may bundle and maintain compatible forks/engines behind stable MediaForge interfaces. Users should not need to switch between Jellyfin, Audiobookshelf or Stash web interfaces in the final product.
+
+The current alpha is intentionally much smaller than that target: it is still building the canonical catalog, connector and safety foundations before playback engines, fork integration, Disc/ISO, enhancement engines and Adult are activated.
+
+
 MediaForge is an open-source, **local-first** enhancement suite that runs *beside* your existing
 [Jellyfin](https://jellyfin.org/) and [Audiobookshelf](https://www.audiobookshelf.org/)
 installations. It does **not** replace their playback, streaming, transcoding, or library cores —
 it adds a safe local control surface for configuring connectors, discovering libraries, and
 preparing future sync.
+
+## Long-term product model
+
+```text
+MediaForge UI (React + TypeScript)
+            |
+       MediaForge Core
+       PostgreSQL catalog
+            |
+    +-------+---------+
+    |       |         |
+ Video   Adult     Audio
+ Engine  Engine    Engine
+    |       |         |
+Jellyfin  Stash-   Audiobookshelf
+derived/  derived/ derived/
+compatible compatible compatible
+```
+
+The engine implementation is deliberately hidden behind MediaForge contracts. The current connector phase is a migration path, not the final visible product boundary. Fork/bundling work remains a later engineering phase so the existing alpha can mature first.
+
+Adult content is a special privacy domain: while Private/Adult Mode is locked, adult routes, navigation, search results, thumbnails, preload requests, activity, history, notifications and API existence must not leak into the normal UI.
 
 ## Project status
 
@@ -194,3 +223,13 @@ secret store at runtime.
 
 MediaForge is licensed under the
 [GNU Affero General Public License v3.0 or later](LICENSE) (`AGPL-3.0-or-later`).
+
+
+## UI reference expansion (2026-08 update)
+
+This overlay now also includes an expanded UI reference pack under `docs/MediaForge/ui-ux/reference-expanded/` together with two written Claude-facing UI spec files:
+
+- `docs/MediaForge/ui-ux/UI_IMPLEMENTATION_PROMPT.md`
+- `docs/MediaForge/ui-ux/SCREEN_REFERENCE_INDEX.md`
+
+Do not rely on screenshots alone. Claude should read the written UI prompt and the screen index, then inspect the reference PNG files.

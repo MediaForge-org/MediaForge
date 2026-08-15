@@ -1,5 +1,24 @@
 # Blu-ray/DVD/UHD-Engine
 
+
+> [!IMPORTANT]
+> ## Normative Verified-Only Override
+>
+> Für Episodenidentität gilt ab dieser Revision **kein Confidence-Schwellwert als Auto-Autorisierung**.
+> Confidence/Heuristiken dürfen Playlists klassifizieren und Review-Vorschläge sortieren, aber ein automatisches
+> `playlist -> episode`-Mapping ist nur zulässig, wenn die vollständige
+> [Disc Verification Policy](disc-verification-policy.md) erfüllt ist.
+>
+> Insbesondere reichen **nicht**: Reihenfolge auf der Disc, „ungefähr 43 Minuten“, ein einzelner unsicherer Provider,
+> ein Score von 0.9/0.99 oder ein AI-/Heuristikvorschlag.
+>
+> Bei zwei möglichen Episoden, widersprüchlichen Quellen, fehlender sekundengenauer Referenz oder unklarer Edition
+> bleibt das Mapping `unresolved`. MediaForge rät nicht. Diese Regel hat Vorrang vor älteren Formulierungen in
+> Unterkapiteln, bis diese vollständig auf das Verified-only-Modell migriert sind.
+>
+> Disc/ISO wird außerdem erst nach dem Usable-Core-Gate der Roadmap implementiert.
+
+
 Zurück zur [Masterdatei](../MediaForge_Master_Engineering.md). Abhängigkeiten: [architecture/overview.md](../architecture/overview.md) (Job-/Event-Verträge, media-tools-Dienst), [database/core-schema.md](../database/core-schema.md) (Katalog, Watch-State, Reviews), [modules/audit.md](audit.md). Verwandt: [connectors/external-player.md](../connectors/external-player.md) (geplant; das Playback-Protokoll ist in diesem Kapitel normativ definiert, das Connector-Kapitel spezifiziert die Player-Anbindungen).
 
 **Vertiefungen** (normative Detailspezifikationen dieses Moduls): [Formatreferenz Blu-ray/UHD](disc-engine/formats-bluray.md) · [Formatreferenz DVD](disc-engine/formats-dvd.md) · [Klassifikationsregel-Katalog](disc-engine/classification-rules.md) · [Mapping-Algorithmus](disc-engine/mapping-algorithm.md) · [Playback-Übersetzung](disc-engine/playback-translation.md) · [API-Referenz](disc-engine/api-reference.md) · [UI-Referenz](disc-engine/ui-reference.md) · [Test-Katalog](disc-engine/test-catalog.md)
@@ -16,7 +35,7 @@ Fünf Teilprobleme, jedes für sich nicht trivial, in Summe der Grund, warum das
 
 **Strukturerkennung.** Ein Disc-Image verrät seinen Inhalt nicht freiwillig. Eine Blu-ray enthält typischerweise 20–200 Playlists, von denen die meisten irrelevant sind (Trailer, Warnhinweise, Menü-Loops, Duplikate); manche Discs enthalten absichtliche Verwirrung (siehe Edge Cases: Struktur-Obfuskation). Die relevanten Playlists — Episoden, Hauptfilm, Bonusmaterial — müssen aus Struktur, Laufzeiten, Kapitelmarken und Referenzmustern erschlossen werden.
 
-**Episoden-Zuordnung unter Unsicherheit.** Selbst wenn sechs Episoden-Playlists erkannt sind: Welche Playlist ist welche Episode? Die Playlist-Nummerierung folgt keiner Norm; die Reihenfolge auf der Disc entspricht meist, aber nicht immer der Ausstrahlungsreihenfolge; Doppelfolgen, Extended Cuts und regionale Schnittfassungen verschieben Laufzeiten. Ein System, das hier rät und falsch rät, produziert falsche „gesehen"-Markierungen — schlimmer als keine. Die Engine braucht deshalb ein Confidence-Modell mit hartem Schwellwert und Review-Pflicht darunter (Architekturregel 11).
+**Episoden-Zuordnung unter Unsicherheit.** Selbst wenn sechs Episoden-Playlists erkannt sind: Welche Playlist ist welche Episode? Die Playlist-Nummerierung folgt keiner Norm; die Reihenfolge auf der Disc entspricht meist, aber nicht immer der Ausstrahlungsreihenfolge; Doppelfolgen, Extended Cuts und regionale Schnittfassungen verschieben Laufzeiten. Ein System, das hier rät und falsch rät, produziert falsche „gesehen"-Markierungen — schlimmer als keine. Die Engine darf Confidence für Klassifikation und Review-Reihenfolge berechnen; **automatische Episodenidentität folgt jedoch ausschließlich der Verified-only-Policy**. Unterhalb vollständiger Verifikation gibt es kein Auto-Mapping, unabhängig vom Score.
 
 **Playback-Übersetzung.** Disc-Playback findet außerhalb von MediaForge statt (externer Player mit Menü-Unterstützung). Der Player berichtet, was er abspielt — bestenfalls Playlist, Position, Zeitstempel; schlechtestenfalls nur „ISO geöffnet/geschlossen". Diese Rohsignale müssen in Episodenfortschritt übersetzt werden: „Playlist 00004, Position 12:31–55:48" heißt „S03E07 zu 95 % gesehen" — aber nur, wenn das Mapping bestätigt ist und die Position im Episodensegment liegt (nicht im Intro-Vorspann des Play-All).
 
@@ -44,7 +63,7 @@ Die Engine zerfällt in vier Subsysteme mit klaren Verträgen:
 
 1. **Disc Scanner** — erkennt Disc-Kandidaten (via Classifier des Fundaments), orchestriert die Strukturanalyse durch den media-tools-Dienst und persistiert das Strukturmodell. Reine Ingestion, keine fachlichen Entscheidungen.
 2. **Struktur-Klassifikator** — bewertet Playlists (Episode-Kandidat / Hauptfilm / Bonus / Müll) anhand lokaler Evidenz (Laufzeiten, Kapitel, Clip-Referenzen, Duplikatmuster). Ergebnis: typisierte Kandidaten mit Begründungsdaten.
-3. **Episoden-Mapper** — gleicht Episode-Kandidaten gegen den Provider-Episodenkatalog ab (Laufzeit-Alignment, Reihenfolge, Disc-Set-Kontext), erzeugt Mapping-Vorschläge mit Confidence und ab Schwellwert-Unterschreitung Review-Tasks. Bestätigung ist immer eine auditierte Action.
+3. **Episoden-Mapper** — gleicht Episode-Kandidaten gegen externe Referenzen ab und erzeugt Evidence/Mapping-Vorschläge. Confidence darf Vorschläge sortieren. Automatisch `verified` wird ein Mapping nur bei erfüllter [Disc Verification Policy](disc-verification-policy.md); sonst bleibt es `unresolved` und kann später erneut geprüft oder manuell bestätigt werden.
 4. **Playback-Übersetzer** — konsumiert Player-Sessions (normiertes Protokoll), mappt Positionen über Playlists und Segmente auf Episodenfortschritt und speist ausschließlich die zentrale Action `RecordPlaybackProgress`. Ungemapptes Playback wird als Session vorgehalten und nach späterer Mapping-Bestätigung nachverrechnet.
 
 Quer dazu liegt das **Disc-Set-Modell** (Staffelbox als geordnete Disc-Gruppe), das dem Mapper entscheidenden Kontext liefert: „Disc 2 von 4 der Staffel-3-Box" schränkt den Episoden-Suchraum drastisch ein.
@@ -53,7 +72,7 @@ Der media-tools-Dienst liefert die Rohstruktur als versioniertes JSON (`disc-ana
 
 ## Alternativen
 
-**Playlists als media_items modellieren**: verworfen, siehe Architekturentscheidung und ADR-0007. **Episoden-Extraktion statt Mapping** (Remux der Episoden als MKV, Disc nur Archiv): verletzt keine Regel (Artefakte wären zulässig), wurde aber als Kernansatz verworfen, weil er das Menü-Erlebnis aufgibt, Speicher verdoppelt und die Extraktion bei Seamless Branching fehleranfällig ist; als optionaler Export-Workflow bleibt er denkbar (offener Punkt). **Mapping ausschließlich manuell** (kein Heuristik-Mapper): maximal korrekt, aber bei einer 60-Disc-Sammlung unzumutbar; die Heuristik mit Review-Schwelle ist der dokumentierte Mittelweg. **Mapping ausschließlich automatisch** (kein Review): verletzt Architekturregel 11 und wurde nie ernsthaft erwogen. **Disc-Datenbank-First** (Mapping primär aus externen Disc-DBs): an Datenlage und Lizenzfragen gescheitert; als optionaler Provider vorgesehen.
+**Playlists als media_items modellieren**: verworfen, siehe Architekturentscheidung und ADR-0007. **Episoden-Extraktion statt Mapping** (Remux der Episoden als MKV, Disc nur Archiv): verletzt keine Regel (Artefakte wären zulässig), wurde aber als Kernansatz verworfen, weil er das Menü-Erlebnis aufgibt, Speicher verdoppelt und die Extraktion bei Seamless Branching fehleranfällig ist; als optionaler Export-Workflow bleibt er denkbar (offener Punkt). **Mapping ausschließlich manuell** ist nicht das Ziel: MediaForge soll die Recherche und Evidenzsammlung vollständig automatisieren. **Automatische Zuordnung** ist aber nur für `verified` Evidence erlaubt; Heuristik/Confidence allein darf niemals autorisieren. Unverifizierbare Fälle bleiben ungelöst statt geraten zu werden. **Disc-Datenbank-First** (Mapping primär aus externen Disc-DBs): an Datenlage und Lizenzfragen gescheitert; als optionaler Provider vorgesehen.
 
 ## Disc-Format-Grundlagen
 
@@ -566,7 +585,7 @@ Das Player-Protokoll ist die exponierteste Fläche: benutzergebundene Tokens mit
 ## Tests
 
 * **Klassifikator/Mapper-Fixtures**: Bibliothek aus `disc-analysis/v1`-JSONs realer anonymisierter Disc-Strukturen (Serien-BD, Film-BD mit Fassungen, Obfuskations-BD, DVD-Box, Play-All-only-DVD, Doppelfolgen-Disc) mit erwarteten Klassifikationen und Alignments als Golden Files. Jede Heuristik-Änderung läuft gegen die gesamte Bibliothek.
-* **Property-Tests des Mappers**: zufällige Episodenlisten + daraus generierte Playlist-Laufzeiten (mit Rauschen) ⇒ das Alignment muss die Konstruktion wiederfinden; mit Rauschen über der Toleranz muss die Confidence unter die Auto-Schwelle fallen (kein „confident wrong").
+* **Property-Tests des Mappers**: zufällige Episodenlisten + daraus generierte Playlist-Laufzeiten (mit Rauschen) ⇒ das Alignment muss die Konstruktion wiederfinden; mit uneindeutiger oder unvollständiger Evidenz darf niemals `verified` entstehen (kein „confident wrong“).
 * **Constraint-Tests**: Segment-Überlappung (Exclusion), doppelte bestätigte Mappings (partielle Unique-Indizes), Invariante 3 (gemischtes Ganz/Segment-Confirm muss in der Action scheitern).
 * **Übersetzungs-Szenarien** (Integration): Event-Sequenzen (normal, Seek-lastig, Session-Abriss, title_only, open_close_only) gegen erwartete `RecordPlaybackProgress`-Aufrufe; Idempotenz (doppelte Verarbeitung ⇒ identischer Endzustand); Nachverrechnung nach später Bestätigung inkl. `occurred_at`-Treue.
 * **Kernszenario als End-to-End-Test** (der Test zur Architekturregel 11): 6-Episoden-Disc-Fixture, Mapping bestätigt, Playback-Events nur für Playlist 2 ⇒ genau eine Episode `watched`, Disc-Status `partial`, alle anderen Episoden ohne Watch-State-Zeile. Dieser Test ist der unverhandelbare Regressionsanker des Moduls.

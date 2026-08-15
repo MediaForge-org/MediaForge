@@ -4,6 +4,23 @@ Zurück zur [Masterdatei](../MediaForge_Master_Engineering.md) und zur bestehend
 
 MediaForge entwickelt kein einfaches Theme. MediaForge entwickelt ein vollständiges Design System, damit Jellyfin, Audiobookshelf, Adult Enhancement und MediaForge-Verwaltungsbereiche wie eine konsistente lokale Premium-Medienumgebung wirken, obwohl die Kernsysteme getrennt und updatefähig bleiben.
 
+## Verbindliche visuelle Referenz
+
+Die Screens unter `ui-ux/reference/` sind die visuelle Qualitätsbaseline. Sie sind keine pixelgenaue Vorgabe, aber verbindlich für:
+- wahrgenommene Produktqualität;
+- Dark-Theme-Farbraum;
+- cinematic Hero-Bereiche;
+- Media Cards und Rows;
+- Typografie;
+- Abstände;
+- Glas-/Depth-Effekte;
+- Status-Chips/Progress;
+- Mischung aus großzügigem Browsing und dichter Management-UI.
+
+Das Ziel ist sichtbar hochwertiger als Standard-Stash und orientiert sich konzeptionell an den besten modernen Jellyfin-UI-Erweiterungen, ohne diese zu kopieren.
+
+Neue Seiten dürfen nicht in generisches Admin-/Bootstrap-Design zurückfallen.
+
 ## Component Library
 
 Die Component Library liegt in `resources/js/components/base/` und bildet die gemeinsame UI-Sprache: Buttons, Icon Buttons, Inputs, Selects, Comboboxes, Tabs, Tabellen, virtuelle Listen, Cards, Dialoge, Drawers, Toasts, Skeletons, Review Panels, Status Chips, Confidence Badges, Progress Rings, Audit Timelines, Diff Views und Dashboard Widgets. Modulkomponenten dürfen spezialisiert sein, müssen aber auf diesen Basiskomponenten aufbauen.
@@ -18,7 +35,7 @@ Verbindliche Patterns sind Master/Detail, Review Inbox, Bulk Preview, Compare/Di
 
 ## UX Guidelines
 
-Die Oberfläche priorisiert wiederkehrende Verwaltung: scannbare Tabellen, klare Filter, kurze Wege von Warnung zu Ursache, keine versteckten Nebenwirkungen, kein stilles Überschreiben und immer sichtbare Herkunft. Jellyfin und Audiobookshelf bleiben als Spezialisten erkennbar, MediaForge macht deren Zustände zusammenhängend handhabbar.
+Die Oberfläche priorisiert wiederkehrende Verwaltung: scannbare Tabellen, klare Filter, kurze Wege von Warnung zu Ursache, keine versteckten Nebenwirkungen, kein stilles Überschreiben und immer sichtbare Herkunft. Die technischen Engines bleiben als Spezialisten erhalten, aber die normale Oberfläche macht sie **nicht als getrennte Apps sichtbar**. MediaForge präsentiert einen durchgehenden Produktfluss.
 
 ## Animation Guidelines
 

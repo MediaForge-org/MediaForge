@@ -1,5 +1,17 @@
 # AI Audio Upscaler
 
+
+> [!IMPORTANT]
+> ## Implementierungspriorität
+>
+> Der Audio-Upscaler bleibt vollständig im Produktumfang, wird aber **erst nach dem Usable-Core-Gate** umgesetzt.
+> Zuerst müssen normale MediaForge-Bibliotheken, UI, Katalog, Security, Search, Matching, Health und Backups
+> zuverlässig nutzbar sein. V30 ist der geplante Schwerpunkt.
+>
+> Der Upscaler bleibt nicht-destruktiv: Rekonstruktion ist eine zusätzliche Edition/Artifact und darf nie als
+> echtes verlustfreies Original bezeichnet werden.
+
+
 Zurück zur [Masterdatei](../MediaForge_Master_Engineering.md). Abhängigkeiten: [architecture/overview.md](../architecture/overview.md) (ai-worker, Queue `ai`), [database/core-schema.md](../database/core-schema.md) (Editionen, Artefakte), [modules/audit.md](audit.md), [modules/audiobook-assembler.md](audiobook-assembler.md) (Track-Sequenz als Eingabe bei Hörbüchern).
 
 **Vertiefungen**: [Worker-Protokoll `ai-job/v1`](audio-upscaler/worker-protocol.md) · [Profile und Metriken](audio-upscaler/profiles-metrics.md) Verwandt: [modules/audio-analysis.md](audio-analysis.md) (geplant; liefert die Qualitätsmetriken), [modules/ai-engine.md](ai-engine.md) (geplant; Modell-Registry und Worker-Protokoll — die hier verwendeten Verträge sind in diesem Kapitel normativ vorweggenommen und wandern bei Ausarbeitung der AI Engine dorthin).

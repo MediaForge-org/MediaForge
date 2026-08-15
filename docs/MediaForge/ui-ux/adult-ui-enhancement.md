@@ -1,33 +1,63 @@
 # Adult UI Enhancement
 
 Zurück zur [Masterdatei](../MediaForge_Master_Engineering.md).
+Fachmodul: [Adult Enhancement](../modules/adult-enhancement.md).
+Designbasis: [Design System](design-system.md).
 
-Die Adult-Sektion erhält eine eigene hochwertige lokale Oberfläche. Sie ist Teil von Jellyfin plus MediaForge Adult Enhancement und nicht von Stash abhängig.
+## Kernregel: im normalen Modus unsichtbar
 
-## Ziele
+Adult erscheint im normalen MediaForge-UI **nirgendwo**.
 
-- eigene Navigation
-- eigene Bibliotheksansicht
-- Performer-Seiten
-- Studio-Seiten
-- Szenenübersichten
-- intelligente Filter
-- Metadatenverwaltung
-- Batch-Bearbeitung
-- Favoriten und Sammlungen
-- Statistiken und Qualitätsbewertung
-- Timeline
-- AI-Tagging
-- Dublettenerkennung
-- getrennte Sichtbarkeits- und Zugriffskonzepte
+Nicht erlaubt:
+- „Adult 🔒“-Kachel auf Home;
+- gesperrter Adult-Menüpunkt;
+- Adult in globaler Suche/Autocomplete;
+- Adult in Continue Watching/Recently Added;
+- Adult-Stats;
+- Notifications/Activity;
+- Background-Preloading von Adult-Artwork.
 
-## Querverweise
+Der geschützte Einstieg liegt in einem absichtlich aufgerufenen Private-Mode-Flow, z. B. Profil → Privater Modus → Passwort/PIN.
 
-Die Produktstrategie steht in [enhancements/adult-enhancement.md](../enhancements/adult-enhancement.md), der optionale Stash-Import in [connectors/stash.md](../connectors/stash.md), allgemeine Security in [architecture/security.md](../architecture/security.md).
+## Entsperrter Modus
+
+Nach Entsperrung darf die Navigation einen eigenen Adult-Kontext zeigen:
+- Home;
+- Library;
+- Performers;
+- Scenes;
+- Studios;
+- Collections;
+- Coverage;
+- Sync/Review.
+
+Das UI bleibt MediaForge und öffnet nicht die originale Stash-Oberfläche.
+
+## Visuelle Qualität
+
+Die Referenzscreens unter `reference/` sind verbindliche Designbaseline:
+- `01_home_dashboard.png`
+- `02_performer_detail.png`
+- `03_scene_detail.png`
+- `04_coverage_library_management.png`
+
+Browsing-Seiten sind cinematic und artwork-zentriert. Coverage/Review/Library Management darf dichter sein, muss aber dieselbe Premium-Designsprache behalten.
+
+## Zero-Leak UX
+
+Beim Sperren:
+- Adult-Route-State verwerfen;
+- Adult-Queries/Cache aus Client-State entfernen;
+- keine letzten Adult-Suchbegriffe in normalem Autocomplete;
+- keine Adult-Thumbnails im Browser-Preload;
+- normaler Home-Feed neu laden;
+- sensitive modale Zustände schließen.
+
+Serverseitige Autorisierung bleibt maßgeblich; Client-Cleanup ist zusätzliche Privacy Defense.
 
 ## Akzeptanzkriterien
 
-- Adult-Bereiche sind ohne Stash vollständig nutzbar.
-- Navigation, Suche, Dashboard und Notifications respektieren Grants konsistent.
-- Batch-Aktionen haben Vorschau, Audit und Rückfallebene.
-- AI-Tagging und Metadatenvorschläge bleiben lokal/optional und sichtbar gekennzeichnet.
+- Screenshot/DOM/Network-Test im gesperrten Modus enthält keine Adult-Entitäten;
+- UI nach Entsperren entspricht der Premium-Referenz;
+- Lock/Unlock benötigt keinen Wechsel in eine andere Web-App;
+- Back/History darf gesperrte Adult-Seiten nicht wieder sichtbar machen.

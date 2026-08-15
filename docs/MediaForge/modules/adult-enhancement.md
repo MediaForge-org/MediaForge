@@ -1,158 +1,187 @@
 # Adult Enhancement Modul
 
-Zurück zur [Masterdatei](../MediaForge_Master_Engineering.md). Überblick: [Enhancement-Strategie](../enhancements/adult-enhancement.md), [Adult UI Enhancement](../ui-ux/adult-ui-enhancement.md), [Stash-Connector optional](../connectors/stash.md), [Modul-Katalog](module-catalog.md).
+Zurück zur [Masterdatei](../MediaForge_Master_Engineering.md).
+UI: [Adult UI Enhancement](../ui-ux/adult-ui-enhancement.md).
+Zielengine: [Adult Engine Target](adult-engine-target.md).
 
-Adult Enhancement ist ein eigenständiges großes MediaForge-Modul. Jellyfin kann lokale Adult-Bibliotheken bereitstellen und abspielen, aber die Adult-Domäne selbst wird in MediaForge modelliert: Szenen, Performer, Studios, Collections, Metadaten, Batch-Flows, AI-Vorschläge, Analytics, Health und Search. Stash ist optionaler Importer oder Migrationspfad, niemals Voraussetzung.
+## Produktregel: unsichtbarer Private Mode
 
-## Zweck
+Adult ist **kein normal sichtbarer MediaForge-Bereich**.
 
-Das Modul macht private lokale Adult-Sammlungen professionell verwaltbar, sichtbarkeitsgeschützt und qualitativ nachvollziehbar. Es trennt Adult-Inhalte von normalen Medienbereichen, ohne parallele Ersatzplattform zu bauen.
+Solange Private-/Adult-Mode gesperrt ist:
+- kein Adult-Menüpunkt;
+- keine Adult-Kachel auf Home;
+- keine Adult-Suchergebnisse oder Autocomplete-Vorschläge;
+- keine Adult-Inhalte in Continue Watching / Recently Added;
+- keine Performer-/Studio-Namen in Activity/Notifications;
+- keine Adult-Statistiken;
+- keine Thumbnail-/Artwork-Preloads;
+- keine unterscheidbare API-Antwort, die die Existenz eines Adult-Objekts verrät.
 
-## Verantwortlichkeiten
+Der Einstieg erfolgt nur über einen bewusst geschützten Flow, z. B. Profil → Privater Modus → Passwort/PIN. Optional kann später ein konfigurierbarer Shortcut existieren. Nach Sperren wird der Adult-Kontext vollständig entfernt.
 
-- **UI:** eigene Navigation, Szenenlisten, Performer-Seiten, Studio-Seiten, Collection-Seiten, Review-Ansichten und Batch-Editoren.
-- **Metadaten:** feldgranulare Provenienz, lokale Overrides, Quellenprioritäten, Tags, Serien/Reihen, Szenenbeschreibungen und Herkunftskennzeichnung.
-- **Performer:** lokale Identität, Aliasnamen, Deduplizierung, Rollen, Beziehungsstatus, Importkonflikte und Sichtbarkeit.
-- **Studios:** Studio-/Label-Hierarchien, Szenen-Zuordnung, Provider-IDs, lokale Normalisierung und Historie.
-- **Szenen:** Szenen als eigene Medienobjekte mit Dateien, Laufzeit, Datum, Tags, Performer-Credits, Studio, Collections und Watch-State.
-- **Batch:** sichere Massenänderungen mit Vorschau, Filter-Snapshot, Audit, Dry Run und Rückfallebene.
-- **AI:** lokale/optionale Vorschläge für Tags, Szenenbeschreibung, Performer-Matching, Dubletten und Qualitätsindikatoren; AI bleibt Vorschlag, nie bestätigter Stand.
-- **Analytics:** Sammlungstrends, Qualitätsabdeckung, Dubletten, fehlende Credits, Studio-/Performer-Verteilung und Speicherprofile.
-- **Health:** fehlende Dateien, defekte Mappings, Sichtbarkeitsverletzungen, Importdrift, veraltete AI-Ergebnisse und Connector-Probleme.
-- **Search:** adult-sichere Indexierung über Szenen, Performer, Studios, Tags und Collections.
-- **Collections:** manuelle und regelbasierte Collections mit Sichtbarkeit, Reihenfolge, Beschreibung, Cover und Herkunft.
+Die Filterung ist serverseitig. „Im DOM verstecken“ ist keine Security.
 
-## Architektur
+## Ziel
 
-```mermaid
-flowchart TB
-    LIB["Lokale Adult-Bibliotheken"]
-    JF["Jellyfin Adult Library"]
-    MF["MediaForge Adult Domain"]
-    META["Adult Metadata"]
-    PEOPLE["Performer / Studios"]
-    SCENE["Scenes"]
-    BATCH["Batch Engine"]
-    AI["AI Suggestions"]
-    SEARCH["Adult-safe Search"]
-    HEALTH["Adult Health"]
-    STASH["Stash optional import"]
+Adult wird langfristig ein vollständiger, schöner, privater Media-Server innerhalb von MediaForge:
+- Scenes;
+- Performer;
+- Studios/Networks/Brands;
+- Galleries/Remote Assets;
+- lokale Files/Versionen;
+- Player/Progress;
+- Collections;
+- Quality/Duplicates;
+- Coverage;
+- Metadata Sources;
+- Historical Sources;
+- Review/Matching.
 
-    LIB --> JF
-    JF --> MF
-    STASH -. optional .-> MF
-    MF --> META
-    MF --> PEOPLE
-    MF --> SCENE
-    MF --> BATCH
-    MF --> AI
-    MF --> SEARCH
-    MF --> HEALTH
+Das sichtbare UI ist MediaForge. Der spätere Media-Core ist Stash-derived.
+
+## Library-driven Aktivierung
+
+Es wird **keine globale Performer-Datenbank auf Vorrat gespiegelt**.
+
+Standard:
+1. lokale Adult-Datei wird von der Library entdeckt;
+2. Scene/File wird analysiert und gematcht;
+3. Performerinnen werden erkannt;
+4. nur Performerinnen, die in mindestens einem lokalen Video vorkommen, werden als aktive Sync-Ziele geführt;
+5. manuell gepinnte/Favoriten dürfen als Ausnahme erhalten bleiben;
+6. erst nach bewusstem Sync werden große Metadaten-, Scene- und Remote-Asset-Abfragen durchgeführt.
+
+## Scene ist nicht File
+
+```text
+AdultScene
+  0..n LocalMediaFiles
+  0..n SourceRecords
+  0..n RemoteAssets
+  n PerformerCredits
 ```
 
-Das Modul hängt an Core, Metadata Engine, Search, AI Engine, Health Center, Rule Engine und Jellyfin Enhancement. Fachentscheidungen liegen in Adult-Actions (`UpdateAdultScene`, `MergeAdultPerformer`, `ApplyAdultBatch`, `AcceptAdultAiSuggestion`), nicht im Connector. Sichtbarkeit wird früh im Query-Pfad erzwungen; Treffer oder Widget-Daten werden nicht erst im Frontend ausgeblendet.
+Eine Scene kann mehrere lokale Versionen (720p/1080p/4K, H.264/HEVC/AV1 usw.) besitzen. Datei-Verschieben oder Re-Encoding erzeugt nicht automatisch eine neue Scene.
 
-## Datenmodell
+## Dateinamen
 
-Das Kernschema wird um adult-spezifische Tabellen erweitert:
+Bevorzugter Standard:
 
-```sql
-CREATE TABLE adult_scenes (
-    id                 CHAR(26) PRIMARY KEY,
-    media_item_id       CHAR(26) NOT NULL REFERENCES media_items(id) ON DELETE CASCADE,
-    title              TEXT NOT NULL,
-    scene_date          DATE,
-    studio_id           CHAR(26) REFERENCES adult_studios(id) ON DELETE SET NULL,
-    visibility_level    TEXT NOT NULL CHECK (visibility_level IN ('restricted','private','shared')),
-    metadata_status     TEXT NOT NULL CHECK (metadata_status IN ('empty','partial','complete','conflict')),
-    created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at          TIMESTAMPTZ NOT NULL DEFAULT now()
-);
+`Studio - YYYY-MM-DD - Performer 1, Performer 2 - Titel.ext`
 
-CREATE TABLE adult_performers (
-    id                 CHAR(26) PRIMARY KEY,
-    display_name        TEXT NOT NULL,
-    sort_name           TEXT,
-    aliases             JSONB NOT NULL DEFAULT '[]',
-    metadata_source     TEXT NOT NULL DEFAULT 'manual',
-    created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at          TIMESTAMPTZ NOT NULL DEFAULT now()
-);
+Im Dateinamen werden standardmäßig nur weibliche Performer ausgegeben. Der kanonische Scene-Cast darf vollständig sein.
 
-CREATE TABLE adult_studios (
-    id                 CHAR(26) PRIMARY KEY,
-    name                TEXT NOT NULL,
-    parent_studio_id    CHAR(26) REFERENCES adult_studios(id) ON DELETE SET NULL,
-    metadata_source     TEXT NOT NULL DEFAULT 'manual',
-    created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at          TIMESTAMPTZ NOT NULL DEFAULT now()
-);
+Parser muss mehrere konfigurierbare Varianten unterstützen, u. a.:
+- `YYYY-MM-DD - Studio - Performer(s) - Titel`
+- `Studio - Performer(s) - YYYY-MM-DD - Titel`
+- `Performer(s) - Studio - YYYY-MM-DD - Titel`
+- ordnerbasierte Muster;
+- frei konfigurierbare Token-Templates.
 
-CREATE TABLE adult_scene_performers (
-    scene_id            CHAR(26) NOT NULL REFERENCES adult_scenes(id) ON DELETE CASCADE,
-    performer_id        CHAR(26) NOT NULL REFERENCES adult_performers(id) ON DELETE RESTRICT,
-    role                TEXT NOT NULL DEFAULT 'performer',
-    source              TEXT NOT NULL,
-    confidence          NUMERIC(4,3),
-    PRIMARY KEY (scene_id, performer_id, role)
-);
+**Nie ungefragt umbenennen.** Parsing liefert Kandidaten; Dateiumbenennung ist eine spätere, explizite Aktion mit Preview.
 
-CREATE TABLE adult_collections (
-    id                 CHAR(26) PRIMARY KEY,
-    name                TEXT NOT NULL,
-    collection_kind     TEXT NOT NULL CHECK (collection_kind IN ('manual','rule','imported')),
-    visibility_level    TEXT NOT NULL CHECK (visibility_level IN ('restricted','private','shared')),
-    created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
-    updated_at          TIMESTAMPTZ NOT NULL DEFAULT now()
-);
+## Library Sync
 
-CREATE TABLE adult_visibility_grants (
-    id                 CHAR(26) PRIMARY KEY,
-    user_id             CHAR(26) NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    scope_type          TEXT NOT NULL CHECK (scope_type IN ('adult_all','collection','studio','performer')),
-    scope_id            CHAR(26),
-    granted_by          CHAR(26) REFERENCES users(id) ON DELETE SET NULL,
-    created_at          TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-```
+Ein Jellyfin-artiger Sync startet asynchrone Jobs:
+- Inventarisierung;
+- ffprobe/technische Metadaten;
+- Fingerprints;
+- Scene Matching;
+- Performer-Aktivierung;
+- Thumbnail-Erzeugung;
+- Hover-/Preview-Clips;
+- Scrubber/Trickplay-Sprites;
+- Quality-Auswertung;
+- optionaler Metadaten-Sync.
 
-Provider-IDs, Audit Logs, Review Tasks, Search Documents und AI Jobs verwenden die bestehenden Core-Tabellen. Adult-spezifische Tabellen speichern nur fachliche Ergänzungen; sie ersetzen nicht `media_items`, `files` oder Jellyfin-IDs.
+UI bleibt währenddessen bedienbar und zeigt Fortschritt.
 
-## APIs
+## Metadatenquellen
 
-| Endpoint | Zweck | Schutz |
-|---|---|---|
-| `GET /api/v1/adult/scenes` | Szenenliste mit Facetten | `adult:view` |
-| `GET /api/v1/adult/scenes/{id}` | Szenendetail | `adult:view` + Grant |
-| `PATCH /api/v1/adult/scenes/{id}` | Metadaten ändern | `adult:write` |
-| `POST /api/v1/adult/batches` | Batch-Dry-Run starten | `adult:batch` |
-| `POST /api/v1/adult/batches/{id}/apply` | geprüften Batch anwenden | `adult:batch` |
-| `GET /api/v1/adult/performers` | Performer suchen/verwalten | `adult:view` |
-| `POST /api/v1/adult/performers/{id}/merge` | Performer zusammenführen | `adult:write` |
-| `GET /api/v1/adult/studios` | Studios verwalten | `adult:view` |
-| `GET /api/v1/adult/collections` | Collections | `adult:view` |
-| `POST /api/v1/adult/ai/suggestions/{id}/accept` | AI-Vorschlag annehmen | `adult:write` |
+Quellen sind Datenlieferanten, niemals kanonische Identität.
 
-Inertia-Seiten verwenden dieselben Policies. API-Responses dürfen nicht durch fehlende Berechtigung verraten, dass ein bestimmter Adult-Inhalt existiert; unberechtigte Zugriffe liefern dieselbe Außenwirkung wie unbekannte IDs.
+Primäre/ergänzende Quellen können sein:
+- StashDB;
+- ThePornDB;
+- FansDB;
+- Original-Studio-/Paid-Sites;
+- Creator-/Direct-Paid-Profile, soweit legitim zugänglich;
+- offizielle Tube-Profile für Performer/Creator, bei denen Tube-Inhalte tatsächlich Teil des Primärkatalogs sind;
+- historische Studio-/Brand-/Distributor-Quellen;
+- weitere zuverlässige Metadatenquellen.
 
-## Erweiterbarkeit
+Bei Studio-Performerinnen werden beliebige Tube-Reuploads **nicht** als Primärquelle behandelt. Bei Tube-nativen Creatorinnen können offizielle Tube-Profile dagegen Primärquelle sein.
 
-Adult-Erweiterungen registrieren Importer, Metadatenquellen, Tagger, Health Checks, Batch-Aktionen, Collection Builder, Search Facets und UI-Widgets. Jede Erweiterung deklariert Datenschutzklasse, Sichtbarkeitsbedarf, Audit-Verhalten und Test-Fixtures. Importer müssen trocken laufen können und vor dem Schreiben Konflikte als Reviews erzeugen.
+## Historische Quellen
 
-## Zukünftige Roadmap
+Eine nicht mehr erreichbare Studioseite löscht keine Scene.
 
-- Performer-Deduplizierung über Alias-, Fingerprint- und Importsignale.
-- Studio-Hierarchien mit Merge-/Split-Workflow.
-- lokale Scraper-Profile mit Quellprioritäten und Rate Limits.
-- adult-spezifische Qualitätsmetriken für Metadatenabdeckung, Scene Health und Dubletten.
-- Collection-Assistent für manuelle, regelbasierte und importierte Collections.
-- sensitive Backup- und Restore-Policies mit zusätzlicher Bestätigung.
-- UI-Verbesserungen für schnelle Batch-Korrekturen ohne Sichtbarkeitslecks.
+Source Records speichern mindestens:
+- source type;
+- external id;
+- URL;
+- first_seen_at;
+- last_seen_alive_at;
+- last_checked_at;
+- current status;
+- extrahierte Felder/Provenienz.
+
+Statusbeispiele:
+`active`, `historical`, `removed`, `source_dead`, `database_only`, `archive_only`, `unverified`, `conflict`.
+
+## Remote Assets
+
+Bilder/Galerien werden standardmäßig **nicht dauerhaft gespiegelt**.
+
+Gespeichert werden:
+- URL;
+- Thumbnail URL;
+- Quelle;
+- Zuordnung;
+- Dimensionen, soweit bekannt;
+- Availability/last checked.
+
+Client nutzt Lazy Loading und kleine Varianten. Optionaler Cache ist löschbar. Permanentes Archivieren ist eine spätere explizite Benutzeraktion.
+
+## Canonical Merge
+
+Jede Scene/Person/Studio-Entität hat eine eigene MediaForge-ID. Source-Felder werden mit Provenienz gespeichert. Manuelle Overrides gewinnen gegen spätere automatische Syncs, bis der Benutzer sie freigibt.
+
+Identity Resolver:
+- Namen/Aliase;
+- Source IDs;
+- URLs;
+- gemeinsame Scenes;
+- Studio-/Creator-Profile;
+- weitere harte Metadaten.
+
+Unsichere Identitäten werden **nicht** automatisch gemergt; sie landen im Review.
+
+## Zero-Leak Security
+
+Serverseitige Scopes gelten für:
+- Query;
+- Search Index;
+- Recommendations;
+- Home Rows;
+- Activity;
+- Notifications;
+- WebSocket/Event Payloads;
+- Artwork URLs;
+- Cache Keys;
+- Browser Metadata;
+- Export/Backup UI.
+
+Unautorisierte Detailzugriffe verhalten sich wie unbekannte IDs.
 
 ## Akzeptanzkriterien
 
-- Adult ist als eigenes Modul sichtbar und nicht als Unterkapitel von Jellyfin formuliert.
-- Jede Adult-Liste, Suche, Notification, Dashboard-Kachel und jeder Export respektiert `adult_visibility_grants`.
-- AI-Ergebnisse sind als Vorschläge gekennzeichnet und brauchen Annahme oder Review.
-- Batch-Aktionen haben Dry Run, Audit und Wiederherstellungspfad.
-- Stash-Import ist optional; ohne Stash bleibt das Modul vollständig nutzbar.
+- normaler Modus verrät nicht, dass Adult aktiviert/gefüllt ist;
+- Adult hat ein eigenständiges Premium-Media-UI, aber dieselbe MediaForge-Designsprache;
+- Library Sync erzeugt technische Media-Artefakte asynchron;
+- nur relevante lokale Performerinnen werden standardmäßig voll synchronisiert;
+- Scene und File sind getrennt;
+- entfernte Quellen löschen keine historischen Daten;
+- Remote Assets müssen nicht lokal gespeichert werden;
+- keine automatische Änderung überschreibt einen manuellen Override.
