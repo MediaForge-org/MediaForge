@@ -104,3 +104,19 @@ Pflicht:
 - wrong edition => unresolved;
 - unique exact verified evidence => verified;
 - no automatic watched state from unresolved mapping.
+
+## Runtime Evidence Storage 2026-08
+
+Jede automatische Disc-Verifikation muss reproduzierbare Evidence referenzieren:
+
+- local disc fingerprint;
+- playlist id;
+- exact measured duration/timebase;
+- disc/edition/region identity;
+- external source fact(s);
+- source retrieval timestamp;
+- normalization rule;
+- conflict check result;
+- verification algorithm version.
+
+Wird eine externe Quelle später geändert, bleibt die ursprüngliche Evidence des bereits geprüften Mappings auditierbar. Revalidation darf den Zustand ändern, aber nicht die Historie löschen.

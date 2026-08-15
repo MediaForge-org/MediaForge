@@ -53,3 +53,24 @@ Fremde Web-UIs sind Developer/Advanced-Fallbacks und nie Standardnavigation.
 ## Design
 
 Siehe [design-system.md](design-system.md) und Referenzbilder in `reference/`.
+
+## API-first Routing and Engine Transparency 2026-08
+
+Die Unified UI läuft langfristig als React-Router-Anwendung gegen MediaForge API v1. Inertia ist kein Endzustand.
+
+### Beispiele für sichtbare Routen
+
+```text
+/filme/inception-2010
+/serien/supernatural/staffel-01/01-die-frau-in-weiss
+/hoerbuecher/der-hobbit-rob-inglis
+/adult/performer/luna-hart
+```
+
+### Engine Transparency
+
+Film/Serie/Audiobook/Adult teilen App Shell, Search, Collections, Notifications, Settings und Design System. Engine-Herkunft wird nur dort sichtbar, wo sie für Diagnose/Technik relevant ist.
+
+### Unified Search
+
+Suchergebnisse können Work/MediaItem/Person/Collection/Timeline Treffer enthalten. Adult-Ergebnisse erscheinen nur im entsperrten Adult Context.

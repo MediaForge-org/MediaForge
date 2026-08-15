@@ -1,8 +1,8 @@
 # MediaForge Master Engineering Specification
 
-Status: Draft  
-Target: Claude Code  
-Language: de-AT  
+Status: Draft
+Target: Claude Code
+Language: de-AT
 
 Diese Datei ist die zentrale technische Spezifikation für MediaForge.
 
@@ -343,28 +343,28 @@ MediaForge entsteht nicht im luftleeren Raum. Zwölf Projekte dienen als Referen
 
 Jellyfin ist der Maßstab für selbst gehostetes Video-Streaming: Bibliotheksverwaltung, Metadaten-Scraping, Transcoding, breite Client-Landschaft. Sein Datenmodell zeigt aber die Grenzen einer datei-zentrischen Sicht: Ein Disc-Image ist ein einzelnes „Movie"-Item; Mehrfach-Episoden auf einer Disc sind nicht modellierbar. Watch-State hängt am Item, Provider-IDs hängen direkt an den Items.
 
-*MediaForge übernimmt:* die Rolle Jellyfins als Playback-Spezialist — MediaForge streamt bewusst nicht selbst, sondern nutzt Jellyfin dafür ([connectors/jellyfin.md](connectors/jellyfin.md)); die Idee bibliotheksweiter Scan-Pipelines mit nachgelagertem Enrichment.  
+*MediaForge übernimmt:* die Rolle Jellyfins als Playback-Spezialist — MediaForge streamt bewusst nicht selbst, sondern nutzt Jellyfin dafür ([connectors/jellyfin.md](connectors/jellyfin.md)); die Idee bibliotheksweiter Scan-Pipelines mit nachgelagertem Enrichment.
 *MediaForge macht anders:* kanonische Entitäten mit eigener Identität statt datei-zentrischer Items; Provider-IDs in Mapping-Tabellen statt am Item; Disc-Images als strukturierte Objekte mit Playlist-/Episoden-Ebene statt als eine große Videodatei.
 
 ### Audiobookshelf
 
 Audiobookshelf (ABS) ist die beste verfügbare Hörbuch-Plattform: Fortschritts-Tracking pro Benutzer, Kapitelanzeige, Podcast-Support, solide Apps. Aber ABS konsumiert Kapitelstrukturen, es erzeugt sie nicht: Fehlen eingebettete Kapitel oder sind Tracks chaotisch benannt, bleibt die Struktur chaotisch. Eine Quellen-Hierarchie (offizielle Kapitel vs. abgeleitete) existiert nicht.
 
-*MediaForge übernimmt:* das Fortschrittsmodell (Position + Fertig-Markierung pro Benutzer und Werk), die Ordner-Konventionen als Export-Ziel ([connectors/audiobookshelf.md](connectors/audiobookshelf.md)).  
+*MediaForge übernimmt:* das Fortschrittsmodell (Position + Fertig-Markierung pro Benutzer und Werk), die Ordner-Konventionen als Export-Ziel ([connectors/audiobookshelf.md](connectors/audiobookshelf.md)).
 *MediaForge macht anders:* Der Kapitel-Assembler ([modules/audiobook-assembler.md](modules/audiobook-assembler.md)) erzeugt Kapitelstrukturen aktiv — mit Quellen-Priorität (offiziell > eingebettet > KI-Vorschlag), CUE-/M4B-Erzeugung und ABS-kompatiblem Export. ABS bleibt Player; MediaForge erzeugt kuratierte Artefakte.
 
 ### Immich
 
 Immich zeigt, wie ein modernes Selfhosting-Projekt ML integriert (Gesichtserkennung, CLIP-Embeddings, semantische Suche) und wie eine saubere Job-Architektur (getrennte ML-Worker, Queue pro Workload) aussieht. Seine Architektur — API-Server, dedizierte ML-Container, PostgreSQL mit pgvector — ist das direkte Vorbild für die MediaForge-AI-Engine und die Queue-Topologie.
 
-*MediaForge übernimmt:* pgvector-in-Postgres statt separatem Vektor-Store; dedizierte ML-Worker-Container mit definierter Job-Schnittstelle; Workload-getrennte Queues.  
+*MediaForge übernimmt:* pgvector-in-Postgres statt separatem Vektor-Store; dedizierte ML-Worker-Container mit definierter Job-Schnittstelle; Workload-getrennte Queues.
 *MediaForge macht anders:* Fotos bleiben in Immich — MediaForge spiegelt nur Katalogdaten über die Referenzarchitektur ([connectors/immich.md](connectors/immich.md)) und übernimmt keine Foto-Binärdaten.
 
 ### Kodi
 
 Kodi ist die einzige verbreitete Software, die Blu-ray- und DVD-Menüs aus ISO/BDMV/VIDEO_TS tatsächlich abspielen kann (via libbluray/libdvdread). Das ist der Existenzbeweis, dass Disc-Menü-Playback ohne physisches Laufwerk technisch möglich ist — und exakt darauf beschränkt sich Kodis Referenzrolle. Kodis Watch-State-Modell ist ausdrücklich **kein** Vorbild: Kodi führt Wiedergabestatus pro Datei bzw. Disc; eine Serien-Disc mit sechs Folgen wird als Einheit „gesehen", sobald sie als gesehen gilt — die Episodengranularität innerhalb der Disc existiert nicht.
 
-*MediaForge übernimmt:* den Nachweis der technischen Machbarkeit von Menü-Playback und die Rolle des externen Players ([connectors/external-player.md](connectors/external-player.md)).  
+*MediaForge übernimmt:* den Nachweis der technischen Machbarkeit von Menü-Playback und die Rolle des externen Players ([connectors/external-player.md](connectors/external-player.md)).
 *MediaForge macht anders (fachlicher Kern):* Watch-State liegt in MediaForge, pro Episode, mit Segment-basiertem Playback-Mapping. Der externe Player ist Anzeigegerät, nie Zustandsführer. Siehe Regel 11 und [modules/disc-engine.md](modules/disc-engine.md).
 
 ### Stash
@@ -381,7 +381,7 @@ Der direkte Fork/Bundling-Schritt bleibt spät in der Roadmap. Bis dahin kann ei
 
 Die *arr-Familie ist das Vorbild für zustandsbehaftete Beschaffungs-Pipelines: gewünschter Zustand (Monitoring), beobachteter Zustand (vorhandene Dateien), Differenz → Aktion. Ihre Provider-ID-Disziplin (TVDB/TMDB/MusicBrainz als Verknüpfung, eigene interne IDs) und ihre Queue-/History-Modelle sind solide. Ihre Schwäche: Jede *arr-Instanz ist ein eigener Silo mit eigener Datenbank, eigenem Kalender, eigener Benutzerverwaltung.
 
-*MediaForge übernimmt:* das Desired-State-Muster für die Workflow Engine; die Trennung von Monitoring und Vorhandensein im Katalogmodell.  
+*MediaForge übernimmt:* das Desired-State-Muster für die Workflow Engine; die Trennung von Monitoring und Vorhandensein im Katalogmodell.
 *MediaForge macht anders:* MediaForge dupliziert keine Beschaffungslogik, sondern konsumiert die *arr-APIs über Connectoren ([connectors/arr-family.md](connectors/arr-family.md)) und bildet den familienübergreifenden Gesamtzustand ab, den die Silos selbst nicht bieten.
 
 ### Prowlarr
@@ -616,3 +616,46 @@ Dieses Inhaltsverzeichnis ist der verbindliche Bauplan des Handbuchs über alle 
 | [0013](adr/0013-react-inertia-typescript-and-roadmap-governance.md) | React + Inertia + TypeScript und V0–V34-Roadmap-Governance | accepted |
 
 Weitere ADRs entstehen mit den jeweiligen Modulen und werden hier ergänzt.
+
+---
+
+# Architektur- und Feature-Erweiterung 2026-08 (verbindlich)
+
+Die Produktarchitektur wurde nach den bisherigen V2-Erfahrungen präzisiert. Bei Konflikten mit älteren „später vielleicht“-Formulierungen gelten die folgenden Dokumente als Zielarchitektur, während `CURRENT_PHASE.md` weiterhin nur den real implementierten Stand beschreibt:
+
+## Target Architecture
+
+- [Target Monorepo](architecture/target-monorepo.md)
+- [Polyglot Runtime & Contracts](architecture/polyglot-runtime-and-contracts.md)
+- [Routing & Public URLs](architecture/routing-and-public-urls.md)
+- [Docker & Release Distribution](architecture/docker-release-distribution.md)
+
+## Media Models / Features
+
+- [Acquisition Center](modules/acquisition-center.md)
+- [Adult Full Analysis & Taxonomy](modules/adult-analysis-and-taxonomy.md)
+- [Adult Lineage & Catalog](modules/adult-lineage-and-catalog.md)
+- [Media Editions & Lineage](modules/media-editions-and-lineage.md)
+- [Series Advanced Model](modules/series-advanced-model.md)
+- [Movies Advanced Model](modules/movies-advanced-model.md)
+- [Audiobook Chapters & Storage](modules/audiobook-chapters-and-storage.md)
+- [Work Graph](modules/work-graph-and-cross-media.md)
+
+## UI/Planning
+
+- [Feature Screen Specifications](ui-ux/FEATURE_SCREEN_SPECIFICATIONS.md)
+- [Detailed Development Phases](DEVELOPMENT_PHASES_DETAILED.md)
+
+## Wichtigste neue harte Regeln
+
+1. MediaForge wird als Polyglot-Monorepo entwickelt.
+2. React Router + MediaForge API v1 ist die Web-Zielarchitektur; Inertia wird nicht als Endzustand weitergeführt.
+3. Alle Engines bleiben hinter Contracts; Frontend kennt keine fremden Engine-APIs.
+4. Sichtbare Routen sind menschenlesbar, API/Stream-Identität bleibt stabil/opaque.
+5. `/adult/...` ist Standard; Strict Private URLs optional.
+6. Adult Analysis nutzt Event+Timestamp+Attributes+Evidence+Verification als Kernmodell.
+7. Acquisition nutzt Staging/Import Sandbox vor finalen Dateisystem-Änderungen.
+8. Hörbuchkapitel sind unabhängig von Dateien; Benutzer entscheidet Storage Strategy.
+9. Film Cut und Technical Edition sind getrennte Ebenen.
+10. Serien unterstützen mehrere Episode Orders.
+11. Work Graph kann verschiedene Medienarten verbinden.

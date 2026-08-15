@@ -31,3 +31,20 @@ Claude should inspect these images before implementing any significant UI work.
 - `21_private_mode_unlock.png` — Private/adult mode unlock / hidden entry point.
 - `22_private_library_sync_and_coverage.png` — Private library sync & coverage screen.
 - `23_private_library_overview.png` — Private library browsing / protected collection overview.
+
+## Screens 30–41 – new architecture/features
+
+- `30_acquisition_center.png` — Acquisition Center, clients, jobs, import pipeline.
+- `31_manual_download_intake.png` — pre-download intake and media detection.
+- `32_import_sandbox_upgrade_review.png` — safe import/quality/edition review.
+- `33_adult_scene_full_analysis_timeline.png` — complete event timeline with visual/audio lanes.
+- `34_adult_tag_taxonomy_event_inspector.png` — hierarchical taxonomy, attributes and evidence.
+- `35_adult_metadata_provenance_date_conflict.png` — multiple date types and field provenance.
+- `36_performer_catalog_completeness.png` — known/local/missing/historical performer catalog.
+- `37_audiobook_single_file_chapter_verification.png` — verified official chapter workflow.
+- `38_audiobook_storage_strategy.png` — logical/CUE/chapter-file storage selection.
+- `39_series_episode_order_and_editions.png` — multiple episode orders, skip segments and editions.
+- `40_feature_overview_p0_p2.png` — broad cross-feature visual overview.
+- `41_feature_matrix_detailed.png` — compact P0/P1/P2 feature matrix.
+
+Generated mockups may contain illustrative placeholder labels/data. They are not authoritative for exact provider names, confidence thresholds, fictional titles, file formats or implementation details. Markdown specifications are authoritative.

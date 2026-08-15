@@ -61,3 +61,40 @@ Serverseitige Autorisierung bleibt maßgeblich; Client-Cleanup ist zusätzliche 
 - UI nach Entsperren entspricht der Premium-Referenz;
 - Lock/Unlock benötigt keinen Wechsel in eine andere Web-App;
 - Back/History darf gesperrte Adult-Seiten nicht wieder sichtbar machen.
+
+## Timeline, Taxonomy and Coverage UI
+
+Die Adult-Oberfläche umfasst zusätzlich drei spezialisierte High-End-Workflows:
+
+### Scene Analysis
+
+Referenz `33_adult_scene_full_analysis_timeline.png`:
+
+- Visual/Audio/Speech Lanes;
+- exact timestamp seek;
+- Evidence;
+- Coverage;
+- Filter;
+- Verification.
+
+### Taxonomy Inspector
+
+Referenz `34_adult_tag_taxonomy_event_inspector.png`:
+
+- Base Tags;
+- Attribute Groups;
+- Occurrences;
+- AI Evidence;
+- manual correction;
+- training/evaluation hooks.
+
+### Catalog Coverage
+
+Referenz `36_performer_catalog_completeness.png`:
+
+- Known vs Local vs Missing vs Historical vs Unresolved;
+- year/studio breakdown;
+- missing-scene workflow;
+- Source Sync/Acquisition integration.
+
+Diese Screens sind Adult-Mode-only und müssen beim Lock aus Client-State/Cache/History-sensitive UI bereinigt werden, soweit technisch möglich.

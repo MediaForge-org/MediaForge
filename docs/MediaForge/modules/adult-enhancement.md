@@ -185,3 +185,30 @@ Unautorisierte Detailzugriffe verhalten sich wie unbekannte IDs.
 - entfernte Quellen löschen keine historischen Daten;
 - Remote Assets müssen nicht lokal gespeichert werden;
 - keine automatische Änderung überschreibt einen manuellen Override.
+
+---
+
+# Erweiterung 2026-08 – verbindliche Detailmodule
+
+Die nachfolgenden Spezifikationen sind Teil dieses Adult-Moduls und haben bei Überschneidungen Vorrang vor älteren, weniger präzisen Formulierungen:
+
+- [Adult Full-Scene Analysis, Event Timeline und Taxonomie](adult-analysis-and-taxonomy.md)
+- [Adult Scene Lineage, Studio-Historie und Catalog Completeness](adult-lineage-and-catalog.md)
+- [Acquisition Center](acquisition-center.md)
+- [Media Editions and Lineage](media-editions-and-lineage.md)
+- [Routing/Adult URLs](../architecture/routing-and-public-urls.md)
+
+## Zusätzliche verbindliche Regeln
+
+1. Adult URL Prefix ist standardmäßig `/adult`.
+2. Strict Private URLs sind optional, nicht Default.
+3. Tags können zeitbezogene Events statt bloßer Scene-Labels sein.
+4. Audio Events wie `crying`/`screaming` sind First-Class Events.
+5. Base Tags unterstützen hierarchische Attribute (z. B. `puke` + consistency/appearance/amount).
+6. Full Scan speichert messbare Coverage; AI Confidence wird separat dargestellt.
+7. Evidence/Model Version/Verification müssen für AI Events nachvollziehbar sein.
+8. `checked_absent` bzw. geprüft-nicht-vorhanden muss ausdrückbar sein.
+9. Scene Lineage unterscheidet Original/Re-release/Compilation/Alternate Edit/Local Edition.
+10. Performer Coverage zeigt Known/Local/Missing/Historical/Unresolved.
+11. Datum wird als mehrere semantische Date Types mit Field Provenance gespeichert.
+12. Acquisition-/Import-Herkunft ist nachvollziehbar, aber Adult Acquisition bleibt im Locked Mode vollständig verborgen.

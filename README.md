@@ -233,3 +233,24 @@ This overlay now also includes an expanded UI reference pack under `docs/MediaFo
 - `docs/MediaForge/ui-ux/SCREEN_REFERENCE_INDEX.md`
 
 Do not rely on screenshots alone. Claude should read the written UI prompt and the screen index, then inspect the reference PNG files.
+
+## Detailed 2026-08 expansion
+
+This package now includes the **full target architecture and feature specifications**, not only UI references. Important new files:
+
+- `docs/MediaForge/architecture/target-monorepo.md`
+- `docs/MediaForge/architecture/polyglot-runtime-and-contracts.md`
+- `docs/MediaForge/architecture/routing-and-public-urls.md`
+- `docs/MediaForge/architecture/docker-release-distribution.md`
+- `docs/MediaForge/modules/acquisition-center.md`
+- `docs/MediaForge/modules/adult-analysis-and-taxonomy.md`
+- `docs/MediaForge/modules/adult-lineage-and-catalog.md`
+- `docs/MediaForge/modules/media-editions-and-lineage.md`
+- `docs/MediaForge/modules/series-advanced-model.md`
+- `docs/MediaForge/modules/movies-advanced-model.md`
+- `docs/MediaForge/modules/audiobook-chapters-and-storage.md`
+- `docs/MediaForge/modules/work-graph-and-cross-media.md`
+- `docs/MediaForge/ui-ux/FEATURE_SCREEN_SPECIFICATIONS.md`
+- `docs/MediaForge/DEVELOPMENT_PHASES_DETAILED.md`
+
+Reference images `30`–`41` document the newly added acquisition, analysis, provenance, chapter, storage and episode-order workflows.

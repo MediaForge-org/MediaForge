@@ -25,7 +25,7 @@ Danach **nicht blind committen**. Erst die Diffs lesen.
 
 ## Danach Claude sagen
 
-> Lies zuerst `docs/MediaForge/CLAUDE_IMPLEMENTATION_DIRECTIVE.md`, danach `docs/MediaForge/MediaForge_Master_Engineering.md`, `docs/MediaForge/PRODUCT_DECISIONS_2026-08.md`, `docs/MediaForge/roadmap.md` und `docs/MediaForge/CURRENT_PHASE.md`.  
+> Lies zuerst `docs/MediaForge/CLAUDE_IMPLEMENTATION_DIRECTIVE.md`, danach `docs/MediaForge/MediaForge_Master_Engineering.md`, `docs/MediaForge/PRODUCT_DECISIONS_2026-08.md`, `docs/MediaForge/roadmap.md` und `docs/MediaForge/CURRENT_PHASE.md`.
 > Diese Dokumente definieren die neue langfristige Richtung. `CURRENT_PHASE.md` definiert weiterhin den echten Implementierungsstand. Implementiere keine spätere Phase vorzeitig. Prüfe die Dokumente zunächst auf interne Widersprüche mit dem existierenden Code und berichte sie, bevor du Änderungen am Code machst.
 
 ## Hinweis
@@ -43,3 +43,15 @@ This overlay now also includes an expanded UI reference pack under `docs/MediaFo
 - `docs/MediaForge/ui-ux/SCREEN_REFERENCE_INDEX.md`
 
 Do not rely on screenshots alone. Claude should read the written UI prompt and the screen index, then inspect the reference PNG files.
+
+## After copying this detailed revision
+
+Run:
+
+```bash
+git status
+git diff --check
+git diff --stat
+```
+
+This overlay intentionally changes architecture/product documentation. It does **not** change `CURRENT_PHASE.md`; that file must remain the real implementation truth until Claude implements the corresponding phases.

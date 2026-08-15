@@ -150,3 +150,50 @@ Before implementing or restyling any major screen:
 5. note any deliberate deviations and why they were necessary for usability or existing architecture
 
 If there is tension between code convenience and UI quality, favor UI quality unless it causes a major architectural problem.
+
+## 11. Neue verbindliche Feature-Referenzen
+
+Vor UI-Arbeit zusätzlich lesen:
+
+- `FEATURE_SCREEN_SPECIFICATIONS.md`
+- `../modules/acquisition-center.md`
+- `../modules/adult-analysis-and-taxonomy.md`
+- `../modules/audiobook-chapters-and-storage.md`
+- `../modules/series-advanced-model.md`
+- `../modules/movies-advanced-model.md`
+
+Die Screens `30` bis `41` unter `reference-expanded/` decken neu hinzugekommene Workflows ab. Claude darf aus einem Bild keine fachliche Regel erfinden; die Markdown-Spezifikation entscheidet.
+
+## 12. Informationsarchitektur für komplexe Screens
+
+Wenn eine Seite sehr viele Daten enthält:
+
+1. Hero/Summary oben;
+2. primäre Workflow-Aktion klar sichtbar;
+3. Tabs für sekundäre Dimensionen;
+4. rechte Side Panel Zone für Status/Provenienz/Impact;
+5. Details on-demand statt alles gleichzeitig offen;
+6. Tabellen nur dort, wo Vergleich wirklich tabellarisch ist;
+7. Visual Evidence/Media wenn semantisch hilfreich.
+
+## 13. URL und Routing UX
+
+Breadcrumb und Browser-Route sollen sprechende Slugs widerspiegeln. API-ULIDs dürfen im normalen UI nicht als Hauptnavigation erscheinen.
+
+## 14. Adult UX
+
+Nach Unlock darf Adult genauso hochwertig und sprechend sein wie andere Bereiche. Standardroute `/adult/...`. Privacy wird durch Auth/Zero-Leak erreicht; Strict Private URLs sind optional.
+
+## 15. AI UX
+
+AI-Ergebnisse zeigen immer:
+
+- was erkannt wurde;
+- wo (Timestamp/Segment);
+- wie vollständig analysiert wurde;
+- Confidence;
+- Verification State;
+- Evidence/Why;
+- Correct/Reject Action soweit sinnvoll.
+
+Kein UI-Text wie „AI verified“ ohne definierte Verifikationsregel.

@@ -2,41 +2,66 @@
 
 ## Verbindliche Entscheidung
 
-PostgreSQL bleibt dauerhaft die kanonische Datenbank von MediaForge.
+PostgreSQL ist dauerhaft die kanonische MediaForge-Datenbank. Major Upgrades werden separat und getestet durchgeführt.
 
-Aktueller Alpha-Stand: PostgreSQL 17.  
-Zielpfad: Upgrade auf eine unterstützte PostgreSQL-18.x-Version in einer eigenen Infrastrukturphase, **nicht** mitten in V2-Facharbeit.
+## Besitzt PostgreSQL
 
-## Was PostgreSQL besitzt
+### Identity
+- Work;
+- MediaItem;
+- Edition/Cut;
+- File;
+- Provider-/Engine-Mappings;
+- Slug History.
 
-- kanonische MediaForge-IDs;
-- Media Items / Editions / Files;
-- Provider- und Engine-Mappings;
-- Benutzer und Rechte;
-- Watch-/Listen-State-Koordination;
-- Reviews und Audit;
-- Metadaten-Provenienz und Source History;
+### Serien/Filme
+- Series/Season/Episode;
+- Episode Orders;
+- Cuts/Technical Editions;
+- Extras;
+- Timeline Segments.
+
+### Adult
+- Scene/Release/Appearance/Lineage;
+- Performer/Studio/Organization History;
+- Taxonomy;
+- Scene Events/Attributes;
+- Analysis Runs/Evidence Metadata;
+- Coverage;
+- Source Facts.
+
+### Audiobooks
+- Work/Edition/Narrator;
+- Chapters independent from Files;
+- Sidecar generation state;
+- Transcript index metadata;
+- Bookmarks/Notes.
+
+### Cross-media
+- Work Graph;
 - Collections;
-- Adult-Domain-Identitäten und Zero-Leak-Rechte;
-- Disc-Mappings/Verifikationsstatus;
-- Background-Job-Checkpoints, soweit fachlich dauerhaft.
+- Watch Orders;
+- Progress mappings.
 
-## Was PostgreSQL nicht ersetzen muss
+### Operations
+- Acquisition Requests/Import Plans;
+- Review;
+- Audit;
+- Jobs/Checkpoints soweit fachlich dauerhaft;
+- Settings/Auth/Privacy.
 
-Eine gebündelte Engine darf intern vorübergehend eigene Persistenz verwenden, solange:
-- ihre IDs nur externe/Engine-IDs sind;
-- MediaForge-Identität in PostgreSQL bleibt;
-- Rebuild/Migration möglich ist;
-- der Core nicht direkt in die Fremd-DB greift.
+## Engine Persistence
 
-## Upgrade-Regel
+Fork-Engines dürfen intern eigene Stores besitzen, solange sie als technische Engine-Persistenz behandelt werden. Core liest/schreibt nicht direkt hinein.
 
-Ein Major-Upgrade braucht:
-1. vollständiges Backup;
-2. Restore-Test in isolierter Instanz;
-3. Extension-Kompatibilität (`pg_trgm`, `btree_gist`, `pgvector`);
-4. Migrations-/Query-Test;
-5. Performance-Baseline vor/nach;
-6. Rollback-Plan.
+## Provenienz
 
-Keine gleichzeitige Schema-Neukonzeption und Major-Version-Migration ohne zwingenden Grund.
+Jedes konfliktanfällige Metadatenfeld kann mehrere Source Facts besitzen. Canonical Choice referenziert Facts statt Herkunft zu verlieren.
+
+## Performance
+
+PostgreSQL bleibt zunächst auch Search-/Graph-Basis. Zusätzliche Such-/Vector-Systeme werden nur bei gemessener Notwendigkeit eingeführt.
+
+## Backup
+
+Backups müssen DB + relevante Sidecar/Config/Key-Metadaten konsistent erfassen. Große Mediafiles werden nicht zwingend in MediaForge-DB-Backups kopiert.

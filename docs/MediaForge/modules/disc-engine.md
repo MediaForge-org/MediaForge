@@ -600,3 +600,37 @@ Das Player-Protokoll ist die exponierteste Fläche: benutzergebundene Tokens mit
 * **Intro-/Credits-Erkennung** (Audio-Fingerprint-Vergleich über Episoden derselben Staffel, um `intro`/`credits`-Segmente automatisch vorzuschlagen): wertvoll für Skip-Funktionen der Player, aber nachgelagert; gehört methodisch zur Audioanalyse ([modules/audio-analysis.md](audio-analysis.md), geplant).
 * **Episoden-Export als Artefakt** (Remux gemappter Playlists zu MKV für Jellyfin-Streaming derselben Discs): als optionaler Workflow skizziert (verletzt keine Regel — Artefakte, Originale unangetastet); Spezifikation vertagt bis Workflow Engine steht.
 * **Kapitel-Titel von Discs** (BD-Kapitelnamen existieren selten, aber manchmal in Meta-XML): Erfassung trivial, Nutzen unklar; vertagt.
+
+## Monorepo/MediaTools Integration 2026-08
+
+Die Disc Engine wird in der neuen Zielarchitektur nicht als PHP-Binärparser gebaut.
+
+### Technische Aufteilung
+
+```text
+MediaForge Server
+   -> DiscAnalysisJob
+services/media-tools (Rust)
+   -> libbluray/libdvdnav/FFmpeg/native tools
+   -> structured DiscAnalysisResult
+MediaForge Server
+   -> PostgreSQL Disc Model / Verification
+```
+
+Rust ist der bevorzugte MediaForge-eigene Wrapper für native Disc-/Media-Libraries. C/C++ darf als bestehende Library genutzt werden; eigener C++-Code wird nur bei klarer Notwendigkeit eingeführt.
+
+### Exact Runtime Evidence
+
+Playlist-Laufzeiten werden mit der technisch zuverlässigsten verfügbaren Timebase gespeichert. Das Fachmodell arbeitet nicht nur mit gerundeten Minuten. Externe Quellen müssen semantisch zur richtigen Disc/Edition/Region passen.
+
+### Verified-only bleibt unverändert
+
+- Confidence = Review-Sortierung;
+- `verified` = vollständige harte Policy erfüllt;
+- equal-runtime ambiguity = unresolved;
+- rounded minutes only = unresolved;
+- conflicting editions = unresolved.
+
+### UI/Deep Link
+
+Disc-Inhalte werden in MediaForge als normale Film-/Serienstruktur dargestellt. Roh-Disc-Debugdaten bleiben Management-Ansicht. Sichtbare Episode-URLs bleiben z. B. `/serien/.../staffel-01/01-...`; physische ISO/Playlist ist eine Playback-/Edition-Implementierung, nicht die URL-Identität.

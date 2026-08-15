@@ -98,3 +98,56 @@ Die bestehende normative Detailreferenz ist [ui/design-system.md](../ui/design-s
 - Module dürfen lokale Spezialkomponenten haben, müssen aber Systemmuster wiederverwenden.
 - Widgets deklarieren Datenquelle, Rollenbedarf, Refresh-Budget und Drilldown-Ziel.
 - Responsive, Accessibility und Performance werden als Abnahmekriterien jedes UI-PRs geprüft.
+
+## Extended Feature Design Rules 2026-08
+
+### Ein Designsystem, mehrere Arbeitsmodi
+
+MediaForge hat drei visuelle Dichten, aber eine gemeinsame Sprache:
+
+1. **Cinematic Browse** – Home, Film, Serie, Performer, Audiobook;
+2. **Focused Detail** – Detailseiten, Player, Editionen, Chapters;
+3. **Operational Workbench** – Acquisition, Review, Taxonomy, Provenance, Disc Verification, AI Analysis.
+
+Operational Screens dürfen dicht sein, aber nicht wie fremde Admin-Software aussehen.
+
+### Design Tokens
+
+Mindestens zentral definieren:
+
+- surface layers;
+- border strength;
+- radius scale;
+- typography hierarchy;
+- accent families;
+- status colors;
+- spacing scale;
+- motion durations/easings;
+- focus ring;
+- chart/event colors.
+
+### Timeline Components
+
+Gemeinsame Timeline-Primitives werden für mehrere Domänen wiederverwendet:
+
+- Adult events;
+- Series recap/intro/credits;
+- Audiobook chapters;
+- Disc playlist/evidence;
+- Cross-edition mapping.
+
+### Evidence Components
+
+Gemeinsame Komponenten:
+
+- EvidenceStrip;
+- SourceFactCard;
+- VerificationBadge;
+- ConfidenceMeter;
+- ProvenanceTimeline;
+- ComparePane;
+- ReviewActionBar.
+
+### Accessibility
+
+Status darf nie nur über Farbe codiert sein. Timeline-Events brauchen Keyboard-Navigation und textuelle Alternativen. Media Cards/Dialogs müssen TV-/Keyboard-/Screenreader-Basics berücksichtigen.

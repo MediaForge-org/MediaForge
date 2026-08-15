@@ -33,3 +33,19 @@ Claude soll liefern:
 - Tests/Gates und Ergebnis;
 - bekannte Limits;
 - keine Commits/Tags/Pushes ohne ausdrückliche Anweisung des Benutzers.
+
+## Neue Architekturentscheidung (verbindlich)
+
+Vor neuen großen UI-/Backend-Arbeiten zusätzlich lesen:
+
+- `architecture/target-monorepo.md`
+- `architecture/polyglot-runtime-and-contracts.md`
+- `architecture/routing-and-public-urls.md`
+- `DEVELOPMENT_PHASES_DETAILED.md`
+- `ui-ux/FEATURE_SCREEN_SPECIFICATIONS.md`
+
+Ziel ist React Router + API-first. Keine neue langfristige Funktion an Inertia koppeln. Bestehende Inertia-Funktionalität wird kontrolliert migriert; nichts blind löschen.
+
+Alle neuen Feature-Screens 30–41 müssen vor dem jeweiligen Modul implementiert werden bzw. als visuelle Referenz geprüft werden.
+
+P0 bedeutet: Datenmodell/Contract früh vorbereiten; es bedeutet **nicht**, dass aufwendige AI-Funktion sofort implementiert werden soll.

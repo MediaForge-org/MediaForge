@@ -211,3 +211,63 @@ Protokoll-Contract-Tests gegen einen Fake-Worker (Chunk-Ergebnisse aus Fixtures;
 * **Wahrnehmungsmetriken** (PESQ/VISQOL-artige Scores zusätzlich zu Signalmetriken): wünschenswert für das Metrik-Delta, Lizenz-/Implementierungsfragen offen.
 * **Batch-Läufe** („alle Hörbücher unter 96 kbit/s mit Profil X"): fachlich ein Rule-Engine-Anwendungsfall; der Upscaler bleibt Einzellauf-orientiert, die Massensteuerung kommt von außen.
 * **Video-Upscaling**: bewusst außerhalb des Modulumfangs (eigene Problemklasse); Namensraum `AudioUpscaler` hält die Grenze explizit.
+
+## MediaForge Runtime Integration 2026-08
+
+Diese Ergänzung bindet den bestehenden Audio-Upscaler verbindlich in die neue Zielarchitektur ein.
+
+### Runtime-Aufteilung
+
+```text
+MediaForge Server (Laravel)
+   -> Job / Policy / Edition State
+Redis / Job transport
+   -> AI Worker (Python)
+   -> MediaTools (Rust + FFmpeg)
+   -> Artifact/Edition result
+MediaForge Server
+   -> PostgreSQL canonical metadata
+```
+
+- Python besitzt ML-Modelle/Inference.
+- Rust koordiniert sichere Media-I/O-, Segment-, Timestamp- und FFmpeg-Arbeit, soweit sinnvoll.
+- Der AI Worker schreibt keine kanonischen Business-Tabellen direkt.
+- Original Audio bleibt Default immutable.
+
+### Ergebnis als Edition
+
+Ein Upscale/Restore ist keine „verbesserte Originaldatei“, sondern eine abgeleitete Edition/Artifact mit Lineage:
+
+```text
+Original Edition
+   -> Enhancement Run
+      -> Reconstructed Edition
+```
+
+Gespeichert werden mindestens:
+
+- Input file hash;
+- Model/Version;
+- Preset;
+- Chunking/Overlap;
+- Source sample rate/codec;
+- Output codec/sample rate;
+- Quality metrics;
+- user A/B decision optional;
+- created_at;
+- lineage.
+
+### UI
+
+Die Referenz `18_audio_enhancement_upscaler.png` bleibt visuelle Basis. Das UI muss zusätzlich deutlich anzeigen:
+
+- Original vs Reconstructed;
+- kein „Lossless Source“-Label für rekonstruierten Inhalt;
+- A/B synchronisiert;
+- job progress;
+- Model/Preset;
+- Keep/Delete/Preferred Edition nur als explizite Aktionen.
+
+### Priorität
+
+Audio Enhancement bleibt nach dem Usable-Core-Gate. Das Datenmodell für Editions/Lineage wird vorher vorbereitet, damit später keine Bibliotheksmigration nötig wird.

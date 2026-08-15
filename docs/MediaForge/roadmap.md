@@ -1,88 +1,135 @@
 # MediaForge Engineering Roadmap
 
-Zurück zur [Masterdatei](MediaForge_Master_Engineering.md). Governance und Frontend-Override: [ADR-0013](adr/0013-react-inertia-typescript-and-roadmap-governance.md).
+Zurück zur [Masterdatei](MediaForge_Master_Engineering.md). Der reale Ist-Stand wird **nur** in `CURRENT_PHASE.md` gepflegt.
+
+## Neue Architecture Foundation vor weiteren großen UI-/Feature-Schritten
+
+Die Zielarchitektur wurde präzisiert: React Router + API-first, Polyglot-Monorepo, schöne Deep Links, Contracts und Gateway sollen **vor** dem großen Premium-UI-Ausbau eingerichtet werden, damit keine neue Oberfläche auf einer später zu entfernenden Inertia-Grenze aufgebaut wird.
+
+Siehe:
+
+- `architecture/target-monorepo.md`
+- `architecture/polyglot-runtime-and-contracts.md`
+- `architecture/routing-and-public-urls.md`
+- `DEVELOPMENT_PHASES_DETAILED.md`
 
 ## Aktueller Status
 
-**Stand August 2026:** V1 ist als lokale Alpha abgeschlossen. V2 ist aktiv; Pakete **V2 A–E** sind umgesetzt, einschließlich des ersten database-only Imports in den kanonischen `media_items`-Katalog. Der reale Lieferstatus wird ausschließlich in [CURRENT_PHASE.md](CURRENT_PHASE.md) gepflegt.
+Stand August 2026: V1 abgeschlossen; V2 aktiv, A–E umgesetzt. Diese Aussage darf nur geändert werden, wenn `CURRENT_PHASE.md` und Code dies beweisen.
 
-Diese Roadmap beschreibt die langfristige Reihenfolge. Sie darf `CURRENT_PHASE.md` niemals als Ist-Stand überschreiben.
+## Foundation Gate A
 
-## Produktziel
+Vor V3/V4-Großumbauten:
 
-MediaForge wird langfristig **eine einzige sichtbare Medienanwendung**. Jellyfin, Audiobookshelf und der spätere Stash-derived Adult-Fork werden hinter stabilen Engine-Verträgen integriert. In frühen Phasen bleiben Connectoren der risikoarme Integrationspfad; Bundling/Forks bleiben bewusst spät.
+- Monorepo-Zielstruktur angelegt;
+- API v1/Contracts vorhanden;
+- React Router App-Shell;
+- Inertia-Migration begonnen/abgeschlossen gemäß Plan;
+- Gateway `localhost:8100`;
+- Deep Links;
+- CI/Compose funktionieren;
+- bestehende V2-Funktionalität erhalten.
 
-PostgreSQL bleibt dauerhaft der kanonische MediaForge-Persistenzspeicher.
+## Usable-Core-Gate B
 
-## Usable-Core-Gate
+Vor Disc/AI Full Analysis/tiefen Spezialfeatures:
 
-Disc/ISO-Automation, AI-Audio-Upscaling und tiefe Fork-/Bundling-Arbeit dürfen erst beginnen, wenn der normale Kern praktisch brauchbar ist. Das Gate verlangt mindestens:
+- Security/Auth/Backup stabil;
+- Premium App Shell;
+- Work/MediaItem/Edition/File Modell;
+- Search/Metadata/Review/Health;
+- normale Filme/Serien/Hörbücher brauchbar;
+- Background Jobs/Observability;
+- keine kritischen Datenverlustprobleme.
 
-- stabile Auth/Security und Backup/Restore;
-- hochwertige React-/TypeScript-App-Shell;
-- kanonisches Media-/Library-/File-Modell;
-- normale Movies/Series/Audiobook-Katalog- und Suchflüsse;
-- belastbares Matching/Review und Library Health;
-- Queue-/Background-Job-Basis;
-- reproduzierbare Tests und Migrationen;
-- keine offenen kritischen Datenverlust-/Security-Probleme.
+## Phasen
 
-Das Gate verhindert, dass spektakuläre Spezialfeatures eine unfertige Basis überdecken.
-
-## Verbindliche Phasen
-
-| Phase | Schwerpunkt | Status |
+| Phase | Schwerpunkt | Status/Notiz |
 |---|---|---|
-| V0 | Repository, Fundament und Developer Baseline | abgeschlossen |
-| V1 | Lokale Core-App und sichere V1-Basis | ausgeliefert (local alpha, V1 A–H) |
-| V2 | Connector Suite, Katalog-Snapshots, Normalisierung, Importplan und erster interner Import | **in Arbeit; A–E umgesetzt** |
-| V3 | Security Hardening und Privacy Baseline | geplant |
-| V4 | React UI/UX Design System und App-Shell | geplant |
-| V5 | Internationalisierung und sprachliche Qualität | geplant |
-| V6 | Media Model, Library Model, File/Edition Model und Path Mapping | geplant |
-| V7 | Metadata Protection Foundation und Never-Touch-Schutz | geplant |
-| V8 | Metadata Vault, Source History und Rollback | geplant |
-| V9 | Backup, Restore, Disaster Recovery und Blueprints | geplant |
-| V10 | Universal Search Local Foundation und Finder UX | geplant |
-| V11 | Online-/External-Provider-Suche und Provider Marketplace | geplant |
-| V12 | Smart Matching, Review Workbench und Bulk Metadata Review | geplant |
-| V13 | Library Integrity, Health Scores und Repair Center — **Usable-Core-Gate** | geplant |
-| V14 | Download-Client-Erkennung und externe Download-Dienste | geplant |
-| V15 | Manueller NZB-/Torrent-Intake und Import Sandbox | geplant |
-| V16 | Import-, Rename- und Move-Engine sowie Naming | geplant |
-| V17 | Source-Capped Downloadqualität und Quality Ladder | geplant |
-| V18 | Server-Transcoding, optimierte Versionen und Lineage | geplant |
-| V19 | Remote Access und Overlay Networks | geplant |
-| V20 | Mobile API, Device Tokens und Device Profiles | geplant |
-| V21 | React-Native-Mobile-App Alpha und Offline Downloads | geplant |
-| V22 | Realtime Watch-State und Playback Handoff | geplant |
-| V23 | Desktop Server App als Docker-Alternative | geplant |
-| V24 | Electron Desktop Client | geplant |
-| V25 | Tauri Desktop Client | geplant |
-| V26 | High-Fidelity Playback Client und Do-Not-Disturb Streaming | geplant |
-| V27 | Streaming Advisor, Resource Monitor und GPU Manager | geplant |
-| V28 | Disc Detection und Disc Container (ISO/BDMV/VIDEO_TS) | geplant; erst nach Usable-Core-Gate |
-| V29 | **Verified-only** Disc Episode Mapping, externe Laufzeitquellen und Menü-Integration | geplant; kein Raten |
-| V30 | Enhancement Engines, AI Audio Restoration/Upscaler und Quality Compare | geplant; erst nach Usable-Core-Gate |
-| V31 | Adult Privacy Foundation, versteckter Private Mode und Zero Leak | geplant |
-| V32 | Adult Metadata Graph, library-driven Sync, Matching Workbench und Adult Media UX | geplant |
-| V33 | Plugin SDK, Local AI, Provider Plugins und Metadata Server | geplant |
-| V34 | Engine-Forks/Bundling (Jellyfin/ABS/Stash-derived), Ecosystem, Releases und Community-ready Plattform | geplant |
+| V0 | Repository/Developer Baseline | abgeschlossen |
+| V1 | Local Core Alpha | abgeschlossen |
+| V2 | Connector/Katalog/Normalisierung/erster Import | aktiv; A–E umgesetzt |
+| **V2-F** | **Architecture Foundation: API-first Monorepo, React Router, Contracts, Gateway, Deep Links** | **als nächster Architekturblock** |
+| V3 | Security Hardening / Privacy Baseline | geplant |
+| V4 | Premium React UI/Design System/App Shell | geplant |
+| V5 | i18n / locale-aware slugs/content | geplant |
+| V6 | Work/MediaItem/Edition/File, Series Orders, Cuts, Chapters | geplant |
+| V7 | Metadata Protection / Manual Locks | geplant |
+| V8 | Metadata Vault / Field Provenance / Source History | geplant |
+| V9 | Backup/Restore/DR | geplant |
+| V10 | Universal Search / Finder | geplant |
+| V11 | External/Official Source Discovery / Provider Marketplace | geplant |
+| V12 | Smart Matching / Review Center / Bulk Review | geplant |
+| V13 | Integrity/Health/Repair – **Usable-Core-Gate B** | geplant |
+| V14 | Acquisition Foundation / Download Client Contracts | geplant |
+| V15 | NZB/Torrent/Magnet Manual Intake / Acquisition Center | geplant |
+| V16 | Staging / Import Sandbox / Rename-Move / Provenance | geplant |
+| V17 | Quality Intelligence / Source Caps / Upgrades / Editions | geplant |
+| V18 | Transcoding/optimized editions/lineage | geplant |
+| V19 | Remote Access | geplant |
+| V20 | Device API/Profile | geplant |
+| V21 | Mobile Client | geplant |
+| V22 | Realtime Watch State / Handoff / Cross-Edition Mapping | geplant |
+| V23 | Desktop Server Packaging | geplant |
+| V24 | Desktop Client | geplant |
+| V25 | TV/Desktop Runtime optimization | geplant |
+| V26 | High-Fidelity Player / Streaming UX | geplant |
+| V27 | Streaming Advisor / GPU / Resource Monitor | geplant |
+| V28 | Disc Detection / ISO/BDMV/VIDEO_TS | nach Gate B |
+| V29 | Verified-only Disc Mapping / Menüs / episode watch state | nach Gate B |
+| V30 | Audiobook Chapter Intelligence + Audio Enhancement foundation | nach Gate B |
+| V31 | Adult Privacy Foundation / `/adult` / Zero Leak | geplant |
+| V32 | Adult Metadata/Coverage/Taxonomy/Scene Lineage | geplant |
+| V33 | Adult Full Analysis / AI Evidence / Smart Tags + Plugin/AI SDK | fortgeschritten |
+| V34 | Deep upstream fork/bundling in monorepo + official Docker releases | spät, nach stabilen Contracts |
+
+## P0/P1/P2 Feature Priorität
+
+### P0 – Datenmodell/Contracts früh vorbereiten
+
+- Scene/Event/Attribute/Evidence;
+- Field Provenance;
+- Scene Lineage;
+- Work/Edition/File;
+- Movie Cut vs Edition;
+- Episode Orders;
+- Audiobook Work/Edition/Chapter;
+- Work Graph;
+- Acquisition/Import Lineage;
+- Slug History.
+
+### P1 – nach brauchbarem Core
+
+- Acquisition Center;
+- Evidence Viewer;
+- Review Center;
+- Smart Collections;
+- Timeline Skip Segments;
+- official Chapter Discovery;
+- Transcript Search;
+- Cross-Edition Progress.
+
+### P2 – fortgeschritten
+
+- Full Adult AI Analysis at scale;
+- Active Learning;
+- Speaker/Character Recognition;
+- reichhaltige Graph-Visualisierung;
+- komplexe Historical Source Archive UI;
+- weitere spezialisierte multimodale Modelle.
 
 ## Fork-Strategie
 
-V34 bleibt bewusst spät. Bis dahin müssen die Engine-Verträge so stabil sein, dass bestehende Jellyfin-/Audiobookshelf-/Stash-Installationen per Adapter funktionieren. V34 darf die Implementierung hinter dem Vertrag austauschen, ohne die MediaForge-UI neu zu erfinden.
+Forks liegen langfristig im selben Monorepo unter `engines/`. Der Import/Bundling-Schritt bleibt spät, aber Contracts/Ordner/Upstream-Sync-Regeln werden früh vorbereitet.
 
-Der Adult-Bereich darf in V31/V32 bereits sein kanonisches Datenmodell, UI, Metadatenlogik und Sync-Verhalten entwickeln. Der direkte Stash-Fork wird spätestens in V34 zum integrierten Adult-Engine-Pfad; Vorarbeiten dürfen früher in einem separaten Fork-Repo erfolgen, solange MediaForge-Verträge eingehalten werden.
+## Disc
 
-## Disc-Grundsatz
+Confidence sortiert höchstens Review-Kandidaten. Automatisches Episodenmapping nur bei `verified` Evidenz gemäß Disc Verification Policy.
 
-V29 verwendet keine automatische „wahrscheinlich richtige“ Episodenzuordnung. Eine Playlist wird nur dann automatisch gemappt, wenn die [Disc Verification Policy](modules/disc-verification-policy.md) erfüllt ist. Confidence dient höchstens zur Sortierung eines Reviews, niemals als Autorisierung.
+## Adult
 
-## Adult-Grundsatz
+Adult ist normal gesperrt vollständig unsichtbar. Nach Unlock sind schöne `/adult/...` URLs Standard; Strict Private URLs optional.
 
-Adult ist im normalen Modus **vollständig unsichtbar**. Kein Menüpunkt und keine gesperrte Home-Kachel. Der Einstieg erfolgt ausschließlich über einen bewusst geschützten Private-Mode-Flow. Details: [adult-enhancement.md](modules/adult-enhancement.md).
+## Zeitplanung
 
-## V0-Gate
-
-V0 ist abgeschlossen. Historische Gate-Details bleiben in V1-/Current-Phase-Dokumentation erhalten.
+Siehe `DEVELOPMENT_PHASES_DETAILED.md` für grobe Korridore.

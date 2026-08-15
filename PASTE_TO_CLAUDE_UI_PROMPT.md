@@ -21,3 +21,13 @@ Important rules:
 6. Adult/private mode must stay hidden from the normal family-facing home experience and only appear behind private mode access.
 
 For the next response, first summarize the design system you infer from these files and images, then explain how you will apply it to the current implementation task before you start coding.
+
+Before coding also read the new target architecture and feature specifications:
+
+- `docs/MediaForge/architecture/target-monorepo.md`
+- `docs/MediaForge/architecture/polyglot-runtime-and-contracts.md`
+- `docs/MediaForge/architecture/routing-and-public-urls.md`
+- `docs/MediaForge/ui-ux/FEATURE_SCREEN_SPECIFICATIONS.md`
+- `docs/MediaForge/DEVELOPMENT_PHASES_DETAILED.md`
+
+Inspect reference-expanded images `30` through `41` as well. Do not infer behavior from generated mockup text when the Markdown spec says something more precise.
