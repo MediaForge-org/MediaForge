@@ -49,3 +49,7 @@ Ziel ist React Router + API-first. Keine neue langfristige Funktion an Inertia k
 Alle neuen Feature-Screens 30–41 müssen vor dem jeweiligen Modul implementiert werden bzw. als visuelle Referenz geprüft werden.
 
 P0 bedeutet: Datenmodell/Contract früh vorbereiten; es bedeutet **nicht**, dass aufwendige AI-Funktion sofort implementiert werden soll.
+
+## Granular prompt execution system
+
+For normal implementation work, use `docs/MediaForge/prompts/` instead of rereading the full specification on every turn. Start with `prompts/README_START_HERE.md`. Each numbered prompt defines its own minimal context budget. Do not preload unrelated documentation or images.

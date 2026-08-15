@@ -55,3 +55,15 @@ git diff --stat
 ```
 
 This overlay intentionally changes architecture/product documentation. It does **not** change `CURRENT_PHASE.md`; that file must remain the real implementation truth until Claude implements the corresponding phases.
+
+## 720-prompt Claude execution layer
+
+This package adds `docs/MediaForge/prompts/` containing 720 detailed prompts. The prompt system is designed so Claude reads only the context listed inside the currently authorized prompt.
+
+After copying the overlay into the repository, start Claude with:
+
+`PASTE_TO_CLAUDE_PROMPT_SYSTEM.md`
+
+Do not paste all 720 prompts into one conversation message. Give Claude one prompt ID/file at a time.
+
+`docs/MediaForge/CURRENT_PHASE.md` is intentionally not supplied by this overlay and must remain the existing repository copy; the first governance prompts read that live file to determine the real implementation baseline.

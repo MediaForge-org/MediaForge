@@ -64,3 +64,7 @@ Dieses Paket ist zum Kopieren über das bestehende `MediaForge`-Repository gedac
 - `adr/0016-event-taxonomy-and-analysis.md`
 - `adr/0017-acquisition-and-staging.md`
 - `adr/0018-audiobook-chapter-storage.md`
+
+## Granular Claude prompt system
+
+This package also adds `docs/MediaForge/prompts/` with 720 detailed, numbered prompts (36 tracks × 20 prompts), plus `PASTE_TO_CLAUDE_PROMPT_SYSTEM.md` and `tools/prompts/show_prompt.py`. The prompt system is an execution layer; the normal MediaForge docs remain the authoritative product specification.

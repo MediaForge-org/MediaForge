@@ -1,0 +1,12 @@
+Added granular Claude prompt system:
+- 720 numbered prompts
+- 36 tracks × 20 prompts
+- docs/MediaForge/prompts/README_START_HERE.md
+- docs/MediaForge/prompts/GLOBAL_RULES_SHORT.md
+- docs/MediaForge/prompts/CONTEXT_ROUTING.md
+- docs/MediaForge/prompts/CLAUDE_EXECUTION_PROTOCOL.md
+- docs/MediaForge/prompts/TRACK_INDEX.md
+- docs/MediaForge/prompts/PROMPT_ORDER.md
+- docs/MediaForge/prompts/PROMPT_CATALOG.json
+- PASTE_TO_CLAUDE_PROMPT_SYSTEM.md
+- tools/prompts/show_prompt.py
