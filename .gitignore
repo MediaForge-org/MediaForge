@@ -25,3 +25,7 @@ Homestead.yaml
 Thumbs.db
 
 docs/MediaForge/.ai/
+
+# Python generated files
+__pycache__/
+*.py[cod]
