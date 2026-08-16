@@ -93,3 +93,20 @@ Status: **verbindliche Ergänzung zur Master-Spezifikation**. `CURRENT_PHASE.md`
 - AI Model Registry + Evaluation/Golden Dataset + Resource Scheduler sind Teil der langfristigen Plattform.
 - Standard-Git-Workflow: kleine grüne Inkremente direkt auf main; Branches nur optional für besonders riskante Experimente; kein kaputter Commit.
 - Die Anzahl der nummerierten Claude-Prompts bleibt 720.
+
+## Ergänzungen vom 17. August 2026
+
+58. **MediaForge owns the product surface:** integrierte Programme liefern Backend-Fähigkeiten; normale Benutzer arbeiten in MediaForge UI/API. Native UIs sind Admin-/Fallback-Werkzeuge.
+59. **Forks früh, Cutover später:** Jellyfin/Stash/Audiobookshelf werden in Track 02 als gepinnte Upstream-Baselines ins Monorepo geholt; Tracks 26–28 vollenden die Integration.
+60. **Unveränderte Managed Upstreams:** SABnzbd, qBittorrent, Prowlarr, Sonarr, Radarr und Whisparr bleiben standardmäßig unveränderte Upstream-Komponenten mit MediaForge Lifecycle/Compatibility Layer.
+61. **Breite Indexer-Unterstützung:** Newznab/Torznab/Prowlarr/Jackett-kompatible Definitionen, native Provider-Plugins, RSS und Browser Companion statt kleiner Hardcoded-Liste.
+62. **AcquisitionBlueprint:** Zielmedium, Release, Naming, Downloader, Seeding, Disc/Remux/Transcode und Library-Policy werden vor der Automation explizit modelliert.
+63. **MediaForge Naming Authority:** SAB/qBit liefern/seed-en; MediaForge entscheidet finale Library-Namen. Usenet-Passwörter sind Secrets und niemals finale Dateinamen.
+64. **Torrent-safe Library:** Hardlink bevorzugt, Reflink/Copy Fallback; aktives Seed-Payload nicht blind auf Dateisystemebene umbenennen.
+65. **Post-Processing DAG:** Probe/Identify/Disc/Remux/Rename/Subtitle/Transcode/Verify/Import/Cleanup sind resumable/idempotente Schritte.
+66. **Disc-to-library Automation:** verifizierte Serien-ISOs dürfen optional Episoden/Extras als MKV remuxen; danach optional H.264, H.265 und/oder AV1 als abgeleitete Editionen erzeugen.
+67. **Erste Sprachklasse:** Deutsch (Default), English (UK), Italiano, Español, Français sind initial vollständig unterstützte UI-Lokalisierungen.
+68. **Professioneller Metadata-Translation-Fallback:** fehlen hochwertige Metadaten in der Ziel-Sprache, erzeugt ein austauschbarer lokaler/Cloud-/Plugin-Übersetzer eine qualitätsgesicherte Übersetzung; Original + Provenienz bleiben erhalten.
+69. **Translation Memory/Glossary:** Wiederverwendung, Terminologie und Kostenkontrolle sind Teil der Plattform; Cloud-Übersetzung bleibt optional.
+70. **Weitere Sprachen später:** zusätzliche Locales werden schrittweise ergänzt und dürfen die fünf initialen First-Class-Locales nicht verwässern.
+71. **Artwork correctness:** UI-Referenzbilder sind Templates; das echte Produkt zeigt nur Artwork des tatsächlich gematchten Media-Objekts, andernfalls Placeholder/Review statt falschem Cover.

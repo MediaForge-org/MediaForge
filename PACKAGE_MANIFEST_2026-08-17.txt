@@ -1,0 +1,30 @@
+MediaForge prompt/docs/UI snapshot — 2026-08-17
+
+Purpose:
+Direct repo-root overlay containing the complete 720 numbered prompt system plus the latest architecture/UI documentation.
+
+Latest additions:
+- early pinned Jellyfin/Stash/Audiobookshelf baselines, later engine cutover
+- unmodified managed backends: SABnzbd, qBittorrent, Prowlarr, Sonarr, Radarr, Whisparr
+- MediaForge-owned normal frontend/product surface
+- broad Newznab/Torznab/Prowlarr/Jackett/plugin provider model
+- AcquisitionBlueprint, Release Decision/Wanted/Upgrade, deterministic naming
+- torrent-safe hardlink/reflink/copy and per-tracker seeding policies
+- resumable post-processing DAG
+- authorised ISO/disc episode/extra remux + optional H.264/H.265/AV1 derived profiles
+- first-class launch locales: de, en-GB, it, es, fr
+- professional metadata translation fallback, glossary, translation memory, provider abstraction
+- two new UI references 68–69
+
+Invariant:
+Exactly 720 numbered prompts. No new Pxxxx IDs.
+
+Validation before packaging:
+- 720 catalog entries / 720 numbered prompt Markdown files
+- IDs exactly P0001..P0720
+- 0 missing dependency targets
+- 0 self-dependencies
+- 0 dependency cycles
+- 0 missing Required Read/UI reference paths, excluding live CURRENT_PHASE.md which is intentionally not packaged
+- 58 UI PNG references in the full snapshot
+- root update overlay contains 511 changed/new files relative to the 2026-08-16 package, including 480 updated Pxxxx prompts and 2 new PNGs

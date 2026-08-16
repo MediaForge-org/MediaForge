@@ -673,3 +673,16 @@ Die ausführlichen verbindlichen Ergänzungen liegen in:
 - `modules/derived-assets-and-storage-manager.md`
 
 Die 720-Prompt-Struktur bleibt bestehen; betroffene Prompts werden aktualisiert statt neue IDs anzuhängen.
+
+## 2026-08-17 — Acquisition, managed backends and localization consolidation
+
+The architecture now explicitly distinguishes MediaForge-derived engines from unchanged managed upstream backends. MediaForge owns the frontend/product surface, canonical data, normalised states, search, queue, provenance and settings while specialised programs perform backend work.
+
+Authoritative additions:
+
+- `architecture/managed-upstreams-and-product-surface.md`
+- `architecture/localization-and-professional-translation.md`
+- `modules/acquisition-automation-and-postprocessing.md`
+- ADR-0025, ADR-0026, ADR-0027
+
+The numbered implementation system remains exactly 720 prompts. Relevant existing prompts route to these documents rather than adding new prompt IDs.

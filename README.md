@@ -260,3 +260,7 @@ Reference images `30`–`41` document the newly added acquisition, analysis, pro
 This package now includes the final UI reference expansion (42–67) and detailed architecture updates for React Router Framework Mode, optional AI/3D, full-body tattoo coverage, 3D reconstruction, plugin/theme/custom CSS, artifact/model storage, resource scheduling and the green-commit workflow.
 
 The numbered Claude system remains exactly **720 prompts**. Existing IDs were updated instead of adding more prompts.
+
+## August 17 architecture addendum
+
+This package retains exactly 720 numbered Claude prompts and adds the latest MediaForge decisions for managed backend applications, early engine-fork baselines, unified acquisition/post-processing and first-class multilingual/professional metadata translation. See ADR-0025 through ADR-0027 and UI references 68–69.

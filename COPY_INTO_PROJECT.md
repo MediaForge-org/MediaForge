@@ -1,34 +1,55 @@
-# Copy into the existing MediaForge repository
+# Copy the 2026-08-17 MediaForge update into the repository root
 
-This archive is **repo-relative**. Copy/extract its contents directly into the existing MediaForge root.
-
-Target example:
+The archives are **repo-relative**: they do not contain an extra `MediaForge/` wrapper directory. Extract/copy their contents directly into:
 
 ```text
 /mnt/Festplatte/Schreibtisch/Projekte/MediaForge
 ```
 
-Recommended safe overlay:
-
-```bash
-rm -rf /tmp/mediaforge-update
-mkdir -p /tmp/mediaforge-update
-unzip -q MediaForge_full_docs_UI_720_prompts_AI3D_plugins_2026-08-16.zip -d /tmp/mediaforge-update
-rsync -av --itemize-changes /tmp/mediaforge-update/ /mnt/Festplatte/Schreibtisch/Projekte/MediaForge/
-```
-
-Then verify:
+## Recommended: use the ROOT UPDATE archive
 
 ```bash
 cd /mnt/Festplatte/Schreibtisch/Projekte/MediaForge
+
+rm -rf /tmp/mediaforge-2026-08-17-update
+mkdir -p /tmp/mediaforge-2026-08-17-update
+
+unzip -q \
+  /mnt/Festplatte/Downloads/MediaForge_ROOT_UPDATE_managed_upstreams_acquisition_i18n_2026-08-17.zip \
+  -d /tmp/mediaforge-2026-08-17-update
+
+rsync -av --itemize-changes \
+  /tmp/mediaforge-2026-08-17-update/ \
+  /mnt/Festplatte/Schreibtisch/Projekte/MediaForge/
+
+rm -rf /tmp/mediaforge-2026-08-17-update
+```
+
+If Firefox saved the ZIP to `~/Downloads`, replace the ZIP path accordingly.
+
+## Verification
+
+```bash
+cd /mnt/Festplatte/Schreibtisch/Projekte/MediaForge
+
 git status --short
 git diff --stat
 git diff --check
-find docs/MediaForge/prompts -type f -regextype posix-extended -regex '.*/P[0-9]{4}_.+\.md' | wc -l
+
+find docs/MediaForge/prompts \
+  -type f \
+  -regextype posix-extended \
+  -regex '.*/P[0-9]{4}_.+\.md' \
+  | wc -l
+
+python3 tools/prompts/check_dependency_graph.py
 ```
 
-Expected prompt count: **720**.
+Expected numbered prompt count: **720**.
+Expected dependency checker result in the live repo: **clean / exit 0**.
 
-`CURRENT_PHASE.md` is intentionally not part of this prepared archive, so the live project progress file is not overwritten.
+## Important preservation rules
 
-Important: the live repository may already contain generated Track-01 artifacts such as `GOVERNANCE_DOMAIN_MODEL.md`, `GOVERNANCE_BOUNDARIES.md`, `RISK_REGISTER.json` and the P0005 dependency checker. This overlay does not remove them. After copying, run the live dependency checker if present; the updated prompt catalog should be acyclic.
+`CURRENT_PHASE.md` is intentionally not part of these prepared archives.
+
+The root update also does **not** replace live Track-01 runtime/governance artefacts that were created after the previous package, including `RISK_REGISTER.json` and the P0005 Python validator/tests. Your already-resolved `RISK-0001` and corrected smoke test therefore remain intact.

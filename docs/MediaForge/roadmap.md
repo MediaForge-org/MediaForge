@@ -150,3 +150,17 @@ Die Zahl der Claude-Arbeitsschritte bleibt **720**. Neue Anforderungen werden in
 - Track 34: Plugin SDK, Theme SDK, Marketplace;
 - Track 35: Artifact Store, Quotas/GC, AI Model Registry, GPU Scheduler;
 - Track 36: optionale AI Docker Profiles/Model Downloads und vollständige CI-Matrix.
+
+## Roadmap refinement — managed upstreams, acquisition and localisation (2026-08-17)
+
+- **Track 02:** create managed-upstream structure and import/pin buildable Jellyfin/Stash/Audiobookshelf source baselines; record exact release/commit/licence and upstream-sync tooling.
+- **Track 07:** contracts for ManagedComponent, provider capabilities, AcquisitionBlueprint/DAG, translation/localisation and canonical upstream-state mapping.
+- **Tracks 10–13:** first-class five-locale UI, locale-aware search, localised metadata/provenance and professional translation fallback.
+- **Tracks 14–15:** unified Acquisition UX, broad Newznab/Torznab/Prowlarr/Jackett provider layer, *Arr transitional automation, SAB/qBit workflows, naming, hardlinks/seeding, release scoring, Wanted/upgrades and Browser Companion/manual fallback.
+- **Tracks 17–21:** normal media/adult workflows consume the unified acquisition model rather than exposing separate Sonarr/Radarr/Whisparr product surfaces.
+- **Track 24:** verified ISO/disc episode+extra extraction, remux and hand-off to optional derived codec profiles.
+- **Tracks 26–28:** complete internal engine cutovers for the already-imported Jellyfin/Stash/Audiobookshelf baselines.
+- **Track 30:** normalised backend events, translation jobs and post-processing DAG execution.
+- **Track 34:** indexer/translation/browser-companion/provider plugins and extension contracts.
+- **Track 35:** managed component updater/rollback, compatibility matrix, storage forecast, bandwidth/resource scheduler and translation cost/queue controls.
+- **Track 36:** managed-upstream compatibility E2E, full acquisition→import/disc/transcode flows and 100% first-class locale release gates.

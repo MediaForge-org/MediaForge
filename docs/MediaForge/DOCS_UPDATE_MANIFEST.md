@@ -82,3 +82,17 @@ Added/updated:
 - UI references 42–67;
 - affected existing Claude prompts updated while keeping exactly 720 IDs;
 - dependency cycle P0441–P0580 removed by eliminating the backwards P0580 hard dependency from Tracks 23–25.
+
+## 2026-08-17 managed backends/acquisition/localisation update
+
+Added:
+
+- ADR-0025 managed upstream backends / MediaForge-owned product surface;
+- ADR-0026 localization + professional metadata translation fallback;
+- ADR-0027 AcquisitionBlueprint + processing DAG;
+- architecture spec for managed upstreams/product surface;
+- architecture spec for localization/translation;
+- detailed acquisition automation/naming/post-processing spec;
+- UI references 68–69.
+
+Updated existing prompt routing/catalog and 480 existing numbered prompts. **No prompt IDs were added; total remains 720.**
