@@ -31,3 +31,9 @@ Before coding also read the new target architecture and feature specifications:
 - `docs/MediaForge/DEVELOPMENT_PHASES_DETAILED.md`
 
 Inspect reference-expanded images `30` through `41` as well. Do not infer behavior from generated mockup text when the Markdown spec says something more precise.
+
+## 2026-08-16 reference expansion
+
+Additional UI references `42`–`67` cover the next-generation dashboard, tattoo coverage/anatomy, evidence fusion, ontology/events, plugins/themes/custom CSS, deployment/workflow, and 3D performer reconstruction.
+
+Important: generated architecture labels inside PNGs are illustrative only. The Markdown architecture documents are authoritative. 3D body figures in the references are neutral placeholders; implement interaction/layout from the reference, not an invented technical stack.

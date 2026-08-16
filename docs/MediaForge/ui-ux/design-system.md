@@ -151,3 +151,7 @@ Gemeinsame Komponenten:
 ### Accessibility
 
 Status darf nie nur über Farbe codiert sein. Timeline-Events brauchen Keyboard-Navigation und textuelle Alternativen. Media Cards/Dialogs müssen TV-/Keyboard-/Screenreader-Basics berücksichtigen.
+
+## Plugin- und Theme-Erweiterungen
+
+Design Tokens und stabile CSS-Variablen sind öffentliche Theme-Schnittstellen. Theme Plugins verwenden standardmäßig scoped/safe CSS. Ein Advanced Custom CSS Modus kann globale Regeln zulassen, ist aber explizit opt-in. Kritische Privacy-/Security-Semantik darf nicht ausschließlich über CSS erzwungen werden.

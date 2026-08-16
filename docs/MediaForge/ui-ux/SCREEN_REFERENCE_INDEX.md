@@ -41,3 +41,32 @@ Use this file as a practical map between the reference images and the UI areas C
 | `41_feature_matrix_detailed.png` | Detailed P0/P1/P2 visual matrix | `ui-ux/FEATURE_SCREEN_SPECIFICATIONS.md` |
 
 For exact interaction meaning, always prefer `FEATURE_SCREEN_SPECIFICATIONS.md` over inferred text in generated mockups.
+
+## Erweiterte Referenzen 42–67
+
+- `42_unified_dashboard_next_generation.png`
+- `43_female_performer_tattoo_profile.png`
+- `44_advanced_tattoo_region_filter.png`
+- `45_scene_analysis_timeline_v2.png`
+- `46_plugins_themes_overview.png`
+- `47_architecture_roadmap_overview.png`
+- `48_tattoo_coverage_analysis.png`
+- `49_tattoo_region_coverage_inspector.png`
+- `50_tattoo_evidence_fusion.png`
+- `51_tattoo_coverage_profile_dashboard.png`
+- `52_tag_ontology_editor.png`
+- `53_scene_event_inspector.png`
+- `54_full_analysis_report.png`
+- `55_plugin_marketplace.png`
+- `56_theme_editor_custom_css.png`
+- `57_runtime_architecture.png`
+- `58_docker_deployment.png`
+- `59_green_commit_workflow.png`
+- `60_implementation_roadmap_36_tracks.png`
+- `61_3d_reconstruction_workspace.png`
+- `62_3d_performer_viewer.png`
+- `63_3d_quality_missing_surface.png`
+- `64_3d_tattoo_projection.png`
+- `65_body_surface_calibration.png`
+- `66_3d_analysis_settings_overview.png`
+- `67_3d_analysis_reference_board.png`

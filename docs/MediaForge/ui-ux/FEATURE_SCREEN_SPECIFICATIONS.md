@@ -270,3 +270,85 @@ Keine blockierenden Vollseiten-Spinner. Jobs laufen asynchron, haben Progress, E
 ## Confidence
 
 Confidence darf sichtbar sein, aber immer neben Evidence/Verification State. Kein Prozentwert darf als alleiniger „Verified“-Beweis verwendet werden.
+
+## Referenzen 42–67 — Erweiterung 2026-08-16
+
+> Alle 3D-Körper in diesen PNGs sind **neutrale UI-Platzhalter**. Die Screens definieren Layout/Interaktion, nicht die exakte Rekonstruktionsqualität. Technische Textlabels in generierten Mockups sind nicht autoritativ; Code/Architektur-Dokumente sind Source of Truth.
+
+### 42 — Unified Dashboard Next Generation
+Home-/Systemoberfläche mit klaren Modulen, Status und konsistentem MediaForge-Look.
+
+### 43 — Female Performer Tattoo Profile
+Performer-Tattoo-Coverage mit Gesamtwert, Regionsergebnissen, Confidence und Evidence.
+
+### 44 — Advanced Tattoo Region Filter
+Feine Anatomie-Filter statt nur Arms/Torso/Legs. Slider/Regionenfilter müssen auf stabile Anatomy IDs mappen.
+
+### 45 — Scene Analysis Timeline v2
+Visuelle/Audio-Events, anklickbare Timestamps, Confidence und Analysefortschritt.
+
+### 46 — Plugins & Themes Overview
+Getrennte Extension Types, aktiv/deaktiviert, Compatibility und Permissions.
+
+### 47 — Architecture/Roadmap Overview
+Nur visuelle Orientierung; Technologie-Namen in Mockups sind nicht bindend.
+
+### 48 — Tattoo Coverage Analysis
+Gesamt-Coverage, Coverage Class, observed/estimated/unknown surface und Region Breakdown.
+
+### 49 — Tattoo Region Coverage Inspector
+Eine konkrete Anatomy Region mit Surface %, Evidence und manueller Review-Möglichkeit.
+
+### 50 — Tattoo Evidence Fusion
+Mehrere Scenes/Views werden zu einem Performer-Profil zusammengeführt; Evidence-Qualität ist sichtbar.
+
+### 51 — Tattoo Coverage Profile Dashboard
+Coverage-Historie/Confidence und regionale Zusammenfassung. Count ist sekundär zur Fläche.
+
+### 52 — Tag Ontology Editor
+Parent/Child-Tags, Attributes, Synonyme, Mappings und Detector Profile.
+
+### 53 — Scene Event Inspector
+Ein Event mit Start/End, Visual/Audio-Evidence, Attributes und Verify/Reject/Edit.
+
+### 54 — Full Analysis Report
+Messbare 100%-Decode-Coverage, Detector-/Model-Versionen, Dense Refinement und offene Unsicherheiten.
+
+### 55 — Plugin Marketplace
+Plugin-Typ, Version, Quelle, Compatibility, Permissions und Install/Update-Zustand.
+
+### 56 — Theme Editor / Custom CSS
+Design Tokens, CSS Variables, scoped Preview, Import/Export und Advanced Global CSS.
+
+### 57 — Runtime Architecture
+Zeigt die sichtbare Ein-Produkt-Architektur. Verbindliche Technologien stehen in `target-monorepo.md`.
+
+### 58 — Docker Deployment
+Core/Engines/optional AI, Volumes, Health und ein sichtbarer Gateway-Einstiegspunkt.
+
+### 59 — Green Commit Workflow
+Letzter grüner Commit -> Arbeitspaket -> lokale Gates -> Commit -> Push -> GitHub Actions -> Fix/Rollback oder nächstes Paket.
+
+### 60 — 36-Track Roadmap
+720 Prompts bleiben 36 × 20; neue Features werden in vorhandene Tracks integriert.
+
+### 61 — 3D Reconstruction Workspace
+Evidence Selection, Multi-view Fusion, Progress, Quality und Erzeugen einer neuen immutable ReconstructionRevision.
+
+### 62 — 3D Performer Viewer
+Rotate/Zoom/Region Select sowie Tattoo/Region/Confidence Overlays und Revision Compare.
+
+### 63 — 3D Quality / Missing Surface
+Observed/Estimated/Unknown Surface nach Region. Unknown ist niemals automatisch tattoo-free.
+
+### 64 — 3D Tattoo Projection
+Tattoo Masks aus mehreren Evidence Frames werden auf das kanonische Mesh projiziert und nach Confidence fusioniert.
+
+### 65 — Body Surface Calibration
+Mesh-basierte Körperform/Oberfläche, Source-backed Measurements und regionale Surface-Gewichte.
+
+### 66 — 3D Analysis Settings Overview
+Quality/Analysis-Modi, Evidence Retention, optional AI, Model/Storage Limits und Privacy.
+
+### 67 — 3D Analysis Reference Board
+Zusammenfassende visuelle Referenz für Reconstruction, Viewer, Projection, Calibration und Quality; Detail-Screens 61–66 haben Vorrang.

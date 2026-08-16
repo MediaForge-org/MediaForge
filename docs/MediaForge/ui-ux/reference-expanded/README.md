@@ -48,3 +48,34 @@ Claude should inspect these images before implementing any significant UI work.
 - `41_feature_matrix_detailed.png` — compact P0/P1/P2 feature matrix.
 
 Generated mockups may contain illustrative placeholder labels/data. They are not authoritative for exact provider names, confidence thresholds, fictional titles, file formats or implementation details. Markdown specifications are authoritative.
+
+## 42–67: AI/3D/Plugins/Workflow
+
+Diese Referenzen ergänzen Tattoo-Coverage, 3D-Reconstruction, Plugin/Theme, Storage/Deployment und den Green-Commit-Workflow. Generierte Architekturtexte in Bildern sind illustrativ; verbindlich sind die Markdown-Spezifikationen.
+
+- `42_unified_dashboard_next_generation.png`
+- `43_female_performer_tattoo_profile.png`
+- `44_advanced_tattoo_region_filter.png`
+- `45_scene_analysis_timeline_v2.png`
+- `46_plugins_themes_overview.png`
+- `47_architecture_roadmap_overview.png`
+- `48_tattoo_coverage_analysis.png`
+- `49_tattoo_region_coverage_inspector.png`
+- `50_tattoo_evidence_fusion.png`
+- `51_tattoo_coverage_profile_dashboard.png`
+- `52_tag_ontology_editor.png`
+- `53_scene_event_inspector.png`
+- `54_full_analysis_report.png`
+- `55_plugin_marketplace.png`
+- `56_theme_editor_custom_css.png`
+- `57_runtime_architecture.png`
+- `58_docker_deployment.png`
+- `59_green_commit_workflow.png`
+- `60_implementation_roadmap_36_tracks.png`
+- `61_3d_reconstruction_workspace.png`
+- `62_3d_performer_viewer.png`
+- `63_3d_quality_missing_surface.png`
+- `64_3d_tattoo_projection.png`
+- `65_body_surface_calibration.png`
+- `66_3d_analysis_settings_overview.png`
+- `67_3d_analysis_reference_board.png`
