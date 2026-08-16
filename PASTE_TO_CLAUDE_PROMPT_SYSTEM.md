@@ -18,3 +18,7 @@ Then verify current git HEAD / working tree and execute **P0001 only**.
 Important: there are 720 prompts. You are not supposed to read or execute them all at once. Every prompt explicitly lists the minimum context it needs. Do not preload unrelated Adult, Disc, AI, Acquisition, fork or UI documentation.
 
 After P0001, stop and wait for the next authorized prompt ID.
+
+## 2026-08-17 package note
+
+The numbered system still contains exactly 720 prompts. Follow the current prompt's Required Reads; managed-upstream/acquisition/localisation documents are intentionally routed only into the tracks that need them.

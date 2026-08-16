@@ -42,3 +42,13 @@ Priority does **not** override dependencies or `CURRENT_PHASE.md`.
 6. Do not continue automatically to the next prompt.
 
 No numbered prompt authorizes a push, tag or release unless it explicitly says so. By default Claude must not push/tag and should not commit unless the user explicitly asks.
+
+## Latest architecture additions — 2026-08-17
+
+The prompt count remains 720. Relevant prompts now route to three additional authoritative documents:
+
+- `architecture/managed-upstreams-and-product-surface.md`
+- `architecture/localization-and-professional-translation.md`
+- `modules/acquisition-automation-and-postprocessing.md`
+
+Do not read them globally unless the current prompt lists them or `CONTEXT_ROUTING.md` directs you there.

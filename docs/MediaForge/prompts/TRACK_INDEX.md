@@ -40,3 +40,14 @@ Each track contains 20 granular prompts using the same lifecycle: audit → mode
 - **34 Plugin SDK, metadata providers and automation extensions** (P2) — `P0661`–`P0680` — folder `34-plugins-providers/`
 - **35 Observability, performance, backup, restore and resilience** (P1) — `P0681`–`P0700` — folder `35-ops-performance/`
 - **36 Docker images, CI, releases, security QA and final integration** (P1) — `P0701`–`P0720` — folder `36-release-qa/`
+
+## 2026-08-17 scope clarifications
+
+No prompt IDs are added; total remains **720**.
+
+- Track 02 now includes pinned, buildable upstream baselines for Jellyfin/Stash/Audiobookshelf plus managed-upstream manifests/tooling.
+- Tracks 10–13 include launch-locale i18n and metadata translation/provenance.
+- Tracks 14–15 include unified provider search, managed *Arr/Prowlarr/SAB/qBit backends, naming, seeding-safe imports and post-processing.
+- Track 24 includes verified series/movie disc extraction/remux handoff.
+- Tracks 26–28 complete already-prepared engine cutovers.
+- Tracks 30/34/35/36 include backend-event normalisation, provider/translation plugins, update/rollback/resource management and compatibility/localisation release gates.

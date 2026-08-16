@@ -42,3 +42,11 @@ Choose the smallest matching authority:
 Do not reread `MediaForge_Master_Engineering.md` unless the prompt lists it or a cross-domain ambiguity cannot be resolved by a smaller authority.
 
 If present in the live checkout, Track-01 generated governance artifacts (`GOVERNANCE_DOMAIN_MODEL.md`, `GOVERNANCE_BOUNDARIES.md`, `RISK_REGISTER.json`) are authoritative for the execution-audit subsystem and must not be overwritten by prepared docs.
+
+## 2026-08-17 routing additions
+
+Read only when the current prompt touches the matching concern:
+
+- managed upstream lifecycle, early Jellyfin/Stash/ABS import, SAB/qBit/Prowlarr/*Arr product boundaries -> `docs/MediaForge/architecture/managed-upstreams-and-product-surface.md` + ADR-0025.
+- UI localisation, canonical status localisation, metadata translation, glossary/translation memory/provider policy -> `docs/MediaForge/architecture/localization-and-professional-translation.md` + ADR-0026.
+- source search, Wanted/release scoring, naming, torrent hardlinks/seeding, post-processing DAG, ISO remux/transcodes -> `docs/MediaForge/modules/acquisition-automation-and-postprocessing.md` + ADR-0027.

@@ -62,3 +62,13 @@ For normal implementation work, use `docs/MediaForge/prompts/` instead of reread
 - Keine Body-Model-/AI-Provider-Lizenz voraussetzen: Provider über Adapter/Model Registry, Lizenz muss vorgesehenen Use erlauben.
 - Neue Adult-3D/Tattoo-Funktionen nur im entsperrten Adult-Kontext und mit vollständiger Zero-Leak-Behandlung.
 - Standardentwicklung folgt `architecture/green-commit-workflow.md`.
+
+## Product-surface, acquisition and localisation rules — 2026-08-17
+
+- Do not implement MediaForge as a launcher for external Web UIs. MediaForge owns normal UX; upstream native UIs are advanced/admin fallbacks.
+- During Track 02 import/pin Jellyfin, Stash and Audiobookshelf baselines without prematurely deleting their ability to build/run as references. Later tracks progressively adapt/cut over capabilities.
+- Treat SABnzbd/qBittorrent/Prowlarr/Sonarr/Radarr/Whisparr as unmodified managed upstreams unless a later explicit ADR changes that rule.
+- Acquisition logic must respect torrent seeding, staging/quarantine and deterministic naming/provenance. Do not hide destructive filesystem operations behind generic helpers.
+- User-visible strings must use localisation keys. Launch locale completeness is de/en-GB/it/es/fr.
+- Do not fabricate localised metadata. Prefer authoritative locale metadata; use the professional translation fallback only when needed and retain source/provenance.
+- UI mockup artwork is illustrative; implementation must bind artwork to the canonical matched media identity.

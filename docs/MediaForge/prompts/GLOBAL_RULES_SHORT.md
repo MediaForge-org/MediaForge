@@ -26,3 +26,13 @@ These rules are intentionally short. Do not replace them by rereading the whole 
 21. **Plugins/Themes.** Extension types are explicit and permissioned; themes use design tokens/scoped CSS by default. Advanced global CSS is opt-in.
 22. **Adult 3D/Tattoos.** Female performer tattoo coverage is surface-based over the complete body, with versioned anatomy regions and observed/estimated/unknown confidence. 3D reconstruction is optional, revisioned and private.
 23. **Derived assets.** Evidence, meshes, textures, model weights and other large generated data belong in the Artifact/Model stores with quotas/GC, not database BLOBs.
+
+## 2026-08-17 global product rules
+
+- MediaForge owns the normal product frontend. Integrated upstream applications are backend capabilities; native upstream UIs are admin/debug fallbacks only.
+- Jellyfin/Stash/Audiobookshelf baselines are prepared early and later adapted into internal engines. SAB/qBittorrent/Prowlarr/Sonarr/Radarr/Whisparr remain unmodified managed upstreams unless an explicit later ADR says otherwise.
+- Never hard-code a small provider/site whitelist into domain logic when capability adapters (Newznab/Torznab/Prowlarr/plugin/etc.) can express the requirement.
+- User-visible product copy must use localisation keys. First-class launch locales are de, en-GB, it, es and fr.
+- Metadata translation fallback preserves the original value/provenance and may not fabricate facts or overwrite authoritative localised metadata.
+- UI reference artwork is illustrative; production artwork must belong to the canonical matched media item or use a neutral placeholder/review state.
+- Numbered prompt IDs remain P0001–P0720; do not create new IDs for these additions.
