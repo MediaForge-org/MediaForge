@@ -21,10 +21,15 @@ Then read these required documents only:
 - `docs/MediaForge/architecture/polyglot-runtime-and-contracts.md`
 - `docs/MediaForge/architecture/target-monorepo.md`
 - `docs/MediaForge/modules/disc-engine.md`
+- `docs/MediaForge/modules/adult-3d-reconstruction-and-tattoo-coverage.md`
+- `docs/MediaForge/architecture/artifact-store-and-derived-assets.md`
 
 Inspect these source paths/symbol neighborhoods first:
 - `services/media-tools`
 - `packages/contracts`
+- `services/media-tools/crates/mesh`
+- `services/media-tools/crates/evidence`
+- `services/media-tools/crates/timeline`
 
 ### UI references for this prompt
 - None for this prompt unless a changed screen directly requires an existing design-system reference.
@@ -32,6 +37,9 @@ Inspect these source paths/symbol neighborhoods first:
 Do **not** recursively open every document linked from the required reads. If a concrete ambiguity remains, use `CONTEXT_ROUTING.md` to open the smallest authoritative document/section that resolves it.
 
 ## Subsystem-specific rule
+
+**2026-08-16 architecture rule:** Rust implements performance-sensitive frame/PTS/mesh/projection/evidence helpers behind existing contracts; it must not redefine canonical Adult semantics.
+
 
 Use Rust for new native MediaForge media tooling while reusing mature native libraries such as FFmpeg/libbluray through processes or safe bindings where appropriate.
 

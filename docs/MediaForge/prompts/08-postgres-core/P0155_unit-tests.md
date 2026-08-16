@@ -21,11 +21,15 @@ Then read these required documents only:
 - `docs/MediaForge/architecture/postgresql-source-of-truth.md`
 - `docs/MediaForge/modules/media-editions-and-lineage.md`
 - `docs/MediaForge/MediaForge_Master_Engineering.md`
+- `docs/MediaForge/architecture/artifact-store-and-derived-assets.md`
+- `docs/MediaForge/modules/adult-3d-reconstruction-and-tattoo-coverage.md`
 
 Inspect these source paths/symbol neighborhoods first:
 - `apps/server/database`
 - `apps/server/app/Domain`
 - `database`
+- `apps/server/app/Domain/Analysis`
+- `apps/server/app/Domain/Adult`
 
 ### UI references for this prompt
 - None for this prompt unless a changed screen directly requires an existing design-system reference.
@@ -33,6 +37,9 @@ Inspect these source paths/symbol neighborhoods first:
 Do **not** recursively open every document linked from the required reads. If a concrete ambiguity remains, use `CONTEXT_ROUTING.md` to open the smallest authoritative document/section that resolves it.
 
 ## Subsystem-specific rule
+
+**2026-08-16 architecture rule:** PostgreSQL stores analysis/reconstruction metadata and artifact references, not large mesh/texture/evidence/model BLOBs.
+
 
 PostgreSQL is the canonical MediaForge source of truth. Engine-local stores may exist during transitions but never become canonical cross-product identity stores.
 

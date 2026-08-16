@@ -21,6 +21,8 @@ Then read these required documents only:
 - `docs/MediaForge/architecture/docker-release-distribution.md`
 - `docs/MediaForge/DEVELOPMENT_PHASES_DETAILED.md`
 - `docs/MediaForge/CLAUDE_IMPLEMENTATION_DIRECTIVE.md`
+- `docs/MediaForge/architecture/ai-capabilities-model-registry.md`
+- `docs/MediaForge/architecture/green-commit-workflow.md`
 
 Inspect these source paths/symbol neighborhoods first:
 - `platform/docker`
@@ -30,11 +32,15 @@ Inspect these source paths/symbol neighborhoods first:
 - `tests`
 
 ### UI references for this prompt
-- None for this prompt unless a changed screen directly requires an existing design-system reference.
+- `docs/MediaForge/ui-ux/reference-expanded/58_docker_deployment.png`
+- `docs/MediaForge/ui-ux/reference-expanded/60_implementation_roadmap_36_tracks.png`
 
 Do **not** recursively open every document linked from the required reads. If a concrete ambiguity remains, use `CONTEXT_ROUTING.md` to open the smallest authoritative document/section that resolves it.
 
 ## Subsystem-specific rule
+
+**2026-08-16 architecture rule:** AI images/models are optional release profiles/downloads; Core images must stay usable without heavy model weights. CI remains green before advancing.
+
 
 Official images/releases require reproducibility, SBOM/provenance/signing policy, multi-arch strategy, migration gates and documented rollback paths.
 

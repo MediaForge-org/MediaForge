@@ -21,11 +21,15 @@ Then read these required documents only:
 - `docs/MediaForge/PRODUCT_DECISIONS_2026-08.md`
 - `docs/MediaForge/modules/adult-enhancement.md`
 - `docs/MediaForge/ui-ux/adult-ui-enhancement.md`
+- `docs/MediaForge/architecture/ai-capabilities-model-registry.md`
+- `docs/MediaForge/modules/adult-3d-reconstruction-and-tattoo-coverage.md`
+- `docs/MediaForge/modules/plugin-theme-sdk.md`
 
 Inspect these source paths/symbol neighborhoods first:
 - `apps/server/app/Domain/Users`
 - `apps/server/app/Domain/Privacy`
 - `apps/web/src/app/auth`
+- `platform/storage`
 
 ### UI references for this prompt
 - `docs/MediaForge/ui-ux/reference-expanded/21_private_mode_unlock.png`
@@ -33,6 +37,9 @@ Inspect these source paths/symbol neighborhoods first:
 Do **not** recursively open every document linked from the required reads. If a concrete ambiguity remains, use `CONTEXT_ROUTING.md` to open the smallest authoritative document/section that resolves it.
 
 ## Subsystem-specific rule
+
+**2026-08-16 architecture rule:** Private 3D meshes, textures, tattoo masks, body measurements and evidence inherit Adult zero-leak rules. Plugin/AI permissions are explicit.
+
 
 Treat private/adult zero-leak as a server-side property. Client hiding alone is insufficient. Unauthorized resource existence must not leak through search, errors, preload, caches or events.
 

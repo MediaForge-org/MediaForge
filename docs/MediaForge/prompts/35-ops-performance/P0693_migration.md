@@ -21,19 +21,30 @@ Then read these required documents only:
 - `docs/MediaForge/architecture/docker-release-distribution.md`
 - `docs/MediaForge/architecture/postgresql-source-of-truth.md`
 - `docs/MediaForge/DEVELOPMENT_PHASES_DETAILED.md`
+- `docs/MediaForge/architecture/ai-capabilities-model-registry.md`
+- `docs/MediaForge/architecture/artifact-store-and-derived-assets.md`
+- `docs/MediaForge/modules/derived-assets-and-storage-manager.md`
 
 Inspect these source paths/symbol neighborhoods first:
 - `platform/observability`
 - `platform/database`
 - `apps/server`
 - `services`
+- `platform/storage`
+- `services/ai/models`
+- `services/ai/evaluation`
 
 ### UI references for this prompt
 - `docs/MediaForge/ui-ux/reference-expanded/17_analytics_and_reports.png`
+- `docs/MediaForge/ui-ux/reference-expanded/58_docker_deployment.png`
+- `docs/MediaForge/ui-ux/reference-expanded/66_3d_analysis_settings_overview.png`
 
 Do **not** recursively open every document linked from the required reads. If a concrete ambiguity remains, use `CONTEXT_ROUTING.md` to open the smallest authoritative document/section that resolves it.
 
 ## Subsystem-specific rule
+
+**2026-08-16 architecture rule:** Operate derived/model stores with quotas/GC and resource scheduling. Playback has priority over background AI.
+
 
 Measure before optimizing. Backups must be restorable, not merely created. Observability must cover the full multi-process system.
 

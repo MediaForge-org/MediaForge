@@ -3,7 +3,7 @@
 **Track:** 23-adult-analysis  
 **Priority:** P2  
 **Prompt position in track:** 12/20  
-**Depends on:** P0451, P0440, P0580
+**Depends on:** P0451, P0440
 
 ## Objective
 
@@ -21,19 +21,32 @@ Then read these required documents only:
 - `docs/MediaForge/modules/adult-analysis-and-taxonomy.md`
 - `docs/MediaForge/adr/0016-event-taxonomy-and-analysis.md`
 - `docs/MediaForge/architecture/polyglot-runtime-and-contracts.md`
+- `docs/MediaForge/modules/adult-3d-reconstruction-and-tattoo-coverage.md`
+- `docs/MediaForge/architecture/ai-capabilities-model-registry.md`
+- `docs/MediaForge/architecture/artifact-store-and-derived-assets.md`
 
 Inspect these source paths/symbol neighborhoods first:
 - `services/media-tools`
 - `services/ai`
 - `apps/server/app/Domain/Adult/Events`
+- `services/ai/reconstruction`
+- `services/ai/evaluation`
+- `services/media-tools/crates/mesh`
+- `platform/storage`
 
 ### UI references for this prompt
 - `docs/MediaForge/ui-ux/reference-expanded/33_adult_scene_full_analysis_timeline.png`
 - `docs/MediaForge/ui-ux/reference-expanded/34_adult_tag_taxonomy_event_inspector.png`
+- `docs/MediaForge/ui-ux/reference-expanded/54_full_analysis_report.png`
+- `docs/MediaForge/ui-ux/reference-expanded/63_3d_quality_missing_surface.png`
+- `docs/MediaForge/ui-ux/reference-expanded/66_3d_analysis_settings_overview.png`
 
 Do **not** recursively open every document linked from the required reads. If a concrete ambiguity remains, use `CONTEXT_ROUTING.md` to open the smallest authoritative document/section that resolves it.
 
 ## Subsystem-specific rule
+
+**2026-08-16 architecture rule:** Heavy analysis/3D is optional. Full decode coverage remains measurable. Reconstruction is multi-scene/revisioned and provider-abstract. Do not hard-depend on completion of Track 29; use versioned contracts and let later Rust work optimize hot paths.
+
 
 Aim for 100% decode coverage. Expensive models may use temporal candidate refinement, but coverage must be measurable and event timestamps/evidence reproducible.
 

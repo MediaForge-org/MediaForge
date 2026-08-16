@@ -21,12 +21,19 @@ Then read these required documents only:
 - `docs/MediaForge/architecture/target-monorepo.md`
 - `docs/MediaForge/adr/0014-target-polyglot-monorepo.md`
 - `docs/MediaForge/architecture/unified-application.md`
+- `docs/MediaForge/architecture/artifact-store-and-derived-assets.md`
+- `docs/MediaForge/modules/plugin-theme-sdk.md`
 
 Inspect these source paths/symbol neighborhoods first:
 - `repository root`
 - `composer.json`
 - `package.json`
 - `docker-compose.yml`
+- `packages/plugin-sdk`
+- `packages/theme-sdk`
+- `packages/contracts/domains`
+- `services/ai/reconstruction`
+- `platform/storage`
 
 ### UI references for this prompt
 - None for this prompt unless a changed screen directly requires an existing design-system reference.

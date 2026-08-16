@@ -21,18 +21,27 @@ Then read these required documents only:
 - `docs/MediaForge/modules/adult-analysis-and-taxonomy.md`
 - `docs/MediaForge/adr/0016-event-taxonomy-and-analysis.md`
 - `docs/MediaForge/ui-ux/FEATURE_SCREEN_SPECIFICATIONS.md`
+- `docs/MediaForge/modules/adult-3d-reconstruction-and-tattoo-coverage.md`
 
 Inspect these source paths/symbol neighborhoods first:
 - `apps/server/app/Domain/Adult/Taxonomy`
 - `apps/server/app/Domain/Adult/Events`
+- `packages/contracts/domains/anatomy`
 
 ### UI references for this prompt
 - `docs/MediaForge/ui-ux/reference-expanded/34_adult_tag_taxonomy_event_inspector.png`
 - `docs/MediaForge/ui-ux/reference-expanded/41_feature_matrix_detailed.png`
+- `docs/MediaForge/ui-ux/reference-expanded/44_advanced_tattoo_region_filter.png`
+- `docs/MediaForge/ui-ux/reference-expanded/48_tattoo_coverage_analysis.png`
+- `docs/MediaForge/ui-ux/reference-expanded/49_tattoo_region_coverage_inspector.png`
+- `docs/MediaForge/ui-ux/reference-expanded/52_tag_ontology_editor.png`
 
 Do **not** recursively open every document linked from the required reads. If a concrete ambiguity remains, use `CONTEXT_ROUTING.md` to open the smallest authoritative document/section that resolves it.
 
 ## Subsystem-specific rule
+
+**2026-08-16 architecture rule:** Taxonomy includes versioned anatomy-region IDs and structured tattoo coverage facts; do not flatten them into ad-hoc strings.
+
 
 Tags are hierarchical events/attributes rather than a flat vocabulary. Example: `puke` can carry attributes such as watery, milky or chunky on each occurrence.
 

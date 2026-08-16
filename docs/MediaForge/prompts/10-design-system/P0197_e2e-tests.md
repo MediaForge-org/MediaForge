@@ -21,21 +21,29 @@ Then read these required documents only:
 - `docs/MediaForge/ui-ux/UI_IMPLEMENTATION_PROMPT.md`
 - `docs/MediaForge/ui-ux/design-system.md`
 - `docs/MediaForge/ui-ux/SCREEN_REFERENCE_INDEX.md`
+- `docs/MediaForge/modules/plugin-theme-sdk.md`
 
 Inspect these source paths/symbol neighborhoods first:
 - `apps/web/src`
 - `packages/design-tokens`
 - `packages/ui-web`
+- `packages/theme-sdk`
+- `apps/web/src/extensions`
 
 ### UI references for this prompt
 - `docs/MediaForge/ui-ux/reference-expanded/01_core_home_dashboard.png`
 - `docs/MediaForge/ui-ux/reference-expanded/10_unified_home_dashboard.png`
 - `docs/MediaForge/ui-ux/reference-expanded/11_movies_tv_library.png`
 - `docs/MediaForge/ui-ux/reference-expanded/12_audiobooks_dashboard.png`
+- `docs/MediaForge/ui-ux/reference-expanded/46_plugins_themes_overview.png`
+- `docs/MediaForge/ui-ux/reference-expanded/56_theme_editor_custom_css.png`
 
 Do **not** recursively open every document linked from the required reads. If a concrete ambiguity remains, use `CONTEXT_ROUTING.md` to open the smallest authoritative document/section that resolves it.
 
 ## Subsystem-specific rule
+
+**2026-08-16 architecture rule:** Design Tokens and stable CSS variables are extension points. Theme CSS is scoped/safe by default; advanced global CSS is opt-in.
+
 
 Use the reference images as visual specifications, not as pixel-perfect screenshots. Build reusable primitives and tokens rather than page-specific one-off CSS.
 

@@ -21,11 +21,13 @@ Then read these required documents only:
 - `docs/MediaForge/architecture/routing-and-public-urls.md`
 - `docs/MediaForge/adr/0015-human-readable-routing.md`
 - `docs/MediaForge/architecture/unified-application.md`
+- `docs/MediaForge/architecture/frontend-framework.md`
 
 Inspect these source paths/symbol neighborhoods first:
 - `apps/web`
 - `apps/server`
 - `routes`
+- `packages/contracts/api`
 
 ### UI references for this prompt
 - None for this prompt unless a changed screen directly requires an existing design-system reference.
@@ -33,6 +35,9 @@ Inspect these source paths/symbol neighborhoods first:
 Do **not** recursively open every document linked from the required reads. If a concrete ambiguity remains, use `CONTEXT_ROUTING.md` to open the smallest authoritative document/section that resolves it.
 
 ## Subsystem-specific rule
+
+**2026-08-16 architecture rule:** Target React Router Framework Mode + Vite. Migrate Inertia incrementally while keeping the last green behavior working.
+
 
 The end state is React Router + real API. Do not retain Inertia as a permanent hidden dependency. Human-readable routes are product contracts; internal API identity remains ULID-based.
 

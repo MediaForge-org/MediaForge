@@ -21,11 +21,17 @@ Then read these required documents only:
 - `docs/MediaForge/architecture/engine-contracts.md`
 - `docs/MediaForge/architecture/polyglot-runtime-and-contracts.md`
 - `docs/MediaForge/architecture/target-monorepo.md`
+- `docs/MediaForge/modules/adult-3d-reconstruction-and-tattoo-coverage.md`
+- `docs/MediaForge/modules/plugin-theme-sdk.md`
+- `docs/MediaForge/architecture/ai-capabilities-model-registry.md`
 
 Inspect these source paths/symbol neighborhoods first:
 - `packages/contracts`
 - `packages/sdk`
 - `tools`
+- `packages/contracts/domains/anatomy`
+- `packages/contracts/domains/reconstruction`
+- `packages/contracts/domains/plugins`
 
 ### UI references for this prompt
 - None for this prompt unless a changed screen directly requires an existing design-system reference.
@@ -33,6 +39,9 @@ Inspect these source paths/symbol neighborhoods first:
 Do **not** recursively open every document linked from the required reads. If a concrete ambiguity remains, use `CONTEXT_ROUTING.md` to open the smallest authoritative document/section that resolves it.
 
 ## Subsystem-specific rule
+
+**2026-08-16 architecture rule:** Contracts must cover optional capabilities and stable IDs for anatomy/reconstruction/plugins without coupling to a specific AI/body-model provider.
+
 
 Contracts are language-neutral. Generated code must be reproducible and committed/ignored according to the documented policy, with no hand-edited generated clients.
 

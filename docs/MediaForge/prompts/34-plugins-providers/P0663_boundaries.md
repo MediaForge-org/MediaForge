@@ -21,18 +21,26 @@ Then read these required documents only:
 - `docs/MediaForge/MediaForge_Master_Engineering.md`
 - `docs/MediaForge/architecture/engine-contracts.md`
 - `docs/MediaForge/modules/acquisition-center.md`
+- `docs/MediaForge/modules/plugin-theme-sdk.md`
 
 Inspect these source paths/symbol neighborhoods first:
 - `packages/sdk`
 - `apps/server/app/Infrastructure/Providers`
 - `plugins`
+- `packages/plugin-sdk`
+- `packages/theme-sdk`
+- `apps/web/src/extensions`
 
 ### UI references for this prompt
-- None for this prompt unless a changed screen directly requires an existing design-system reference.
+- `docs/MediaForge/ui-ux/reference-expanded/46_plugins_themes_overview.png`
+- `docs/MediaForge/ui-ux/reference-expanded/55_plugin_marketplace.png`
 
 Do **not** recursively open every document linked from the required reads. If a concrete ambiguity remains, use `CONTEXT_ROUTING.md` to open the smallest authoritative document/section that resolves it.
 
 ## Subsystem-specific rule
+
+**2026-08-16 architecture rule:** Plugin types, manifests, compatibility and permissions are explicit. Theme SDK uses tokens/scoped CSS; global Custom CSS is Advanced opt-in.
+
 
 Extensions run through versioned capabilities and permissions. Do not let plugins write arbitrary core tables or bypass privacy policies.
 

@@ -21,6 +21,7 @@ Then read these required documents only:
 - `docs/MediaForge/CURRENT_PHASE.md`
 - `docs/MediaForge/PRODUCT_DECISIONS_2026-08.md`
 - `docs/MediaForge/CLAUDE_IMPLEMENTATION_DIRECTIVE.md`
+- `docs/MediaForge/architecture/green-commit-workflow.md`
 
 Inspect these source paths/symbol neighborhoods first:
 - `repository root`
@@ -34,6 +35,9 @@ Inspect these source paths/symbol neighborhoods first:
 Do **not** recursively open every document linked from the required reads. If a concrete ambiguity remains, use `CONTEXT_ROUTING.md` to open the smallest authoritative document/section that resolves it.
 
 ## Subsystem-specific rule
+
+**2026-08-16 architecture rule:** Use the green-commit workflow: no known-broken state may be committed; branches are optional, not a per-prompt requirement.
+
 
 Do not implement product features. This track exists to establish a trustworthy baseline, execution rules, dependency graph and rollback discipline.
 

@@ -21,6 +21,7 @@ Then read these required documents only:
 - `docs/MediaForge/architecture/target-monorepo.md`
 - `docs/MediaForge/ui-ux/design-system.md`
 - `docs/MediaForge/ui-ux/UI_IMPLEMENTATION_PROMPT.md`
+- `docs/MediaForge/architecture/frontend-framework.md`
 
 Inspect these source paths/symbol neighborhoods first:
 - `resources/js`
@@ -28,6 +29,9 @@ Inspect these source paths/symbol neighborhoods first:
 - `package.json`
 - `vite.config.ts`
 - `tsconfig.json`
+- `apps/web`
+- `packages/ui-web`
+- `packages/design-tokens`
 
 ### UI references for this prompt
 - `docs/MediaForge/ui-ux/reference-expanded/01_core_home_dashboard.png`
@@ -36,6 +40,9 @@ Inspect these source paths/symbol neighborhoods first:
 Do **not** recursively open every document linked from the required reads. If a concrete ambiguity remains, use `CONTEXT_ROUTING.md` to open the smallest authoritative document/section that resolves it.
 
 ## Subsystem-specific rule
+
+**2026-08-16 architecture rule:** Preserve the path toward React Router Framework Mode; do not introduce a second Next.js full-stack server layer.
+
 
 Move the React/TypeScript application without redesigning it yet. Preserve current user-visible behavior until the dedicated design-system prompts.
 

@@ -21,21 +21,30 @@ Then read these required documents only:
 - `docs/MediaForge/modules/adult-lineage-and-catalog.md`
 - `docs/MediaForge/modules/adult-enhancement.md`
 - `docs/MediaForge/modules/adult-engine-target.md`
+- `docs/MediaForge/modules/adult-3d-reconstruction-and-tattoo-coverage.md`
 
 Inspect these source paths/symbol neighborhoods first:
 - `apps/server/app/Domain/Adult`
 - `apps/web/src/features/performers`
 - `apps/web/src/features/scenes`
 - `apps/web/src/features/studios`
+- `apps/server/app/Domain/Adult/Analysis`
+- `packages/contracts/domains/anatomy`
+- `apps/web/src/features/adult`
 
 ### UI references for this prompt
 - `docs/MediaForge/ui-ux/reference-expanded/02_core_performer_detail.png`
 - `docs/MediaForge/ui-ux/reference-expanded/04_core_coverage_library_management.png`
 - `docs/MediaForge/ui-ux/reference-expanded/36_performer_catalog_completeness.png`
+- `docs/MediaForge/ui-ux/reference-expanded/50_tattoo_evidence_fusion.png`
+- `docs/MediaForge/ui-ux/reference-expanded/63_3d_quality_missing_surface.png`
 
 Do **not** recursively open every document linked from the required reads. If a concrete ambiguity remains, use `CONTEXT_ROUTING.md` to open the smallest authoritative document/section that resolves it.
 
 ## Subsystem-specific rule
+
+**2026-08-16 architecture rule:** Female performer tattoo coverage is a first-class catalog/filter dimension; surface percentage and fine anatomy regions matter more than tattoo count.
+
 
 Scenes, performers, studios, brands, networks and historical sources need first-class lineage. Deep sync is library-driven rather than a global mirror.
 
