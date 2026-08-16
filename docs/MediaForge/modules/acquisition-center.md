@@ -224,3 +224,23 @@ Acquisition Center zeigt:
 - Drag & Drop Intake.
 
 Die UI soll wie MediaForge wirken, nicht wie ein eingebettetes qBittorrent/SABnzbd.
+
+## 13. Expanded acquisition architecture — 17 August 2026
+
+Detailed automation/naming/post-processing requirements live in `acquisition-automation-and-postprocessing.md` and ADR-0027.
+
+Binding additions:
+
+- MediaForge owns the normal Acquisition UI; SABnzbd/qBittorrent/Prowlarr/Sonarr/Radarr/Whisparr are backend capabilities, not separate day-to-day product surfaces.
+- Support broad provider ecosystems through Newznab, Torznab, Prowlarr-managed definitions, Jackett-compatible Torznab endpoints, native provider plugins, RSS and a Browser Companion/manual fallback instead of a small hard-coded tracker whitelist.
+- Drag/drop intake classifies the target media/library before submission where evidence is sufficient.
+- `AcquisitionBlueprint` records expected identity, source, downloader, naming, seeding, disc/remux/transcode and final-library policy before automation begins.
+- MediaForge is final naming authority after SAB repair/unpack. Default single-media Usenet output can use the sanitised NZB/job base name for both folder and main media file; secrets/password markers never survive into final names.
+- Torrent imports preserve seeding by default through hardlinks/reflinks/copies; any active-payload rename is performed through qBittorrent APIs rather than behind the client's back.
+- Per-tracker seeding policies, Wanted/Upgrade monitoring, explainable release scoring, failure fallback, provenance, quarantine, storage forecasts and resource scheduling are first-class.
+- Disc/ISO inputs can branch into verified episode/extra extraction, Matroska remux and optional H.264/H.265/AV1 derived outputs.
+
+Additional UI references:
+
+- `68_backend_capabilities_acquisition_overview.png`
+- `69_localization_translation_acquisition_overview.png`
