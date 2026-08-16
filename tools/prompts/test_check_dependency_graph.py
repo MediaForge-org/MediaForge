@@ -10,6 +10,7 @@ from check_dependency_graph import (
     EXIT_UNTRACKED_DEFECT,
     check,
     load_catalog,
+    load_risk_register,
 )
 
 
@@ -104,20 +105,24 @@ class DefectDetectionTests(unittest.TestCase):
 
 
 class RealCatalogSmokeTest(unittest.TestCase):
-    """Documents, rather than hides, the current known state of the real repo data."""
+    """Documents, rather than hides, the current known state of the real repo data.
 
-    def test_real_catalog_has_exactly_the_known_p0441_p0580_cycle(self):
+    The former P0441-P0580 cycle (RISK-0001, found by P0003) was eliminated by dropping
+    the redundant P0580 dependency from tracks 23-25; see RISK_REGISTER.json#RISK-0001,
+    whose status is now "resolved". This test documents the clean state that replaced it
+    and must not regress to expecting that cycle again.
+    """
+
+    def test_real_catalog_is_fully_clean_with_no_known_cycle(self):
         catalog = load_catalog()
-        result = check(catalog, risk_register=None)  # this branch has no risk register yet
+        risk_register = load_risk_register()  # RISK_REGISTER.json now present, RISK-0001 resolved
+        result = check(catalog, risk_register=risk_register)
         self.assertEqual(result["prompt_count"], 720)
         self.assertEqual(result["missing_targets"], [])
         self.assertEqual(result["self_dependencies"], [])
-        self.assertEqual(len(result["untracked_cycles"]), 1)
-        cycle = result["untracked_cycles"][0]
-        self.assertEqual(len(cycle), 140)
-        self.assertEqual(cycle[0], "P0441")
-        self.assertEqual(cycle[-1], "P0580")
-        self.assertEqual(result["exit_code"], EXIT_UNTRACKED_DEFECT)
+        self.assertEqual(result["untracked_cycles"], [])
+        self.assertEqual(result["tracked_cycles"], [])
+        self.assertEqual(result["exit_code"], EXIT_CLEAN)
 
 
 if __name__ == "__main__":
