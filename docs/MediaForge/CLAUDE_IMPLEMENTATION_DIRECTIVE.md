@@ -53,3 +53,12 @@ P0 bedeutet: Datenmodell/Contract früh vorbereiten; es bedeutet **nicht**, dass
 ## Granular prompt execution system
 
 For normal implementation work, use `docs/MediaForge/prompts/` instead of rereading the full specification on every turn. Start with `prompts/README_START_HERE.md`. Each numbered prompt defines its own minimal context budget. Do not preload unrelated documentation or images.
+
+## Green-Commit- und Capability-Regeln 2026-08-16
+
+- Keine neue Next.js-Schicht einführen; Web-Ziel ist React Router Framework Mode + MediaForge API v1.
+- AI/3D niemals zu einer Core-Hard-Dependency machen.
+- Keine großen Analysis-Artefakte als PostgreSQL-BLOB speichern.
+- Keine Body-Model-/AI-Provider-Lizenz voraussetzen: Provider über Adapter/Model Registry, Lizenz muss vorgesehenen Use erlauben.
+- Neue Adult-3D/Tattoo-Funktionen nur im entsperrten Adult-Kontext und mit vollständiger Zero-Leak-Behandlung.
+- Standardentwicklung folgt `architecture/green-commit-workflow.md`.

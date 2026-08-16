@@ -659,3 +659,17 @@ Die Produktarchitektur wurde nach den bisherigen V2-Erfahrungen präzisiert. Bei
 9. Film Cut und Technical Edition sind getrennte Ebenen.
 10. Serien unterstützen mehrere Episode Orders.
 11. Work Graph kann verschiedene Medienarten verbinden.
+
+## Architektur-Delta 2026-08-16
+
+Die ausführlichen verbindlichen Ergänzungen liegen in:
+
+- `architecture/frontend-framework.md`
+- `architecture/ai-capabilities-model-registry.md`
+- `architecture/artifact-store-and-derived-assets.md`
+- `architecture/green-commit-workflow.md`
+- `modules/adult-3d-reconstruction-and-tattoo-coverage.md`
+- `modules/plugin-theme-sdk.md`
+- `modules/derived-assets-and-storage-manager.md`
+
+Die 720-Prompt-Struktur bleibt bestehen; betroffene Prompts werden aktualisiert statt neue IDs anzuhängen.

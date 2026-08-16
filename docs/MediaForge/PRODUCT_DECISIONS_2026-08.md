@@ -79,3 +79,17 @@ Status: **verbindliche Ergänzung zur Master-Spezifikation**. `CURRENT_PHASE.md`
 55. **Disc/ISO bleibt:** ISO/BDMV/VIDEO_TS, Menüs, Episoden-Watch-State.
 56. **Disc Verified-only:** kein Confidence-basiertes Auto-Mapping; sekundengenaue/editionstreue Evidenz erforderlich.
 57. **Audio Upscaler bleibt später:** Ergebnis als rekonstruierte Edition, nie als echtes Original ausgeben.
+
+## Ergänzungen vom 16. August 2026
+
+- Web-Ziel: React Router **Framework Mode** + Vite; Next.js wird nicht als zweiter Full-Stack-Server eingeführt.
+- Plugin-System umfasst Themes, UI Extensions, Metadata Provider, Automation, Analysis Provider und Engine Adapter.
+- Themes erhalten Design Tokens/scoped CSS; Custom CSS bleibt möglich, global nur Advanced/opt-in.
+- AI/3D ist vollständig optional; Model Downloads erfolgen erst nach Aktivierung.
+- 3D Performer Reconstruction ist Multi-Scene, revisioniert und provider-abstrakt.
+- Tattoo Coverage für weibliche Adult-Performer ist flächenbasiert über die gesamte Körperoberfläche; Tattoo Count ist sekundär.
+- Anatomy Regions werden versioniert und deutlich feiner als arms/torso/legs modelliert.
+- Große AI-/3D-Artefakte liegen im content-addressed Artifact Store statt PostgreSQL-BLOBs.
+- AI Model Registry + Evaluation/Golden Dataset + Resource Scheduler sind Teil der langfristigen Plattform.
+- Standard-Git-Workflow: kleine grüne Inkremente direkt auf main; Branches nur optional für besonders riskante Experimente; kein kaputter Commit.
+- Die Anzahl der nummerierten Claude-Prompts bleibt 720.

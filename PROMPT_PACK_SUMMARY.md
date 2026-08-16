@@ -1,21 +1,9 @@
-# MediaForge Claude prompt pack summary
+# MediaForge Prompt Pack Summary — 2026-08-16
 
-- **720 detailed numbered prompts** (`P0001`–`P0720`)
-- **36 tracks**
-- **20 prompts per track**
-- Each prompt contains:
-  - explicit dependencies
-  - priority P0/P1/P2
-  - minimal required docs
-  - targeted source paths
-  - exact UI images where relevant
-  - subsystem-specific architectural rule
-  - exact work scope
-  - non-goals
-  - acceptance criteria
-  - validation/test expectations
-  - completion/handoff format
-- Claude is explicitly instructed not to read all MediaForge documentation for each task.
-- The full MediaForge docs remain the product specification; `docs/MediaForge/prompts/` is the execution layer.
-
-Start with `PASTE_TO_CLAUDE_PROMPT_SYSTEM.md`.
+- **720 numbered prompts remain exactly 720** (`P0001`–`P0720`).
+- 36 tracks × 20 lifecycle prompts.
+- New decisions are integrated into existing prompts; no new numbered IDs were added.
+- The former dependency cycle across P0441–P0580 is removed by dropping the backwards hard dependency from Tracks 23–25 to P0580. Track 29 now optimizes behind earlier contracts.
+- Updated areas: React Router Framework Mode, optional AI/3D, Tattoo Coverage/Anatomy, 3D Reconstruction Revisions, Artifact/Model Stores, Plugin/Theme SDK, Custom CSS, Resource Scheduler, Derived Storage/GC, green-commit workflow.
+- Claude must continue reading only the current prompt's Required Reads/UI references.
+- `CURRENT_PHASE.md` is intentionally not included/overwritten by this package.

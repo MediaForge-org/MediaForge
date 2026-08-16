@@ -1,0 +1,28 @@
+MediaForge complete documentation/UI/prompt overlay — 2026-08-16
+
+PROMPTS
+- 720 numbered prompts exactly: P0001..P0720
+- 36 tracks × 20 prompts
+- prompt dependency graph: acyclic / topological count 720
+- former P0441..P0580 cycle corrected without renumbering
+
+UI REFERENCES
+- 56 PNGs total in docs/MediaForge/ui-ux/reference-expanded
+- 26 new references: 42..67
+
+NEW ARCHITECTURE AREAS
+- React Router Framework Mode + Vite
+- optional AI/3D capabilities
+- AI Model Registry / evaluation
+- content-addressed Artifact Store
+- Derived Asset storage budgets + GC
+- detailed anatomy ontology
+- multi-scene 3D performer reconstruction
+- female performer tattoo surface coverage
+- plugin/theme SDK and Custom CSS
+- green-commit main workflow
+
+SAFETY OF OVERLAY
+- CURRENT_PHASE.md intentionally absent
+- existing live generated governance artifacts are not deleted
+- prepared archive is repo-relative

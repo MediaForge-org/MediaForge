@@ -133,3 +133,20 @@ Adult ist normal gesperrt vollständig unsichtbar. Nach Unlock sind schöne `/ad
 ## Zeitplanung
 
 Siehe `DEVELOPMENT_PHASES_DETAILED.md` für grobe Korridore.
+
+## Roadmap-Ergänzungen 2026-08-16
+
+Die Zahl der Claude-Arbeitsschritte bleibt **720**. Neue Anforderungen werden in vorhandene Tracks integriert:
+
+- Track 02: Plugin-/Theme-SDK-Ordner, Artifact-/Reconstruction-Struktur vorbereiten;
+- Track 05: React Router Framework Mode und Inertia-Strangler-Migration;
+- Track 07: Anatomy/Reconstruction/Plugin/Capability Contracts;
+- Track 08: Analysis-/Reconstruction-Metadaten in PostgreSQL, keine großen BLOBs;
+- Track 09: private 3D/Evidence/Model-Zugriffe;
+- Track 10: Theme Tokens und Custom CSS;
+- Track 21/22: Tattoo Coverage, Body Regions und Filter;
+- Track 23: optionale Full Analysis + 3D Reconstruction + Tattoo Projection;
+- Track 29: Rust Mesh/Projection/Evidence Hotpaths ohne rückwärtsgerichtete Dependency;
+- Track 34: Plugin SDK, Theme SDK, Marketplace;
+- Track 35: Artifact Store, Quotas/GC, AI Model Registry, GPU Scheduler;
+- Track 36: optionale AI Docker Profiles/Model Downloads und vollständige CI-Matrix.

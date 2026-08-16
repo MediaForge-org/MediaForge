@@ -254,3 +254,9 @@ This package now includes the **full target architecture and feature specificati
 - `docs/MediaForge/DEVELOPMENT_PHASES_DETAILED.md`
 
 Reference images `30`–`41` document the newly added acquisition, analysis, provenance, chapter, storage and episode-order workflows.
+
+## 2026-08-16 AI/3D/Plugin/Frontend update
+
+This package now includes the final UI reference expansion (42–67) and detailed architecture updates for React Router Framework Mode, optional AI/3D, full-body tattoo coverage, 3D reconstruction, plugin/theme/custom CSS, artifact/model storage, resource scheduling and the green-commit workflow.
+
+The numbered Claude system remains exactly **720 prompts**. Existing IDs were updated instead of adding more prompts.
