@@ -18,6 +18,10 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
+- `docs/MediaForge/architecture/localization-and-professional-translation.md`
+- `docs/MediaForge/modules/acquisition-automation-and-postprocessing.md`
+- `docs/MediaForge/adr/0026-localization-and-translation.md`
+- `docs/MediaForge/adr/0027-acquisition-blueprint-processing-dag.md`
 - `docs/MediaForge/MediaForge_Master_Engineering.md`
 - `docs/MediaForge/modules/adult-lineage-and-catalog.md`
 - `docs/MediaForge/ui-ux/FEATURE_SCREEN_SPECIFICATIONS.md`
@@ -28,6 +32,7 @@ Inspect these source paths/symbol neighborhoods first:
 - `apps/server/app/Domain/Reviews`
 
 ### UI references for this prompt
+- `docs/MediaForge/ui-ux/reference-expanded/69_localization_translation_acquisition_overview.png`
 - `docs/MediaForge/ui-ux/reference-expanded/15_metadata_matching_workbench.png`
 - `docs/MediaForge/ui-ux/reference-expanded/20_provenance_inspector.png`
 - `docs/MediaForge/ui-ux/reference-expanded/35_adult_metadata_provenance_date_conflict.png`
@@ -37,6 +42,12 @@ Do **not** recursively open every document linked from the required reads. If a 
 ## Subsystem-specific rule
 
 Every important field should be traceable to evidence/source/observation where practical. Manual overrides must survive automated syncs.
+
+
+## Mandatory target additions — 2026-08-17
+
+- Preserve original and translated metadata separately with field-level provenance; machine-translated fields may later be superseded by authoritative locale metadata.
+- Acquisition provenance records source/decision/post-processing without storing secrets.
 
 ## Exact work for this prompt
 

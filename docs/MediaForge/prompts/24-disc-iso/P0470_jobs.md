@@ -18,6 +18,8 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
+- `docs/MediaForge/modules/acquisition-automation-and-postprocessing.md`
+- `docs/MediaForge/adr/0027-acquisition-blueprint-processing-dag.md`
 - `docs/MediaForge/modules/disc-engine.md`
 - `docs/MediaForge/modules/disc-verification-policy.md`
 - `docs/MediaForge/architecture/polyglot-runtime-and-contracts.md`
@@ -28,6 +30,7 @@ Inspect these source paths/symbol neighborhoods first:
 - `apps/web/src/features/discs`
 
 ### UI references for this prompt
+- `docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png`
 - `docs/MediaForge/ui-ux/reference-expanded/19_disc_exact_verification.png`
 
 Do **not** recursively open every document linked from the required reads. If a concrete ambiguity remains, use `CONTEXT_ROUTING.md` to open the smallest authoritative document/section that resolves it.
@@ -35,6 +38,13 @@ Do **not** recursively open every document linked from the required reads. If a 
 ## Subsystem-specific rule
 
 No confidence-only episode mapping. Automated episode identity requires verified evidence; otherwise keep the mapping unresolved. Do not implement DRM bypass.
+
+
+## Mandatory target additions — 2026-08-17
+
+- For authorised disc/ISO inputs, verified mapping may branch into episode/main-feature/extra remux operations and optional derived transcode profiles.
+- MKVToolNix-style remux and FFmpeg-style transcoding are separate stages; ambiguous title/playlist mapping goes to Review, never guesswork.
+- Minimum derived video profile families are H.264/AVC, H.265/HEVC and AV1, with multiple selectable outputs allowed.
 
 ## Exact work for this prompt
 

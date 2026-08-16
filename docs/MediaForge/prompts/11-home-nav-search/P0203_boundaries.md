@@ -18,6 +18,9 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
+- `docs/MediaForge/architecture/localization-and-professional-translation.md`
+- `docs/MediaForge/adr/0026-localization-and-translation.md`
+- `docs/MediaForge/modules/acquisition-automation-and-postprocessing.md`
 - `docs/MediaForge/ui-ux/unified-interface.md`
 - `docs/MediaForge/ui-ux/UI_IMPLEMENTATION_PROMPT.md`
 - `docs/MediaForge/architecture/routing-and-public-urls.md`
@@ -28,6 +31,7 @@ Inspect these source paths/symbol neighborhoods first:
 - `apps/server/app/Domain/Search`
 
 ### UI references for this prompt
+- `docs/MediaForge/ui-ux/reference-expanded/69_localization_translation_acquisition_overview.png`
 - `docs/MediaForge/ui-ux/reference-expanded/10_unified_home_dashboard.png`
 - `docs/MediaForge/ui-ux/reference-expanded/11_movies_tv_library.png`
 
@@ -36,6 +40,12 @@ Do **not** recursively open every document linked from the required reads. If a 
 ## Subsystem-specific rule
 
 Adult content must not appear in the normal home/search/navigation state while locked. The home must still feel like one product across multiple engines.
+
+
+## Mandatory target additions — 2026-08-17
+
+- Search must consider localised/alternate titles and locale-aware display/sorting without changing canonical identity.
+- Global search may surface Acquisition candidates through the unified MediaForge product surface rather than linking users to separate upstream apps.
 
 ## Exact work for this prompt
 

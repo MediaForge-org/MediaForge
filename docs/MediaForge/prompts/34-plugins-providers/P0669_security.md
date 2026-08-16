@@ -18,6 +18,12 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
+- `docs/MediaForge/architecture/managed-upstreams-and-product-surface.md`
+- `docs/MediaForge/modules/acquisition-automation-and-postprocessing.md`
+- `docs/MediaForge/architecture/localization-and-professional-translation.md`
+- `docs/MediaForge/adr/0025-managed-upstream-backends.md`
+- `docs/MediaForge/adr/0026-localization-and-translation.md`
+- `docs/MediaForge/adr/0027-acquisition-blueprint-processing-dag.md`
 - `docs/MediaForge/MediaForge_Master_Engineering.md`
 - `docs/MediaForge/architecture/engine-contracts.md`
 - `docs/MediaForge/modules/acquisition-center.md`
@@ -32,6 +38,8 @@ Inspect these source paths/symbol neighborhoods first:
 - `apps/web/src/extensions`
 
 ### UI references for this prompt
+- `docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png`
+- `docs/MediaForge/ui-ux/reference-expanded/69_localization_translation_acquisition_overview.png`
 - `docs/MediaForge/ui-ux/reference-expanded/55_plugin_marketplace.png`
 - `docs/MediaForge/ui-ux/reference-expanded/56_theme_editor_custom_css.png`
 
@@ -43,6 +51,12 @@ Do **not** recursively open every document linked from the required reads. If a 
 
 
 Extensions run through versioned capabilities and permissions. Do not let plugins write arbitrary core tables or bypass privacy policies.
+
+
+## Mandatory target additions — 2026-08-17
+
+- Provider plugins may extend indexer/search, Browser Companion, automation and TranslationProvider capabilities without bypassing MediaForge security/provenance.
+- Plugin locale bundles integrate with the same localisation message schema and quality checks.
 
 ## Exact work for this prompt
 

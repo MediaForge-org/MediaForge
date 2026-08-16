@@ -18,6 +18,11 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
+- `docs/MediaForge/architecture/managed-upstreams-and-product-surface.md`
+- `docs/MediaForge/modules/acquisition-automation-and-postprocessing.md`
+- `docs/MediaForge/architecture/localization-and-professional-translation.md`
+- `docs/MediaForge/adr/0025-managed-upstream-backends.md`
+- `docs/MediaForge/adr/0027-acquisition-blueprint-processing-dag.md`
 - `docs/MediaForge/modules/movies-advanced-model.md`
 - `docs/MediaForge/modules/media-editions-and-lineage.md`
 - `docs/MediaForge/modules/work-graph-and-cross-media.md`
@@ -27,6 +32,8 @@ Inspect these source paths/symbol neighborhoods first:
 - `apps/web/src/features/movies`
 
 ### UI references for this prompt
+- `docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png`
+- `docs/MediaForge/ui-ux/reference-expanded/69_localization_translation_acquisition_overview.png`
 - `docs/MediaForge/ui-ux/reference-expanded/11_movies_tv_library.png`
 - `docs/MediaForge/ui-ux/reference-expanded/40_feature_overview_p0_p2.png`
 
@@ -35,6 +42,12 @@ Do **not** recursively open every document linked from the required reads. If a 
 ## Subsystem-specific rule
 
 Model editorial cuts separately from technical encodes/editions. A different cut is not merely a higher-quality duplicate.
+
+
+## Mandatory target additions — 2026-08-17
+
+- Movie Wanted/monitoring/release automation may initially use Radarr behind MediaForge UX but MediaForge owns canonical edition/quality decisions and provenance.
+- Alternate cuts/technical editions must not be flattened by automation.
 
 ## Exact work for this prompt
 

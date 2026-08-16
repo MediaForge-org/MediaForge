@@ -18,6 +18,10 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
+- `docs/MediaForge/architecture/managed-upstreams-and-product-surface.md`
+- `docs/MediaForge/architecture/localization-and-professional-translation.md`
+- `docs/MediaForge/adr/0025-managed-upstream-backends.md`
+- `docs/MediaForge/adr/0026-localization-and-translation.md`
 - `docs/MediaForge/modules/adult-enhancement.md`
 - `docs/MediaForge/ui-ux/adult-ui-enhancement.md`
 - `docs/MediaForge/PRODUCT_DECISIONS_2026-08.md`
@@ -27,6 +31,8 @@ Inspect these source paths/symbol neighborhoods first:
 - `apps/web/src/features/private-mode`
 
 ### UI references for this prompt
+- `docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png`
+- `docs/MediaForge/ui-ux/reference-expanded/69_localization_translation_acquisition_overview.png`
 - `docs/MediaForge/ui-ux/reference-expanded/21_private_mode_unlock.png`
 - `docs/MediaForge/ui-ux/reference-expanded/23_private_library_overview.png`
 
@@ -35,6 +41,12 @@ Do **not** recursively open every document linked from the required reads. If a 
 ## Subsystem-specific rule
 
 Default URLs may be beautiful `/adult/...` routes. Optional Strict Private URLs may use opaque routes. In either mode, locked-state zero-leak remains mandatory.
+
+
+## Mandatory target additions — 2026-08-17
+
+- Whisparr may be a transitional Adult automation backend, but all normal Adult UX remains inside the privacy-gated MediaForge product surface.
+- Managed-upstream/translation features must obey Adult zero-leak and external-provider privacy policies.
 
 ## Exact work for this prompt
 

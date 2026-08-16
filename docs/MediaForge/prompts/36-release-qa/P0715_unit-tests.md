@@ -18,6 +18,12 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
+- `docs/MediaForge/architecture/managed-upstreams-and-product-surface.md`
+- `docs/MediaForge/modules/acquisition-automation-and-postprocessing.md`
+- `docs/MediaForge/architecture/localization-and-professional-translation.md`
+- `docs/MediaForge/adr/0025-managed-upstream-backends.md`
+- `docs/MediaForge/adr/0026-localization-and-translation.md`
+- `docs/MediaForge/adr/0027-acquisition-blueprint-processing-dag.md`
 - `docs/MediaForge/architecture/docker-release-distribution.md`
 - `docs/MediaForge/DEVELOPMENT_PHASES_DETAILED.md`
 - `docs/MediaForge/CLAUDE_IMPLEMENTATION_DIRECTIVE.md`
@@ -32,6 +38,8 @@ Inspect these source paths/symbol neighborhoods first:
 - `tests`
 
 ### UI references for this prompt
+- `docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png`
+- `docs/MediaForge/ui-ux/reference-expanded/69_localization_translation_acquisition_overview.png`
 - `docs/MediaForge/ui-ux/reference-expanded/58_docker_deployment.png`
 - `docs/MediaForge/ui-ux/reference-expanded/60_implementation_roadmap_36_tracks.png`
 
@@ -43,6 +51,13 @@ Do **not** recursively open every document linked from the required reads. If a 
 
 
 Official images/releases require reproducibility, SBOM/provenance/signing policy, multi-arch strategy, migration gates and documented rollback paths.
+
+
+## Mandatory target additions — 2026-08-17
+
+- Release gates include managed-upstream startup/API/compatibility/rollback tests and full acquisition-to-import/post-processing E2E coverage.
+- First-class locales de/en-GB/it/es/fr require complete message-key coverage and representative layout/plural/date/number quality checks.
+- UI reference artwork is illustrative; production must never ship a mismatched poster/cover for a canonical media item.
 
 ## Exact work for this prompt
 

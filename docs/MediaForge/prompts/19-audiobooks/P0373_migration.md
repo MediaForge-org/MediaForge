@@ -18,6 +18,10 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
+- `docs/MediaForge/modules/acquisition-automation-and-postprocessing.md`
+- `docs/MediaForge/architecture/localization-and-professional-translation.md`
+- `docs/MediaForge/adr/0026-localization-and-translation.md`
+- `docs/MediaForge/adr/0027-acquisition-blueprint-processing-dag.md`
 - `docs/MediaForge/modules/audiobook-chapters-and-storage.md`
 - `docs/MediaForge/adr/0018-audiobook-chapter-storage.md`
 - `docs/MediaForge/ui-ux/FEATURE_SCREEN_SPECIFICATIONS.md`
@@ -27,6 +31,7 @@ Inspect these source paths/symbol neighborhoods first:
 - `apps/web/src/features/audiobooks`
 
 ### UI references for this prompt
+- `docs/MediaForge/ui-ux/reference-expanded/69_localization_translation_acquisition_overview.png`
 - `docs/MediaForge/ui-ux/reference-expanded/12_audiobooks_dashboard.png`
 - `docs/MediaForge/ui-ux/reference-expanded/37_audiobook_single_file_chapter_verification.png`
 - `docs/MediaForge/ui-ux/reference-expanded/38_audiobook_storage_strategy.png`
@@ -36,6 +41,12 @@ Do **not** recursively open every document linked from the required reads. If a 
 ## Subsystem-specific rule
 
 Model Work, Edition, Chapter and AudioFile separately. Verified official chapters may be stored logically, exported to CUE/JSON, or physically split only after explicit user choice.
+
+
+## Mandatory target additions — 2026-08-17
+
+- Audiobook acquisition/import uses the same MediaForge naming/provenance pipeline while preserving chapter/edition semantics.
+- Metadata translation fallback may fill missing localised descriptions/chapters while retaining original text/provenance.
 
 ## Exact work for this prompt
 

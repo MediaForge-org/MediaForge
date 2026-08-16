@@ -18,6 +18,11 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
+- `docs/MediaForge/architecture/managed-upstreams-and-product-surface.md`
+- `docs/MediaForge/modules/acquisition-automation-and-postprocessing.md`
+- `docs/MediaForge/architecture/localization-and-professional-translation.md`
+- `docs/MediaForge/adr/0025-managed-upstream-backends.md`
+- `docs/MediaForge/adr/0027-acquisition-blueprint-processing-dag.md`
 - `docs/MediaForge/modules/adult-lineage-and-catalog.md`
 - `docs/MediaForge/modules/adult-enhancement.md`
 - `docs/MediaForge/modules/adult-engine-target.md`
@@ -33,6 +38,8 @@ Inspect these source paths/symbol neighborhoods first:
 - `apps/web/src/features/adult`
 
 ### UI references for this prompt
+- `docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png`
+- `docs/MediaForge/ui-ux/reference-expanded/69_localization_translation_acquisition_overview.png`
 - `docs/MediaForge/ui-ux/reference-expanded/02_core_performer_detail.png`
 - `docs/MediaForge/ui-ux/reference-expanded/04_core_coverage_library_management.png`
 - `docs/MediaForge/ui-ux/reference-expanded/36_performer_catalog_completeness.png`
@@ -55,6 +62,12 @@ Do **not** recursively open every document linked from the required reads. If a 
 
 
 Scenes, performers, studios, brands, networks and historical sources need first-class lineage. Deep sync is library-driven rather than a global mirror.
+
+
+## Mandatory target additions — 2026-08-17
+
+- Adult acquisition results/automation map to MediaForge performer/scene/studio identities; backend-specific entities never become canonical IDs.
+- Normal search/Wanted/download UI is MediaForge-owned; Whisparr/Prowlarr/qBittorrent/SAB remain implementation backends where configured.
 
 ## Exact work for this prompt
 

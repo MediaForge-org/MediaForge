@@ -18,6 +18,8 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
+- `docs/MediaForge/architecture/localization-and-professional-translation.md`
+- `docs/MediaForge/adr/0026-localization-and-translation.md`
 - `docs/MediaForge/architecture/target-monorepo.md`
 - `docs/MediaForge/ui-ux/design-system.md`
 - `docs/MediaForge/ui-ux/UI_IMPLEMENTATION_PROMPT.md`
@@ -34,6 +36,7 @@ Inspect these source paths/symbol neighborhoods first:
 - `packages/design-tokens`
 
 ### UI references for this prompt
+- `docs/MediaForge/ui-ux/reference-expanded/69_localization_translation_acquisition_overview.png`
 - `docs/MediaForge/ui-ux/reference-expanded/01_core_home_dashboard.png`
 - `docs/MediaForge/ui-ux/reference-expanded/10_unified_home_dashboard.png`
 
@@ -45,6 +48,12 @@ Do **not** recursively open every document linked from the required reads. If a 
 
 
 Move the React/TypeScript application without redesigning it yet. Preserve current user-visible behavior until the dedicated design-system prompts.
+
+
+## Mandatory target additions — 2026-08-17
+
+- The extracted React web app must be localisation-first and must not bake user-visible strings into migration-only components.
+- Preserve independent UI-locale and metadata-locale concepts; launch locales are de, en-GB, it, es and fr.
 
 ## Exact work for this prompt
 

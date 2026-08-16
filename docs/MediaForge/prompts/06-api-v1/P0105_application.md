@@ -18,6 +18,9 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
+- `docs/MediaForge/architecture/localization-and-professional-translation.md`
+- `docs/MediaForge/adr/0026-localization-and-translation.md`
+- `docs/MediaForge/architecture/managed-upstreams-and-product-surface.md`
 - `docs/MediaForge/architecture/polyglot-runtime-and-contracts.md`
 - `docs/MediaForge/architecture/engine-contracts.md`
 - `docs/MediaForge/architecture/unified-application.md`
@@ -28,6 +31,7 @@ Inspect these source paths/symbol neighborhoods first:
 - `routes/api.php`
 
 ### UI references for this prompt
+- `docs/MediaForge/ui-ux/reference-expanded/69_localization_translation_acquisition_overview.png`
 - None for this prompt unless a changed screen directly requires an existing design-system reference.
 
 Do **not** recursively open every document linked from the required reads. If a concrete ambiguity remains, use `CONTEXT_ROUTING.md` to open the smallest authoritative document/section that resolves it.
@@ -35,6 +39,12 @@ Do **not** recursively open every document linked from the required reads. If a 
 ## Subsystem-specific rule
 
 The API must be usable by web, desktop, mobile, TV and future engine clients. Avoid web-only response shapes and avoid leaking engine-specific IDs as canonical identities.
+
+
+## Mandatory target additions — 2026-08-17
+
+- API contracts expose canonical MediaForge statuses/error codes, not arbitrary English upstream strings.
+- Localisation is applied at the product boundary; provider/backend implementation details stay normalised.
 
 ## Exact work for this prompt
 

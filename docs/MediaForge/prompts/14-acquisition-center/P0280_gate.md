@@ -18,6 +18,10 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
+- `docs/MediaForge/architecture/managed-upstreams-and-product-surface.md`
+- `docs/MediaForge/modules/acquisition-automation-and-postprocessing.md`
+- `docs/MediaForge/adr/0025-managed-upstream-backends.md`
+- `docs/MediaForge/adr/0027-acquisition-blueprint-processing-dag.md`
 - `docs/MediaForge/modules/acquisition-center.md`
 - `docs/MediaForge/adr/0017-acquisition-and-staging.md`
 - `docs/MediaForge/ui-ux/FEATURE_SCREEN_SPECIFICATIONS.md`
@@ -27,6 +31,8 @@ Inspect these source paths/symbol neighborhoods first:
 - `apps/web/src/features/acquisition`
 
 ### UI references for this prompt
+- `docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png`
+- `docs/MediaForge/ui-ux/reference-expanded/69_localization_translation_acquisition_overview.png`
 - `docs/MediaForge/ui-ux/reference-expanded/30_acquisition_center.png`
 - `docs/MediaForge/ui-ux/reference-expanded/31_manual_download_intake.png`
 
@@ -35,6 +41,13 @@ Do **not** recursively open every document linked from the required reads. If a 
 ## Subsystem-specific rule
 
 MediaForge may accept user-supplied NZB/torrent/magnet inputs and permitted custom sources, but it must not become a piracy search engine or bypass access controls.
+
+
+## Mandatory target additions — 2026-08-17
+
+- Acquisition is a MediaForge product surface: Search, Wanted, Releases, Downloads, Queue, History, Upgrades, Import and Sources use MediaForge UI.
+- Support broad provider capability adapters (Newznab/Torznab/Prowlarr/Jackett-compatible/native/RSS/Browser Companion/manual) instead of a hard-coded site list.
+- Sonarr/Radarr/Whisparr are transitional automation backends; Prowlarr/SAB/qBittorrent may remain specialised managed backends.
 
 ## Exact work for this prompt
 

@@ -18,6 +18,8 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
+- `docs/MediaForge/architecture/localization-and-professional-translation.md`
+- `docs/MediaForge/adr/0026-localization-and-translation.md`
 - `docs/MediaForge/ui-ux/UI_IMPLEMENTATION_PROMPT.md`
 - `docs/MediaForge/ui-ux/design-system.md`
 - `docs/MediaForge/ui-ux/SCREEN_REFERENCE_INDEX.md`
@@ -31,6 +33,7 @@ Inspect these source paths/symbol neighborhoods first:
 - `apps/web/src/extensions`
 
 ### UI references for this prompt
+- `docs/MediaForge/ui-ux/reference-expanded/69_localization_translation_acquisition_overview.png`
 - `docs/MediaForge/ui-ux/reference-expanded/01_core_home_dashboard.png`
 - `docs/MediaForge/ui-ux/reference-expanded/10_unified_home_dashboard.png`
 - `docs/MediaForge/ui-ux/reference-expanded/11_movies_tv_library.png`
@@ -46,6 +49,12 @@ Do **not** recursively open every document linked from the required reads. If a 
 
 
 Use the reference images as visual specifications, not as pixel-perfect screenshots. Build reusable primitives and tokens rather than page-specific one-off CSS.
+
+
+## Mandatory target additions — 2026-08-17
+
+- All normal user-visible copy uses stable localisation keys and must support de, en-GB, it, es and fr from the initial target.
+- Components must tolerate language expansion and locale-specific number/date/size/plural formatting.
 
 ## Exact work for this prompt
 

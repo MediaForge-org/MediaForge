@@ -18,6 +18,8 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
+- `docs/MediaForge/architecture/managed-upstreams-and-product-surface.md`
+- `docs/MediaForge/adr/0025-managed-upstream-backends.md`
 - `docs/MediaForge/architecture/target-monorepo.md`
 - `docs/MediaForge/adr/0014-target-polyglot-monorepo.md`
 - `docs/MediaForge/architecture/unified-application.md`
@@ -36,6 +38,7 @@ Inspect these source paths/symbol neighborhoods first:
 - `platform/storage`
 
 ### UI references for this prompt
+- `docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png`
 - None for this prompt unless a changed screen directly requires an existing design-system reference.
 
 Do **not** recursively open every document linked from the required reads. If a concrete ambiguity remains, use `CONTEXT_ROUTING.md` to open the smallest authoritative document/section that resolves it.
@@ -43,6 +46,13 @@ Do **not** recursively open every document linked from the required reads. If a 
 ## Subsystem-specific rule
 
 Preserve Git history and working behavior while introducing the target top-level layout. Avoid a big-bang move that makes the application unbuildable for multiple prompts.
+
+
+## Mandatory target additions — 2026-08-17
+
+- Import/pin buildable Jellyfin, Stash and Audiobookshelf upstream baselines early in the monorepo; record exact release/tag, commit SHA and licence provenance at the time of import.
+- Prepare `platform/managed-upstreams/` and `tools/upstream-sync/` seams without prematurely performing the later engine cutover.
+- Keep normal product UX owned by MediaForge; source import is not permission to expose upstream UIs as the product.
 
 ## Exact work for this prompt
 

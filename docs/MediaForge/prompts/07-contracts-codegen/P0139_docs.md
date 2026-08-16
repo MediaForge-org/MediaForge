@@ -18,6 +18,12 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
+- `docs/MediaForge/architecture/managed-upstreams-and-product-surface.md`
+- `docs/MediaForge/architecture/localization-and-professional-translation.md`
+- `docs/MediaForge/modules/acquisition-automation-and-postprocessing.md`
+- `docs/MediaForge/adr/0025-managed-upstream-backends.md`
+- `docs/MediaForge/adr/0026-localization-and-translation.md`
+- `docs/MediaForge/adr/0027-acquisition-blueprint-processing-dag.md`
 - `docs/MediaForge/architecture/engine-contracts.md`
 - `docs/MediaForge/architecture/polyglot-runtime-and-contracts.md`
 - `docs/MediaForge/architecture/target-monorepo.md`
@@ -34,6 +40,8 @@ Inspect these source paths/symbol neighborhoods first:
 - `packages/contracts/domains/plugins`
 
 ### UI references for this prompt
+- `docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png`
+- `docs/MediaForge/ui-ux/reference-expanded/69_localization_translation_acquisition_overview.png`
 - None for this prompt unless a changed screen directly requires an existing design-system reference.
 
 Do **not** recursively open every document linked from the required reads. If a concrete ambiguity remains, use `CONTEXT_ROUTING.md` to open the smallest authoritative document/section that resolves it.
@@ -44,6 +52,12 @@ Do **not** recursively open every document linked from the required reads. If a 
 
 
 Contracts are language-neutral. Generated code must be reproducible and committed/ignored according to the documented policy, with no hand-edited generated clients.
+
+
+## Mandatory target additions — 2026-08-17
+
+- Contracts must cover ManagedComponent lifecycle/capabilities, provider capabilities, AcquisitionBlueprint/post-processing states and localisation/translation provenance.
+- Do not couple canonical identities to Sonarr/Radarr/Whisparr/Prowlarr/SAB/qBittorrent IDs.
 
 ## Exact work for this prompt
 

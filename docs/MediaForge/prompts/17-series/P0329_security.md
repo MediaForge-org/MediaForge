@@ -18,6 +18,11 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
+- `docs/MediaForge/architecture/managed-upstreams-and-product-surface.md`
+- `docs/MediaForge/modules/acquisition-automation-and-postprocessing.md`
+- `docs/MediaForge/architecture/localization-and-professional-translation.md`
+- `docs/MediaForge/adr/0025-managed-upstream-backends.md`
+- `docs/MediaForge/adr/0027-acquisition-blueprint-processing-dag.md`
 - `docs/MediaForge/modules/series-advanced-model.md`
 - `docs/MediaForge/modules/media-editions-and-lineage.md`
 - `docs/MediaForge/architecture/routing-and-public-urls.md`
@@ -27,6 +32,8 @@ Inspect these source paths/symbol neighborhoods first:
 - `apps/web/src/features/series`
 
 ### UI references for this prompt
+- `docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png`
+- `docs/MediaForge/ui-ux/reference-expanded/69_localization_translation_acquisition_overview.png`
 - `docs/MediaForge/ui-ux/reference-expanded/39_series_episode_order_and_editions.png`
 
 Do **not** recursively open every document linked from the required reads. If a concrete ambiguity remains, use `CONTEXT_ROUTING.md` to open the smallest authoritative document/section that resolves it.
@@ -34,6 +41,12 @@ Do **not** recursively open every document linked from the required reads. If a 
 ## Subsystem-specific rule
 
 Support multiple episode orders and keep Episode separate from File/Edition. Human-readable URLs are stable presentation routes, not canonical identity.
+
+
+## Mandatory target additions — 2026-08-17
+
+- Series Wanted/monitoring/release automation may initially use Sonarr behind MediaForge UX but must map into canonical MediaForge series/episode identities.
+- Season packs/disc-derived episodes are named and imported only after deterministic episode matching.
 
 ## Exact work for this prompt
 

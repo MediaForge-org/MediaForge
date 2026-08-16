@@ -18,6 +18,10 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
+- `docs/MediaForge/architecture/managed-upstreams-and-product-surface.md`
+- `docs/MediaForge/modules/acquisition-automation-and-postprocessing.md`
+- `docs/MediaForge/adr/0025-managed-upstream-backends.md`
+- `docs/MediaForge/adr/0027-acquisition-blueprint-processing-dag.md`
 - `docs/MediaForge/modules/acquisition-center.md`
 - `docs/MediaForge/modules/media-editions-and-lineage.md`
 - `docs/MediaForge/adr/0017-acquisition-and-staging.md`
@@ -28,6 +32,7 @@ Inspect these source paths/symbol neighborhoods first:
 - `apps/web/src/features/acquisition`
 
 ### UI references for this prompt
+- `docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png`
 - `docs/MediaForge/ui-ux/reference-expanded/31_manual_download_intake.png`
 - `docs/MediaForge/ui-ux/reference-expanded/32_import_sandbox_upgrade_review.png`
 
@@ -36,6 +41,13 @@ Do **not** recursively open every document linked from the required reads. If a 
 ## Subsystem-specific rule
 
 Downloads land in staging first. No completed download should be moved directly into a library without a deterministic import plan, validation and provenance record.
+
+
+## Mandatory target additions — 2026-08-17
+
+- SABnzbd handles Usenet download/repair/unpack; MediaForge owns classification, final naming, provenance and library placement.
+- qBittorrent seed payload is preserved by default; prefer hardlink/reflink/copy for renamed library views, or rename active payload through qBittorrent APIs only.
+- Implement resumable post-processing stages rather than one opaque script; custom scripts are explicit contract-bound DAG nodes.
 
 ## Exact work for this prompt
 

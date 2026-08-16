@@ -18,6 +18,12 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
+- `docs/MediaForge/architecture/managed-upstreams-and-product-surface.md`
+- `docs/MediaForge/modules/acquisition-automation-and-postprocessing.md`
+- `docs/MediaForge/architecture/localization-and-professional-translation.md`
+- `docs/MediaForge/adr/0025-managed-upstream-backends.md`
+- `docs/MediaForge/adr/0026-localization-and-translation.md`
+- `docs/MediaForge/adr/0027-acquisition-blueprint-processing-dag.md`
 - `docs/MediaForge/architecture/docker-release-distribution.md`
 - `docs/MediaForge/architecture/postgresql-source-of-truth.md`
 - `docs/MediaForge/DEVELOPMENT_PHASES_DETAILED.md`
@@ -35,6 +41,8 @@ Inspect these source paths/symbol neighborhoods first:
 - `services/ai/evaluation`
 
 ### UI references for this prompt
+- `docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png`
+- `docs/MediaForge/ui-ux/reference-expanded/69_localization_translation_acquisition_overview.png`
 - `docs/MediaForge/ui-ux/reference-expanded/17_analytics_and_reports.png`
 - `docs/MediaForge/ui-ux/reference-expanded/58_docker_deployment.png`
 - `docs/MediaForge/ui-ux/reference-expanded/66_3d_analysis_settings_overview.png`
@@ -47,6 +55,13 @@ Do **not** recursively open every document linked from the required reads. If a 
 
 
 Measure before optimizing. Backups must be restorable, not merely created. Observability must cover the full multi-process system.
+
+
+## Mandatory target additions — 2026-08-17
+
+- Managed-upstream updates are pinned, compatibility-tested and rollback-capable; do not auto-promote an unverified upstream release.
+- Coordinate downloader bandwidth, torrent upload, playback, remux/transcode, AI and translation jobs through resource/storage budgets.
+- Expose peak temporary storage forecasts and translation/provider cost/queue controls.
 
 ## Exact work for this prompt
 

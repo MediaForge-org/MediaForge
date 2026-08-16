@@ -18,6 +18,9 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
+- `docs/MediaForge/modules/acquisition-automation-and-postprocessing.md`
+- `docs/MediaForge/architecture/localization-and-professional-translation.md`
+- `docs/MediaForge/adr/0027-acquisition-blueprint-processing-dag.md`
 - `docs/MediaForge/modules/media-editions-and-lineage.md`
 - `docs/MediaForge/architecture/postgresql-source-of-truth.md`
 - `docs/MediaForge/MediaForge_Master_Engineering.md`
@@ -28,6 +31,8 @@ Inspect these source paths/symbol neighborhoods first:
 - `apps/web/src/features/library`
 
 ### UI references for this prompt
+- `docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png`
+- `docs/MediaForge/ui-ux/reference-expanded/69_localization_translation_acquisition_overview.png`
 - `docs/MediaForge/ui-ux/reference-expanded/13_library_settings_and_parser.png`
 
 Do **not** recursively open every document linked from the required reads. If a concrete ambiguity remains, use `CONTEXT_ROUTING.md` to open the smallest authoritative document/section that resolves it.
@@ -35,6 +40,12 @@ Do **not** recursively open every document linked from the required reads. If a 
 ## Subsystem-specific rule
 
 Keep Work/MediaItem, Edition and File separate. Never let physical filesystem layout become canonical media identity.
+
+
+## Mandatory target additions — 2026-08-17
+
+- Final file/folder naming is owned by MediaForge and follows explicit templates/policies; acquisition source names remain provenance, not canonical identity.
+- Torrent-safe imports must preserve seeding through hardlink/reflink/copy or qBittorrent-aware rename flows.
 
 ## Exact work for this prompt
 

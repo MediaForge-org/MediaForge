@@ -18,6 +18,8 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
+- `docs/MediaForge/architecture/managed-upstreams-and-product-surface.md`
+- `docs/MediaForge/adr/0025-managed-upstream-backends.md`
 - `docs/MediaForge/modules/adult-engine-target.md`
 - `docs/MediaForge/architecture/engine-contracts.md`
 - `docs/MediaForge/architecture/target-monorepo.md`
@@ -28,6 +30,7 @@ Inspect these source paths/symbol neighborhoods first:
 - `services/media-tools`
 
 ### UI references for this prompt
+- `docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png`
 - None for this prompt unless a changed screen directly requires an existing design-system reference.
 
 Do **not** recursively open every document linked from the required reads. If a concrete ambiguity remains, use `CONTEXT_ROUTING.md` to open the smallest authoritative document/section that resolves it.
@@ -35,6 +38,11 @@ Do **not** recursively open every document linked from the required reads. If a 
 ## Subsystem-specific rule
 
 Keep upstream Stash-derived code recognizable and syncable. Preserve AGPL notices/history and isolate MediaForge integration seams.
+
+
+## Mandatory target additions — 2026-08-17
+
+- Stash source should already be pinned/imported from Track 02; this track completes/adapts the internal Adult Engine while preserving MediaForge canonical/privacy layers.
 
 ## Exact work for this prompt
 

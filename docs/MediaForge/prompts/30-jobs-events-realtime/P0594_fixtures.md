@@ -18,6 +18,12 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
+- `docs/MediaForge/architecture/managed-upstreams-and-product-surface.md`
+- `docs/MediaForge/modules/acquisition-automation-and-postprocessing.md`
+- `docs/MediaForge/architecture/localization-and-professional-translation.md`
+- `docs/MediaForge/adr/0025-managed-upstream-backends.md`
+- `docs/MediaForge/adr/0026-localization-and-translation.md`
+- `docs/MediaForge/adr/0027-acquisition-blueprint-processing-dag.md`
 - `docs/MediaForge/architecture/polyglot-runtime-and-contracts.md`
 - `docs/MediaForge/architecture/engine-contracts.md`
 - `docs/MediaForge/MediaForge_Master_Engineering.md`
@@ -28,6 +34,8 @@ Inspect these source paths/symbol neighborhoods first:
 - `apps/web/src/app/providers`
 
 ### UI references for this prompt
+- `docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png`
+- `docs/MediaForge/ui-ux/reference-expanded/69_localization_translation_acquisition_overview.png`
 - `docs/MediaForge/ui-ux/reference-expanded/16_tasks_queues_sync_operations.png`
 
 Do **not** recursively open every document linked from the required reads. If a concrete ambiguity remains, use `CONTEXT_ROUTING.md` to open the smallest authoritative document/section that resolves it.
@@ -35,6 +43,12 @@ Do **not** recursively open every document linked from the required reads. If a 
 ## Subsystem-specific rule
 
 Jobs must be idempotent, observable and restart-safe. Events are contracts, not ad-hoc websocket payloads.
+
+
+## Mandatory target additions — 2026-08-17
+
+- Normalise upstream events into canonical MediaForge event/status schemas before realtime/UI localisation.
+- Translation jobs and post-processing DAG nodes are resumable/idempotent background work with observable progress and bounded retries.
 
 ## Exact work for this prompt
 

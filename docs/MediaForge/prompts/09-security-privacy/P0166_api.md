@@ -18,6 +18,9 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
+- `docs/MediaForge/architecture/localization-and-professional-translation.md`
+- `docs/MediaForge/adr/0026-localization-and-translation.md`
+- `docs/MediaForge/architecture/managed-upstreams-and-product-surface.md`
 - `docs/MediaForge/PRODUCT_DECISIONS_2026-08.md`
 - `docs/MediaForge/modules/adult-enhancement.md`
 - `docs/MediaForge/ui-ux/adult-ui-enhancement.md`
@@ -32,6 +35,7 @@ Inspect these source paths/symbol neighborhoods first:
 - `platform/storage`
 
 ### UI references for this prompt
+- `docs/MediaForge/ui-ux/reference-expanded/69_localization_translation_acquisition_overview.png`
 - `docs/MediaForge/ui-ux/reference-expanded/21_private_mode_unlock.png`
 
 Do **not** recursively open every document linked from the required reads. If a concrete ambiguity remains, use `CONTEXT_ROUTING.md` to open the smallest authoritative document/section that resolves it.
@@ -42,6 +46,12 @@ Do **not** recursively open every document linked from the required reads. If a 
 
 
 Treat private/adult zero-leak as a server-side property. Client hiding alone is insufficient. Unauthorized resource existence must not leak through search, errors, preload, caches or events.
+
+
+## Mandatory target additions — 2026-08-17
+
+- Cloud translation is optional and policy-gated; private/Adult metadata must not be sent externally without explicit allowed-provider configuration.
+- Managed-upstream credentials/cookies/API keys are secrets and must never leak into URLs, logs, provenance or normal UI.
 
 ## Exact work for this prompt
 
