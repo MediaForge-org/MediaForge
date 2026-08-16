@@ -296,3 +296,13 @@ Hardwareprofile:
 - Exact.
 
 `Exact` priorisiert Trefferquote und Boundary Precision, kann aber erheblich länger laufen.
+
+## 19. Performer Tattoo Coverage und 3D
+
+Detaillierte Tattooanalyse wird für weibliche Adult-Performer priorisiert. Primäre Kennzahl ist flächenbasierte Gesamt-Coverage über die **vollständige Körperoberfläche**, nicht Tattoo Count und nicht nur sichtbare Haut. Body Regions verwenden die versionierte Anatomy Ontology. Multi-Scene Evidence kann optional ein individuelles 3D-Mesh erzeugen und Tattoos auf dessen Oberfläche projizieren.
+
+Siehe `adult-3d-reconstruction-and-tattoo-coverage.md`.
+
+## 20. Optionalität
+
+Full Analysis, 3D Reconstruction, Tattoo Projection und große lokale AI-Modelle sind opt-in Capabilities. Ohne sie bleibt Adult Catalog/Playback/Metadata vollständig funktionsfähig.
