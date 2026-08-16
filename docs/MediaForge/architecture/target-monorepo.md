@@ -310,3 +310,24 @@ Die Foundation gilt als abgeschlossen, wenn:
 - Docker Compose und CI grün sind;
 - keine existierende V2-Katalogfunktion verloren ging;
 - schöne Deep Links direkt im Browser geladen/reloaded werden können.
+
+## 18. Erweiterungen 2026-08-16
+
+Die Root-Struktur wird ergänzt um:
+
+```text
+packages/plugin-sdk/
+packages/theme-sdk/
+packages/contracts/domains/anatomy/
+packages/contracts/domains/reconstruction/
+packages/contracts/domains/plugins/
+platform/storage/
+services/media-tools/crates/mesh/
+services/media-tools/crates/evidence/
+services/ai/reconstruction/
+services/ai/evaluation/
+```
+
+Web-Ziel ist **React Router Framework Mode**, nicht nur ein nackter Router und nicht Next.js als zweite Full-Stack-Serverruntime. Details: `frontend-framework.md`.
+
+Große AI/3D-Funktionen sind Capability-gesteuert und optional. Große Binärartefakte liegen nicht in PostgreSQL, sondern im content-addressed Artifact Store. Details: `ai-capabilities-model-registry.md` und `artifact-store-and-derived-assets.md`.

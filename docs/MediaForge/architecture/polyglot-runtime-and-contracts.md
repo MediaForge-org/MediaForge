@@ -150,3 +150,7 @@ Video Engine offline -> Katalog weiterhin browsbar, Playback deaktiviert
 AI Worker offline -> Library/Playback funktioniert, Analyse wartet
 Adult Engine locked -> keine Adult-Daten sichtbar
 ```
+
+## 13. Reconstruction / Artifact Boundary
+
+3D ist kein eigener Monolith. Python besitzt ML-Inference/Multi-view-Reconstruction/Segmentation; Rust besitzt Frame-/PTS-, Mesh-, Projection-, Surface- und Artifact-IO-Hotpaths. Beide sprechen versionierte Contracts. Track 23 darf deshalb nicht hart von der vollständigen Track-29-Implementierung abhängen; Track 29 optimiert hinter vorher definierten Contracts.
