@@ -70,3 +70,10 @@ For exact interaction meaning, always prefer `FEATURE_SCREEN_SPECIFICATIONS.md` 
 - `65_body_surface_calibration.png`
 - `66_3d_analysis_settings_overview.png`
 - `67_3d_analysis_reference_board.png`
+
+### 68–69 — Managed backends, acquisition and localisation
+
+- `68_backend_capabilities_acquisition_overview.png` — unified MediaForge frontend over engines/managed upstream backends, acquisition/search/download/system examples.
+- `69_localization_translation_acquisition_overview.png` — first-class locale controls, professional metadata translation workflow, translation memory and responsive unified UX.
+
+Artwork shown in reference images is illustrative. Production UI must bind posters/covers/thumbnails to the matched canonical media identity or show a neutral placeholder/review state.

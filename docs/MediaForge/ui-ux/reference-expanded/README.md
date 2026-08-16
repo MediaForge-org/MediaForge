@@ -79,3 +79,10 @@ Diese Referenzen ergänzen Tattoo-Coverage, 3D-Reconstruction, Plugin/Theme, Sto
 - `65_body_surface_calibration.png`
 - `66_3d_analysis_settings_overview.png`
 - `67_3d_analysis_reference_board.png`
+
+## References 68–69
+
+- `68_backend_capabilities_acquisition_overview.png`
+- `69_localization_translation_acquisition_overview.png`
+
+These extend the visual baseline for unified acquisition/managed backends and professional multilingual UX. Media artwork inside all mockups is non-authoritative sample content.

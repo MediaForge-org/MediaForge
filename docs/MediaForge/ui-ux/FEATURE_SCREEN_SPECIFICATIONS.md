@@ -352,3 +352,32 @@ Quality/Analysis-Modi, Evidence Retention, optional AI, Model/Storage Limits und
 
 ### 67 — 3D Analysis Reference Board
 Zusammenfassende visuelle Referenz für Reconstruction, Viewer, Projection, Calibration und Quality; Detail-Screens 61–66 haben Vorrang.
+
+## Reference 68 — Backend capabilities and unified acquisition
+
+File: `reference-expanded/68_backend_capabilities_acquisition_overview.png`
+
+Purpose: visualise MediaForge as the single normal frontend over video/adult/audio engines plus Prowlarr, Sonarr, Radarr, Whisparr, SABnzbd and qBittorrent backend capabilities.
+
+Required ideas, not literal sample content:
+
+- one MediaForge navigation and visual language;
+- unified Search/Wanted/Downloads/Queue/System pages;
+- implementation backend visible only as secondary status/provenance;
+- advanced native UI remains optional admin fallback;
+- real product artwork must come from the canonical matched media item; the poster examples in mockups are placeholders only.
+
+## Reference 69 — Localization, translation and acquisition overview
+
+File: `reference-expanded/69_localization_translation_acquisition_overview.png`
+
+Purpose: show first-class locale settings, translation provider/translation-memory management and the fact that all acquisition/backend states are represented through MediaForge terminology.
+
+Required ideas:
+
+- Deutsch default plus English (UK), Italiano, Español and Français;
+- independent UI locale and metadata locale;
+- professional metadata translation fallback with source/target/provenance;
+- translation glossary/memory and provider settings;
+- no untranslated raw upstream statuses in normal UI;
+- responsive layouts across desktop/tablet/mobile.

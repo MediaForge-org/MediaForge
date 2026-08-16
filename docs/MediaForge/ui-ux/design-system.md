@@ -155,3 +155,7 @@ Status darf nie nur über Farbe codiert sein. Timeline-Events brauchen Keyboard-
 ## Plugin- und Theme-Erweiterungen
 
 Design Tokens und stabile CSS-Variablen sind öffentliche Theme-Schnittstellen. Theme Plugins verwenden standardmäßig scoped/safe CSS. Ein Advanced Custom CSS Modus kann globale Regeln zulassen, ist aber explizit opt-in. Kritische Privacy-/Security-Semantik darf nicht ausschließlich über CSS erzwungen werden.
+
+## Localization design constraints
+
+The design system must be locale-expansion safe for `de`, `en-GB`, `it`, `es`, `fr` from the initial release target. Components must not rely on fixed English/German label widths. Use semantic message keys, correct plural/select formatting and locale-aware number/date/size components. Raw upstream status strings are never styled directly as product copy; map them to canonical MediaForge states first.

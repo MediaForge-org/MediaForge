@@ -37,3 +37,7 @@ Inspect reference-expanded images `30` through `41` as well. Do not infer behavi
 Additional UI references `42`–`67` cover the next-generation dashboard, tattoo coverage/anatomy, evidence fusion, ontology/events, plugins/themes/custom CSS, deployment/workflow, and 3D performer reconstruction.
 
 Important: generated architecture labels inside PNGs are illustrative only. The Markdown architecture documents are authoritative. 3D body figures in the references are neutral placeholders; implement interaction/layout from the reference, not an invented technical stack.
+
+## Latest reference additions (68–69)
+
+Also inspect `68_backend_capabilities_acquisition_overview.png` and `69_localization_translation_acquisition_overview.png` when implementing unified acquisition/managed backends or localisation/translation settings. Treat covers/posters inside mockups as layout placeholders; bind real artwork to canonical metadata in implementation.
