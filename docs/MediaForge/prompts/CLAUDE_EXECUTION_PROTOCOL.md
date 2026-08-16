@@ -2,7 +2,7 @@
 
 For each numbered prompt:
 
-1. Verify working tree and current branch.
+1. Verify working tree and current HEAD. `main` is the normal workflow; do not create/switch branches unless the user explicitly chooses one for a risky experiment.
 2. Read `GLOBAL_RULES_SHORT.md`.
 3. Read only the prompt's required docs and source paths.
 4. Restate a short implementation plan in the work log/response; do not ask unnecessary clarification questions when the prompt already defines the target.
@@ -18,6 +18,8 @@ For each numbered prompt:
    - behavior now guaranteed
    - known limitations/blockers
    - whether the next prompt is ready
-11. No push/tag/release unless explicitly authorized by the user.
+11. No commit/push/tag/release unless explicitly authorized by the user.
+12. If current uncommitted work breaks tests, fix it inside the package or selectively restore only this package. Never use destructive reset/clean blindly.
+13. After an authorized push, GitHub Actions must be green before advancing to the next work package.
 
 If the prompt is blocked by a missing prerequisite, stop after documenting the blocker and smallest prerequisite fix. Do not invent a different architecture to bypass the dependency.

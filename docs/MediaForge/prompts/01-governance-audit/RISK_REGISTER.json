@@ -6,7 +6,7 @@
       "id": "RISK-0001",
       "title": "Dependency cycle in PROMPT_CATALOG.json across tracks 23-29",
       "severity": "high",
-      "status": "open",
+      "status": "resolved",
       "found_by": "P0003",
       "found_at_commit": "acbf6d5",
       "affected_prompt_range": ["P0441", "P0580"],
@@ -25,9 +25,25 @@
       "scope_note": "All affected prompts are P2 priority and far behind CURRENT_PHASE.md; this does not block any prompt on the current execution path (P0001-P0020 and beyond, up to wherever CURRENT_PHASE.md actually is). Not fixed by P0003 or P0004: repairing a 720-prompt catalog is outside both prompts' declared scope and was not requested.",
       "gate_condition": {
         "blocks": ["P0020"],
-        "rule": "Track 01's own gate prompt (P0020, 01-governance-audit/P0020_gate.md, once read at that step) must not pass while this entry's status is 'open'. A prompt-dependency graph with any cycle is not a valid execution schedule for the prompt system this track governs."
+        "rule": "Track 01's own gate prompt (P0020, 01-governance-audit/P0020_gate.md, once read at that step) must not pass while this entry's status is 'open'. A prompt-dependency graph with any cycle is not a valid execution schedule for the prompt system this track governs.",
+        "satisfied": true
       },
-      "resolution": null
+      "resolution": {
+        "resolved_by": "external documentation/prompt-system import (2026-08-16), verified in-session by this governance-consistency fix",
+        "actual_fix_implemented": "Tracks 23-25 (adult-analysis, disc-iso, audio-enhancement) had their direct 'depends_on: P0580' entry removed from every one of their prompts (P0441-P0500). This is the reverse of this entry's original recommended_fix (which proposed instead dropping the track-initial 'depends on previous track's last prompt' edges for tracks 24-29). Both approaches break the cycle; the actually-implemented one keeps the natural track-to-track sequencing (24 after 23, 25 after 24, ...) and removes only the redundant forward-reaching capability dependency on P0580 that tracks 23-25 no longer declare. Documented at the source in docs/MediaForge/prompts/PROMPT_ORDER.md, top-of-file note dated 2026-08-16: \"Tracks 23-25 no longer depend on P0580; Track 29 is a later optimization/implementation track behind versioned contracts. This removes the P0441-P0580 cycle without renumbering prompts.\"",
+        "verified_facts": {
+          "cycle_p0441_p0580_eliminated": true,
+          "prompt_ids_unchanged": "P0001-P0720, verified contiguous with no gaps and no renumbering",
+          "total_prompt_count": 720,
+          "dependency_graph_acyclic": true,
+          "check_dependency_graph_exit_code": 0,
+          "check_dependency_graph_output": "720 prompts checked.\nResult: clean.",
+          "topologically_executable_prompts": "720/720",
+          "missing_dependency_targets": 0
+        },
+        "verification_method": "Independently re-run in-session (not taken on report alone): (1) `python3 tools/prompts/check_dependency_graph.py` -> exit 0, \"Result: clean.\"; (2) independent Tarjan strongly-connected-components pass over PROMPT_CATALOG.json's depends_on graph -> 0 cyclic components, 0 missing dependency targets; (3) direct inspection of P0441/P0460/P0461/P0501/P0580/P0581 depends_on arrays confirming the P0580 edges are gone from tracks 23-25 while the legitimate track-to-track chain (e.g. P0581 -> P0580) remains; (4) prompt ID contiguity check, 1..720, no gaps.",
+        "note": "This entry is kept, not deleted, as historical audit evidence per explicit instruction that RISK-0001 must remain traceable rather than disappear once fixed."
+      }
     }
   ]
 }

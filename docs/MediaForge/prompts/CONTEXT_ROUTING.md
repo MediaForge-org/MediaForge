@@ -31,6 +31,14 @@ Choose the smallest matching authority:
 - Disc → `modules/disc-engine.md` + `modules/disc-verification-policy.md`
 - Audio enhancement → `modules/audio-upscaler.md`
 - UI visual system → `ui-ux/UI_IMPLEMENTATION_PROMPT.md` + relevant image(s)
-- Governance/execution vocabulary and module boundaries → `01-governance-audit/GOVERNANCE_DOMAIN_MODEL.md` + `01-governance-audit/GOVERNANCE_BOUNDARIES.md`
+
+- frontend framework choice → `architecture/frontend-framework.md`
+- AI capabilities/model registry → `architecture/ai-capabilities-model-registry.md`
+- derived/artifact storage → `architecture/artifact-store-and-derived-assets.md` + `modules/derived-assets-and-storage-manager.md`
+- Adult 3D/tattoo coverage/anatomy → `modules/adult-3d-reconstruction-and-tattoo-coverage.md`
+- plugins/themes/custom CSS → `modules/plugin-theme-sdk.md`
+- Git/rollback workflow → `architecture/green-commit-workflow.md`
 
 Do not reread `MediaForge_Master_Engineering.md` unless the prompt lists it or a cross-domain ambiguity cannot be resolved by a smaller authority.
+
+If present in the live checkout, Track-01 generated governance artifacts (`GOVERNANCE_DOMAIN_MODEL.md`, `GOVERNANCE_BOUNDARIES.md`, `RISK_REGISTER.json`) are authoritative for the execution-audit subsystem and must not be overwritten by prepared docs.

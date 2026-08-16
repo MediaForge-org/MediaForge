@@ -1,5 +1,7 @@
 # Prompt order — 720 prompts
 
+**2026-08-16 dependency correction:** count remains 720. Tracks 23–25 no longer depend on `P0580`; Track 29 is a later optimization/implementation track behind versioned contracts. This removes the P0441–P0580 cycle without renumbering prompts.
+
 Run one prompt at a time unless explicitly authorized otherwise. Tracks are ordered by default dependency/priority, but `P2` tracks must also respect the usable-core gates in the roadmap.
 
 ## Track 01 — Governance, repository audit and execution discipline (P0)

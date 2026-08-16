@@ -22,7 +22,7 @@ The prompts are intentionally granular. Run one prompt at a time unless the user
 
 ## Baseline
 
-This prompt pack was generated after documentation commit `5c9e7ee` (`docs: expand MediaForge architecture features and UI references`). Always inspect current `HEAD` and `CURRENT_PHASE.md`; do not assume the code has remained unchanged.
+This prompt pack was originally generated after documentation commit `5c9e7ee` and updated on **2026-08-16** with the final architecture/UI expansion. Always inspect current `HEAD` and `CURRENT_PHASE.md`; do not assume the code has remained unchanged. The live repository may already contain completed Track-01 governance artifacts that must be preserved.
 
 ## Priority
 

@@ -46,12 +46,21 @@ the prose of a specific past audit response.
 checked directly rather than asserted:
 
 ```
-720 prompts, 0 missing dependency targets, 0 self-dependencies.
+[P0003, as originally found] 720 prompts, 0 missing dependency targets, 0 self-dependencies.
 Strongly-connected-component analysis (Tarjan) on the depends_on graph:
   1 cyclic component, size 140: P0441 … P0580
 ```
 
-**Finding — persisted as `RISK_REGISTER.json#RISK-0001` (added by P0004), not fixed by this prompt:**
+> **Status: RESOLVED, tracked as `RISK_REGISTER.json#RISK-0001` (status: `resolved`).** The finding
+> below is preserved verbatim as the historical audit record from P0003 — the cycle it describes no
+> longer exists in the current catalog. Re-verified in-session after an external documentation import:
+> `python3 tools/prompts/check_dependency_graph.py` → `Result: clean.` (exit 0); an independent Tarjan
+> pass finds 0 cyclic components and 0 missing dependency targets across all 720 prompts (`P0001`–`P0720`,
+> unchanged, unrenumbered). See `RISK_REGISTER.json#RISK-0001.resolution` for the full verification
+> record and the actually-implemented fix (which differs from this document's original recommendation
+> below — see the correction at the end of this section).
+
+**Finding as originally reported by P0003 (historical — see status note above):**
 tracks 23–29 (`adult-analysis`,
 `disc-iso`, `audio-enhancement`, `video-engine`, `adult-engine`, `audio-engine`,
 `rust-media-tools` — all P2, all far behind `CURRENT_PHASE.md`) form one genuine dependency cycle:
@@ -65,21 +74,28 @@ tracks 23–29 (`adult-analysis`,
   reaches `P0580`, which is exactly the node every prompt in `23-adult-analysis` also declares as a
   direct dependency — closing the loop back onto `P0441`.
 
-Net effect: as declared, none of P0441–P0580 has a valid topological execution order. This is a data
-defect in `PROMPT_CATALOG.json` (and the corresponding individual prompt files), not a code defect —
-it affects only far-future P2 tracks, not the current V2 E baseline or the work between here and
-`P0020`. It does, however, gate `P0020` itself: `RISK_REGISTER.json#RISK-0001.gate_condition` records
-that Track 01's own gate prompt must not pass while this entry's `status` is `open`, since a prompt
-system whose own dependency graph contains a cycle cannot certify itself as a trustworthy execution
-schedule. Per this prompt's non-goals ("do not redesign or refactor unrelated subsystems", "do not read
-the full repository documentation tree") and the user's explicit instruction not to pull forward
-later-prompt decisions, **this cycle is reported and persisted, not repaired, here.** Recommended smallest fix for
-whoever owns that data later: drop the redundant per-prompt `P0580` dependency in tracks 23–25 (the
-track-to-track chain already sequences them after `29-rust-media-tools` transitively is *not* true
-today — more likely the intended fix is the reverse: drop the track-initial "depends on previous
-track's last prompt" edges for 24–29 and rely solely on each track's explicit `P0580`/`P0240`-style
-capability dependency, which is what actually expresses "this engine track needs Rust MediaTools and
-the target monorepo, not the second I finish adult-analysis").
+At the time P0003 ran, none of P0441–P0580 had a valid topological execution order — a data defect in
+`PROMPT_CATALOG.json` (and the corresponding individual prompt files), not a code defect. It affected
+only far-future P2 tracks, never the current V2 E baseline or the work between P0001 and `P0020`, but it
+did gate `P0020` itself: `RISK_REGISTER.json#RISK-0001.gate_condition` records that Track 01's own gate
+prompt must not pass while this entry's `status` is `open`, since a prompt system whose own dependency
+graph contains a cycle cannot certify itself as a trustworthy execution schedule. Per P0003's non-goals
+("do not redesign or refactor unrelated subsystems") and the then-current instruction not to pull
+forward later-prompt decisions, P0003 reported and persisted the cycle without repairing it, and
+recommended dropping the track-initial "depends on previous track's last prompt" edges for tracks
+24–29 as the smallest fix.
+
+**Correction (post-P0003):** that is *not* the fix that was actually implemented. An external
+documentation/prompt-system import (2026-08-16) instead dropped the redundant direct `P0580`
+dependency from every prompt in tracks 23–25 (`P0441`–`P0500`), leaving the track-to-track chain
+(`24` after `23`, `25` after `24`, …, `29` after `28`) intact and unbroken — the reverse of this
+document's original recommendation, but equally effective at breaking the cycle, and arguably more
+faithful to what the P0580/P0240-style entries were meant to express ("needs this capability done"),
+which the track-to-track chain alone already gives every later track transitively. Documented at the
+source in `PROMPT_ORDER.md`'s 2026-08-16 dependency-correction note. `RISK-0001` is `resolved`, not
+deleted, per explicit instruction that it remain as historical audit evidence — see its `resolution`
+field for the independently re-verified facts (0 cyclic components, 0 missing dependency targets, all
+720 prompt IDs unchanged, `check_dependency_graph.py` exit 0).
 
 ## Acceptance criteria check
 

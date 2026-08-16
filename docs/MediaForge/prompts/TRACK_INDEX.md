@@ -1,5 +1,7 @@
 # Track index
 
+**Prompt count remains 720.** New AI/3D/plugin/storage/frontend decisions are integrated into existing tracks rather than adding new IDs.
+
 Each track contains 20 granular prompts using the same lifecycle: audit → model → boundaries → persistence → application → API → frontend → validation → security → jobs → realtime → observability → migration → fixtures → unit tests → integration tests → E2E → performance → docs → gate.
 
 - **01 Governance, repository audit and execution discipline** (P0) — `P0001`–`P0020` — folder `01-governance-audit/`
