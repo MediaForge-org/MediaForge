@@ -1,6 +1,6 @@
 # Acquisition Automation, Naming and Post-Processing
 
-Status: **binding long-term feature specification**  
+Status: **binding long-term feature specification**
 Updated: 2026-08-17
 
 This document extends `acquisition-center.md` with automated source search, managed automation backends, deterministic naming, torrent-safe imports, disc processing and transcoding.

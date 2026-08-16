@@ -1,6 +1,6 @@
 # ADR-0025 — MediaForge owns the frontend; specialised programs are backend capabilities
 
-**Status:** Accepted  
+**Status:** Accepted
 **Date:** 2026-08-17
 
 ## Decision

@@ -1,6 +1,6 @@
 # Managed Upstreams and the MediaForge Product Surface
 
-Status: **binding target architecture**  
+Status: **binding target architecture**
 Updated: 2026-08-17
 
 ## 1. Product rule

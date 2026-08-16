@@ -1,6 +1,6 @@
 # ADR-0027 — AcquisitionBlueprint and resumable post-processing DAG
 
-**Status:** Accepted  
+**Status:** Accepted
 **Date:** 2026-08-17
 
 ## Decision

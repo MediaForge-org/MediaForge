@@ -1,6 +1,6 @@
 # Localization and Professional Metadata Translation
 
-Status: **binding product architecture**  
+Status: **binding product architecture**
 Updated: 2026-08-17
 
 ## 1. Launch locales

@@ -1,6 +1,6 @@
 # ADR-0026 — Localization-first product with professional metadata translation fallback
 
-**Status:** Accepted  
+**Status:** Accepted
 **Date:** 2026-08-17
 
 ## Decision
