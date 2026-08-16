@@ -16,7 +16,7 @@ Der Benutzer installiert und öffnet **MediaForge**. Jellyfin-, Stash- und Audio
 MediaForge/
 ├── apps/
 │   ├── server/                 # PHP 8.4 + Laravel – Control Plane / API
-│   ├── web/                    # React 19 + TypeScript + React Router + Vite
+│   ├── web/                    # React 19 + TypeScript + React Router Framework Mode + Vite
 │   ├── desktop/                # später: Desktop-Client
 │   ├── mobile/                 # später: Mobile-Client
 │   └── tv/                     # später: TV-Client
@@ -34,6 +34,7 @@ MediaForge/
 │   ├── contracts/              # OpenAPI, JSON Schema, Events
 │   ├── sdk/                    # generierte/handgeschriebene Clients
 │   ├── media-model/            # gemeinsame kanonische Begriffe/Schema-Artefakte
+│   ├── localization/           # UI-i18n, Glossare, Translation Memory, Locale-QA
 │   ├── design-tokens/          # Farben, Typo, Spacing, Motion
 │   ├── ui-web/                 # wiederverwendbare React-Komponenten
 │   └── icons/                  # MediaForge Icon-Set
@@ -43,6 +44,7 @@ MediaForge/
 │   ├── compose/                # dev/prod/test Compose
 │   ├── gateway/                # Reverse Proxy / Routing
 │   ├── database/               # PostgreSQL Bootstrap / Backup / Maintenance
+│   ├── managed-upstreams/      # SAB/qBit/Prowlarr/*Arr manifests + compatibility
 │   ├── observability/          # Logs, Metrics, Traces, Health
 │   └── releases/               # Release-/Image-/SBOM-Automation
 │
@@ -108,7 +110,7 @@ Das Web-Frontend ist eine echte React-App:
 
 - React 19;
 - TypeScript;
-- React Router;
+- React Router Framework Mode;
 - Vite;
 - Tailwind + MediaForge Design System;
 - MediaForge API v1;
@@ -331,3 +333,13 @@ services/ai/evaluation/
 Web-Ziel ist **React Router Framework Mode**, nicht nur ein nackter Router und nicht Next.js als zweite Full-Stack-Serverruntime. Details: `frontend-framework.md`.
 
 Große AI/3D-Funktionen sind Capability-gesteuert und optional. Große Binärartefakte liegen nicht in PostgreSQL, sondern im content-addressed Artifact Store. Details: `ai-capabilities-model-registry.md` und `artifact-store-and-derived-assets.md`.
+
+## 17. Upstream integration update — 17 August 2026
+
+The detailed policy is defined by `managed-upstreams-and-product-surface.md` and ADR-0025.
+
+- Jellyfin, Stash and Audiobookshelf are imported as pinned source baselines during Track 02 so later contracts can be designed against their real capabilities. Tracks 26–28 complete the cutover rather than first importing the projects.
+- SABnzbd, qBittorrent, Prowlarr, Sonarr, Radarr and Whisparr are managed upstream services: upstream code remains unmodified by default while MediaForge owns lifecycle, compatibility, normalised API/events and the normal product UI.
+- Prowlarr/SAB/qBittorrent may remain long-term backend components. Sonarr/Radarr/Whisparr are transitional automation providers whose product-level Wanted/Release/Upgrade functions can progressively move into MediaForge.
+- Normal users see MediaForge concepts, not a collection of embedded product surfaces. Native upstream UIs are advanced/admin fallbacks only.
+- `packages/localization` owns first-class UI locale resources, glossary/translation-memory contracts and localisation QA.
