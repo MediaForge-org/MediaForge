@@ -44,6 +44,26 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway" # reach the real Jellyfin/ABS on the host
 
+  # One-off Composer install container. The runtime image (built from the
+  # repo root Dockerfile) deliberately has no `composer` binary -- Composer
+  # only exists in that Dockerfile's `vendor` build stage, which is not part
+  # of the runtime image. Running `composer install` against the `app`
+  # service therefore always fails with "composer: not found". This service
+  # uses the official Composer image against the same bind mount instead, so
+  # `vendor/` lands on the host and becomes visible to `app`/`worker`/
+  # `horizon`/`scheduler` through their own bind mount. Never started by
+  # `up`; invoked on demand via `docker compose run --rm composer ...`
+  # (see `make setup`).
+  composer:
+    profiles: ["tools"]
+    image: composer:2
+    working_dir: /var/www/html
+    environment:
+      COMPOSER_HOME: /tmp/composer-home
+    volumes:
+      - ../..:/var/www/html
+    networks: [mediaforge]
+
   # Vite HMR is opt-in. Production-build mode is the stable default on Windows
   # bind mounts; start HMR explicitly with `--profile hmr` when live frontend
   # updates are needed (see docs/MediaForge/dev-runtime.md).

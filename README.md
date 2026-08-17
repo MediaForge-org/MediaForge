@@ -117,14 +117,26 @@ Without Make, run the equivalent commands from the repository root:
 
 ```bash
 cp .env.example .env   # PowerShell: Copy-Item .env.example .env
+chmod 666 .env          # host-owned, but `app` writes it as www-data during key:generate below (Linux only; harmless elsewhere)
 docker compose -f deploy/dev/docker-compose.yml build
 docker compose -f deploy/dev/docker-compose.yml up -d postgres redis
-docker compose -f deploy/dev/docker-compose.yml run --rm app composer install
+
+# The runtime `app` image deliberately ships without a `composer` binary (it
+# only exists in the Dockerfile's build-time `vendor` stage), and on a fresh
+# clone there is no host vendor/ or node_modules/ yet for the bind mount to
+# expose either -- both one-off installs below write straight onto the bind
+# mount so every service that mounts the repo can see the result.
+docker compose -f deploy/dev/docker-compose.yml run --rm composer install --no-interaction --prefer-dist --ignore-platform-reqs
+docker compose -f deploy/dev/docker-compose.yml run --rm --no-deps vite npm ci
+docker compose -f deploy/dev/docker-compose.yml run --rm --no-deps vite npm run build
+
 docker compose -f deploy/dev/docker-compose.yml run --rm app php artisan key:generate --force
 docker compose -f deploy/dev/docker-compose.yml up -d
 docker compose -f deploy/dev/docker-compose.yml exec -T app php artisan migrate --force
 docker compose -f deploy/dev/docker-compose.yml exec -T app php artisan db:seed --force
 ```
+
+On native Linux, add `-u "$(id -u):$(id -g)" -e HOME=/tmp -e COMPOSER_HOME=/tmp/composer-home` to the `composer` and `vite` `run` commands above, so `vendor/`/`node_modules/`/`public/build/` land owned by you instead of root — `make setup` already does this for you. Not needed on macOS/Windows Docker Desktop.
 
 ### Create a local development user
 

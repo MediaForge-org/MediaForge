@@ -4,6 +4,16 @@
 COMPOSE := docker compose -f deploy/dev/docker-compose.yml
 APP := $(COMPOSE) exec -T app
 
+# Composer/npm one-off install containers write into the bind-mounted repo as
+# root by default (the official composer/node images run as root). Run them
+# as the host user instead so vendor/ and node_modules/ land owned by you,
+# not root -- matters on native Linux bind mounts (Fedora et al.); harmless
+# elsewhere. HOME/COMPOSER_HOME point at a scratch dir so an arbitrary,
+# passwd-less UID still has a writable cache location.
+HOST_UID := $(shell id -u)
+HOST_GID := $(shell id -g)
+RUN_AS_HOST := -u $(HOST_UID):$(HOST_GID) -e HOME=/tmp -e COMPOSER_HOME=/tmp/composer-home
+
 # The dev container injects .env (APP_ENV=local, DB=mediaforge, redis, ...) as real
 # process env vars that shadow phpunit.xml's <env>. Inject the hermetic test
 # environment explicitly so the suite always runs as `testing` against
@@ -16,7 +26,7 @@ TEST_ENV := -e APP_ENV=testing -e DB_DATABASE=mediaforge_test \
 PEST := $(COMPOSE) exec -T $(TEST_ENV) app php vendor/bin/pest
 
 .DEFAULT_GOAL := help
-.PHONY: help setup up down restart build logs shell \
+.PHONY: help setup setup-check up down restart build logs shell \
         migrate fresh seed test lint analyse types stan pint ci \
         assets runtime-reset hmr dev-up dev-ps dev-doctor
 
@@ -24,15 +34,26 @@ help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | \
 		awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-12s\033[0m %s\n", $$1, $$2}'
 
-setup: ## First-run: build, install deps, migrate, seed
+setup: ## First-run: build, install deps, migrate, seed (works from a fresh clone, no host vendor/node_modules needed)
 	@test -f .env || cp .env.example .env
+	@chmod 666 .env # host-owned, but `app` writes it as www-data (a different uid) during key:generate below
 	$(COMPOSE) build
 	$(COMPOSE) up -d postgres redis
-	$(COMPOSE) run --rm app composer install
+	# The runtime image has no `composer` binary on purpose (see the `composer`
+	# service's comment in deploy/dev/docker-compose.yml); install into the
+	# bind mount with the dedicated Composer image instead so vendor/ becomes
+	# visible to every service that mounts the repo.
+	$(COMPOSE) run --rm $(RUN_AS_HOST) composer install --no-interaction --prefer-dist --ignore-platform-reqs
+	# Same shadowing problem for node_modules/public/build: the `vite` service
+	# is a plain node image with nothing pre-installed, so both steps are
+	# required on a fresh clone (see `make assets`, which shares this).
+	$(COMPOSE) run --rm $(RUN_AS_HOST) --no-deps vite npm ci
+	$(COMPOSE) run --rm $(RUN_AS_HOST) --no-deps vite npm run build
 	$(COMPOSE) run --rm app php artisan key:generate --force
 	$(COMPOSE) up -d
 	$(APP) php artisan migrate --force
 	$(APP) php artisan db:seed --force
+	@$(MAKE) --no-print-directory setup-check
 	@echo "\nMediaForge is up:  http://localhost:8100"
 	@echo "Mailpit:           http://localhost:8126"
 	@echo "Jellyfin (dev):    http://localhost:8110"
@@ -83,7 +104,10 @@ ci: ## Run the full local gate (style, static analysis, tests)
 	$(PEST)
 
 assets: ## Build frontend assets in a clean one-off node container (not the HMR service)
-	$(COMPOSE) run --rm --no-deps vite npm run build
+	$(COMPOSE) run --rm $(RUN_AS_HOST) --no-deps vite sh -c "npm ci && npm run build"
+
+setup-check: ## Verify the make-setup contract against the running stack (vendor/assets/sessions/HTTP)
+	@bash tools/dev/verify_setup.sh
 
 runtime-reset: ## Force stable production-build mode (remove public/hot, clear caches)
 	$(APP) php artisan mediaforge:runtime:reset
@@ -109,6 +133,6 @@ dev-doctor: ## Read-only health check: compose state + app reachability + routes
 	-docker ps --format "table {{.Names}}\t{{.Status}}"
 	@echo "\n== app health (/up) =="
 	-$(COMPOSE) exec -T app php artisan --version
-	-$(COMPOSE) exec -T app sh -lc 'curl -fsS -o /dev/null -w "app /up -> HTTP %{http_code}\n" http://localhost/up || echo "app /up -> unreachable"'
+	-$(COMPOSE) exec -T app sh -lc 'curl -fsS -o /dev/null -w "app /up -> HTTP %{http_code}\n" http://127.0.0.1:8080/up || echo "app /up -> unreachable"'
 	@echo "\n== registered GET routes =="
 	-$(APP) php artisan route:list --method=GET
