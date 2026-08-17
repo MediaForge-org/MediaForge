@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MediaForge RISK_REGISTER.json (fields load-bearing to check_dependency_graph.py)",
+  "description": "Describes only the fields tools/prompts/check_dependency_graph.py actually reads from docs/MediaForge/prompts/01-governance-audit/RISK_REGISTER.json: top-level entries[], and per entry entry.get('status') and entry.get('affected_prompt_range'). The real file also carries a top-level description string and, per entry, title/severity/found_by/found_at_commit/affected_prompt_count/affected_tracks/evidence/recommended_fix/scope_note/gate_condition/resolution -- none of which this contract validates. additionalProperties is left true throughout for exactly that reason.",
+  "type": "object",
+  "required": ["schema_version", "entries"],
+  "properties": {
+    "schema_version": {
+      "const": 1,
+      "description": "Pinned to the value the real file has today. Bump only when the real file's schema_version changes."
+    },
+    "entries": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/entry" }
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "entry": {
+      "type": "object",
+      "required": [],
+      "description": "Both fields the checker reads are accessed via .get(), i.e. optional at the type level even though every current entry happens to have them.",
+      "properties": {
+        "status": {
+          "type": "string",
+          "description": "Deliberately not enum-restricted to [\"open\",\"resolved\"]. check_dependency_graph.py's _cycle_is_tracked only special-cases the literal string \"open\" and treats every other value identically, so enumerating a closed status vocabulary would describe more than the code actually implements."
+        },
+        "affected_prompt_range": {
+          "type": "array",
+          "description": "Exactly a 2-tuple [low, high] of prompt ids, matching the len(rng) != 2 guard and _prompt_number parsing in check_dependency_graph.py exactly.",
+          "prefixItems": [
+            { "type": "string", "pattern": "^P[0-9]{4}$" },
+            { "type": "string", "pattern": "^P[0-9]{4}$" }
+          ],
+          "items": false,
+          "minItems": 2,
+          "maxItems": 2
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}

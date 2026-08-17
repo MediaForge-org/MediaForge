@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "check_dependency_graph.check() return-value contract",
+  "description": "This dict is never serialized to JSON on disk or over a wire by the current implementation -- it is an in-memory Python dict, described here via JSON Schema vocabulary as a precise type notation for anyone calling check() programmatically. This is the one genuinely closed shape in the whole contract: it mirrors the literal `return {...}` in check_dependency_graph.check(), so additionalProperties is false and every key is required.",
+  "type": "object",
+  "required": [
+    "prompt_count",
+    "missing_targets",
+    "self_dependencies",
+    "tracked_cycles",
+    "untracked_cycles",
+    "risk_register_present",
+    "exit_code"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "prompt_count": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "len(catalog)."
+    },
+    "missing_targets": {
+      "type": "array",
+      "description": "Sorted list of (prompt_id, missing_dependency_id) pairs -- a depends_on entry pointing at an id not present in the catalog.",
+      "items": {
+        "type": "array",
+        "prefixItems": [
+          { "type": "string", "pattern": "^P[0-9]{4}$" },
+          { "type": "string" }
+        ],
+        "items": false,
+        "minItems": 2,
+        "maxItems": 2
+      }
+    },
+    "self_dependencies": {
+      "type": "array",
+      "description": "Sorted list of prompt ids that list themselves in depends_on.",
+      "items": { "type": "string", "pattern": "^P[0-9]{4}$" }
+    },
+    "tracked_cycles": {
+      "type": "array",
+      "description": "Strongly-connected components of size > 1 that are fully covered by an open, range-matching RISK_REGISTER.json entry.",
+      "items": {
+        "type": "array",
+        "minItems": 2,
+        "items": { "type": "string", "pattern": "^P[0-9]{4}$" }
+      }
+    },
+    "untracked_cycles": {
+      "type": "array",
+      "description": "Strongly-connected components of size > 1 not covered by any open risk-register entry -- these are the ones that fail the check.",
+      "items": {
+        "type": "array",
+        "minItems": 2,
+        "items": { "type": "string", "pattern": "^P[0-9]{4}$" }
+      }
+    },
+    "risk_register_present": {
+      "type": "boolean",
+      "description": "Whether a risk_register argument (dict) was passed to check() at all -- true even if it has zero entries."
+    },
+    "exit_code": {
+      "type": "integer",
+      "enum": [0, 1, 2],
+      "description": "0 = EXIT_CLEAN, 1 = EXIT_UNTRACKED_DEFECT, 2 = EXIT_ONLY_TRACKED_CYCLES."
+    }
+  }
+}

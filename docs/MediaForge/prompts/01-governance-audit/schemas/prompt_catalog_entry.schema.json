@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MediaForge governance prompt-catalog entry (fields load-bearing to check_dependency_graph.py)",
+  "description": "Describes only the fields tools/prompts/check_dependency_graph.py actually reads from one docs/MediaForge/prompts/PROMPT_CATALOG.json record: p['id'] and p.get('depends_on', []). The real catalog record also carries track, track_slug, track_title, priority, focus, file, required_reads, source_paths, ui_refs -- none of which this contract validates, because nothing in check_dependency_graph.py reads them. additionalProperties is left true for exactly that reason: this schema is a load-bearing subset, not a full description of the human-authored record.",
+  "type": "object",
+  "required": ["id"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^P[0-9]{4}$",
+      "description": "Canonical MediaForge prompt identity. Never an engine/provider id or database key."
+    },
+    "depends_on": {
+      "type": "array",
+      "description": "Optional. Read via p.get('depends_on', []) -- absent is equivalent to an empty array, not a validation error.",
+      "items": {
+        "type": "string",
+        "pattern": "^P[0-9]{4}$"
+      }
+    }
+  },
+  "additionalProperties": true
+}

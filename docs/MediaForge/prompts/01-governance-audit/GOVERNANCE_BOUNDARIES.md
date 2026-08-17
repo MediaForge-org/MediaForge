@@ -34,6 +34,8 @@ The only way another track or a future prompt is meant to consume Track 01's out
 2. **`CLAUDE_EXECUTION_PROTOCOL.md`** — the process interface. Defines the step sequence every prompt follows.
 3. **`TRACK_INDEX.md` / `PROMPT_ORDER.md` / `PROMPT_CATALOG.json`** — the scheduling interface (structured, machine-checkable; see *Testable dependency direction* below).
 4. **`GOVERNANCE_DOMAIN_MODEL.md`** — the vocabulary interface, opt-in via `CONTEXT_ROUTING.md`, not preloaded by default.
+5. **`GOVERNANCE_API_CONTRACT.md`** (added by P0006) — the CLI/Python/data contract for
+   `tools/prompts/check_dependency_graph.py`, cross-referencing its JSON Schemas under `schemas/`.
 
 Audit reports and risk-register findings produced by individual prompt runs (e.g. this file, P0001's
 response) are **not** an interface other automated prompts read — they are addressed to the human

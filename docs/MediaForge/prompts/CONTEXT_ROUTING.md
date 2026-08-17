@@ -41,7 +41,7 @@ Choose the smallest matching authority:
 
 Do not reread `MediaForge_Master_Engineering.md` unless the prompt lists it or a cross-domain ambiguity cannot be resolved by a smaller authority.
 
-If present in the live checkout, Track-01 generated governance artifacts (`GOVERNANCE_DOMAIN_MODEL.md`, `GOVERNANCE_BOUNDARIES.md`, `RISK_REGISTER.json`) are authoritative for the execution-audit subsystem and must not be overwritten by prepared docs.
+If present in the live checkout, Track-01 generated governance artifacts (`GOVERNANCE_DOMAIN_MODEL.md`, `GOVERNANCE_BOUNDARIES.md`, `RISK_REGISTER.json`, `GOVERNANCE_API_CONTRACT.md`) are authoritative for the execution-audit subsystem and must not be overwritten by prepared docs.
 
 ## 2026-08-17 routing additions
 
