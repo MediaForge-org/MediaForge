@@ -50,3 +50,4 @@ Read only when the current prompt touches the matching concern:
 - managed upstream lifecycle, early Jellyfin/Stash/ABS import, SAB/qBit/Prowlarr/*Arr product boundaries -> `docs/MediaForge/architecture/managed-upstreams-and-product-surface.md` + ADR-0025.
 - UI localisation, canonical status localisation, metadata translation, glossary/translation memory/provider policy -> `docs/MediaForge/architecture/localization-and-professional-translation.md` + ADR-0026.
 - source search, Wanted/release scoring, naming, torrent hardlinks/seeding, post-processing DAG, ISO remux/transcodes -> `docs/MediaForge/modules/acquisition-automation-and-postprocessing.md` + ADR-0027.
+- player volume/gain (including 100/150/200%), loudness/LUFS, limiter, dialogue/DRC/EQ/downmix, device audio profiles and requested/effective audio state -> `docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md`.

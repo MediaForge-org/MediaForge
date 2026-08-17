@@ -18,6 +18,7 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
+- `docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md`
 - `docs/MediaForge/architecture/managed-upstreams-and-product-surface.md`
 - `docs/MediaForge/adr/0025-managed-upstream-backends.md`
 - `docs/MediaForge/architecture/engine-contracts.md`
@@ -44,6 +45,10 @@ Keep upstream Jellyfin-derived code recognizable and syncable. MediaForge integr
 
 - Jellyfin source should already be pinned/imported from Track 02; this track completes/adapts the internal Video Engine rather than first copying the upstream project.
 - At actual import/update time verify the current official stable upstream; prefer Jellyfin 12.x stable as the initial long-lived baseline when available.
+
+## Mandatory target additions — 2026-08-17 — player audio
+
+- Gate the video-engine bridge against canonical MediaForge audio semantics and explicit direct-play/transcode/degraded capability behavior; native Jellyfin UI/settings must not become the product contract.
 
 ## Exact work for this prompt
 

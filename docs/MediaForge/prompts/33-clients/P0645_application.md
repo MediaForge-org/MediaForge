@@ -18,6 +18,7 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
+- `docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md`
 - `docs/MediaForge/architecture/target-monorepo.md`
 - `docs/MediaForge/architecture/routing-and-public-urls.md`
 - `docs/MediaForge/architecture/engine-contracts.md`
@@ -36,6 +37,10 @@ Do **not** recursively open every document linked from the required reads. If a 
 ## Subsystem-specific rule
 
 Clients consume the stable MediaForge API/SDK; they must not depend on Laravel/Inertia implementation details or internal engine APIs.
+
+## Mandatory target additions — 2026-08-17 — player audio
+
+- Resolve platform/device capabilities into the canonical requested-vs-effective audio state. Device profiles may differ for TV, AVR, headphones, laptop speakers, mobile and other outputs while inheriting MediaForge defaults deterministically.
 
 ## Exact work for this prompt
 

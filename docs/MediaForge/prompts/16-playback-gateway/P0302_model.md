@@ -18,6 +18,7 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
+- `docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md`
 - `docs/MediaForge/architecture/unified-application.md`
 - `docs/MediaForge/architecture/engine-contracts.md`
 - `docs/MediaForge/architecture/routing-and-public-urls.md`
@@ -36,6 +37,11 @@ Do **not** recursively open every document linked from the required reads. If a 
 ## Subsystem-specific rule
 
 Large media bytes must not proxy through Laravel unnecessarily. Control/session APIs may pass through the server; streams route efficiently through the gateway to the responsible engine.
+
+## Mandatory target additions — 2026-08-17 — player audio
+
+- Model canonical playback audio intent and effective state: 100/150/200% maximum-volume policy, 100% unity, separate advanced preamp, loudness-normalization intent, limiter/protection, dialogue/DRC/EQ/downmix settings, profile scope/inheritance and requested-vs-effective capability state.
+- Keep MediaForge concepts engine-neutral; do not encode Jellyfin/Audiobookshelf IDs into the canonical model.
 
 ## Exact work for this prompt
 

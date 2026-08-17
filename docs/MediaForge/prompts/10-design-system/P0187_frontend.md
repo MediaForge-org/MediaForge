@@ -18,6 +18,7 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
+- `docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md`
 - `docs/MediaForge/architecture/localization-and-professional-translation.md`
 - `docs/MediaForge/adr/0026-localization-and-translation.md`
 - `docs/MediaForge/ui-ux/UI_IMPLEMENTATION_PROMPT.md`
@@ -55,6 +56,11 @@ Use the reference images as visual specifications, not as pixel-perfect screensh
 
 - All normal user-visible copy uses stable localisation keys and must support de, en-GB, it, es and fr from the initial target.
 - Components must tolerate language expansion and locale-specific number/date/size/plural formatting.
+
+## Mandatory target additions — 2026-08-17 — player audio
+
+- Implement the shared player-volume primitive so product surfaces can choose a 100%, 150% or 200% maximum. 100% is unity; the >100% boost zone must be visually distinguishable.
+- Provide accessible simple and advanced audio-control primitives that work with mouse, keyboard, touch and TV/remote focus navigation. Do not implement DSP in the design-system layer.
 
 ## Exact work for this prompt
 

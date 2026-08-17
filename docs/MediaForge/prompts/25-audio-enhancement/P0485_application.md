@@ -18,6 +18,7 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
+- `docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md`
 - `docs/MediaForge/modules/audio-upscaler.md`
 - `docs/MediaForge/modules/media-editions-and-lineage.md`
 - `docs/MediaForge/architecture/polyglot-runtime-and-contracts.md`
@@ -35,6 +36,10 @@ Do **not** recursively open every document linked from the required reads. If a 
 ## Subsystem-specific rule
 
 Never overwrite originals by default. Reconstructed audio is a new edition/artifact and must be labeled reconstructed rather than falsely lossless-original.
+
+## Mandatory target additions — 2026-08-17 — player audio
+
+- Keep temporary playback gain/normalization/EQ/DRC strictly separate from restoration/reconstruction jobs. A user selecting 200% volume or +dB playback gain must never create or relabel a reconstructed edition.
 
 ## Exact work for this prompt
 

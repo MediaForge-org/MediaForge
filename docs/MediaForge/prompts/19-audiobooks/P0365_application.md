@@ -18,6 +18,7 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
+- `docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md`
 - `docs/MediaForge/modules/acquisition-automation-and-postprocessing.md`
 - `docs/MediaForge/architecture/localization-and-professional-translation.md`
 - `docs/MediaForge/adr/0026-localization-and-translation.md`
@@ -47,6 +48,11 @@ Model Work, Edition, Chapter and AudioFile separately. Verified official chapter
 
 - Audiobook acquisition/import uses the same MediaForge naming/provenance pipeline while preserving chapter/edition semantics.
 - Metadata translation fallback may fill missing localised descriptions/chapters while retaining original text/provenance.
+
+## Mandatory target additions — 2026-08-17 — player audio
+
+- Apply the shared canonical player-audio model with audiobook/spoken-word-oriented defaults: prioritize voice clarity and consistent perceived loudness without copying movie/cinema presets blindly.
+- Playback DSP must not alter chapter timestamps, bookmarks, playback progress or source identity.
 
 ## Exact work for this prompt
 

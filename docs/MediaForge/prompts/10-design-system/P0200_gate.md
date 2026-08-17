@@ -18,6 +18,7 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
+- `docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md`
 - `docs/MediaForge/architecture/localization-and-professional-translation.md`
 - `docs/MediaForge/adr/0026-localization-and-translation.md`
 - `docs/MediaForge/ui-ux/UI_IMPLEMENTATION_PROMPT.md`
@@ -55,6 +56,10 @@ Use the reference images as visual specifications, not as pixel-perfect screensh
 
 - All normal user-visible copy uses stable localisation keys and must support de, en-GB, it, es and fr from the initial target.
 - Components must tolerate language expansion and locale-specific number/date/size/plural formatting.
+
+## Mandatory target additions — 2026-08-17 — player audio
+
+- Gate the reusable volume/audio-control primitives against the canonical player-audio policy, including the boost-zone treatment, disabled/unsupported states and TV/remote accessibility.
 
 ## Exact work for this prompt
 

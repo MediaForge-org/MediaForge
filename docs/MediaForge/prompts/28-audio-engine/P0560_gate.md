@@ -18,6 +18,7 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
+- `docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md`
 - `docs/MediaForge/architecture/managed-upstreams-and-product-surface.md`
 - `docs/MediaForge/adr/0025-managed-upstream-backends.md`
 - `docs/MediaForge/architecture/engine-contracts.md`
@@ -43,6 +44,10 @@ Keep upstream Audiobookshelf-derived code recognizable and syncable. MediaForge 
 ## Mandatory target additions — 2026-08-17
 
 - Audiobookshelf source should already be pinned/imported from Track 02; this track completes/adapts the internal Audio Engine while MediaForge remains the product UI/source of truth.
+
+## Mandatory target additions — 2026-08-17 — player audio
+
+- Gate the audio-engine bridge against MediaForge's canonical audio/profile semantics, spoken-word behavior and explicit requested-vs-effective capability reporting.
 
 ## Exact work for this prompt
 

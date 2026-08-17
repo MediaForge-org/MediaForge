@@ -51,3 +51,4 @@ No prompt IDs are added; total remains **720**.
 - Track 24 includes verified series/movie disc extraction/remux handoff.
 - Tracks 26–28 complete already-prepared engine cutovers.
 - Tracks 30/34/35/36 include backend-event normalisation, provider/translation plugins, update/rollback/resource management and compatibility/localisation release gates.
+- Tracks 10/16/19/25/26/28/29/33 now integrate the canonical player-audio policy: VLC-like optional 100/150/200% player volume, LUFS/true-peak analysis, limiter/clipping protection, dialogue/DRC/EQ/downmix, device/media profiles, engine capability negotiation and audiobook-specific spoken-word defaults.

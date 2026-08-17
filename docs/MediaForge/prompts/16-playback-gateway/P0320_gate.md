@@ -18,6 +18,7 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
+- `docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md`
 - `docs/MediaForge/architecture/unified-application.md`
 - `docs/MediaForge/architecture/engine-contracts.md`
 - `docs/MediaForge/architecture/routing-and-public-urls.md`
@@ -36,6 +37,10 @@ Do **not** recursively open every document linked from the required reads. If a 
 ## Subsystem-specific rule
 
 Large media bytes must not proxy through Laravel unnecessarily. Control/session APIs may pass through the server; streams route efficiently through the gateway to the responsible engine.
+
+## Mandatory target additions — 2026-08-17 — player audio
+
+- The playback track cannot pass its gate until the canonical player-audio policy is proven: 100% unity; 100/150/200% limits; limiter/clipping protection; LUFS analysis/cache/versioning; dialogue/DRC/EQ/downmix; profile precedence; requested/effective state; direct-play preservation; accessibility and audiobook-specific profile compatibility.
 
 ## Exact work for this prompt
 

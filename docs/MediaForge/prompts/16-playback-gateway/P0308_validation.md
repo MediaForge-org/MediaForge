@@ -18,6 +18,7 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
+- `docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md`
 - `docs/MediaForge/architecture/unified-application.md`
 - `docs/MediaForge/architecture/engine-contracts.md`
 - `docs/MediaForge/architecture/routing-and-public-urls.md`
@@ -36,6 +37,11 @@ Do **not** recursively open every document linked from the required reads. If a 
 ## Subsystem-specific rule
 
 Large media bytes must not proxy through Laravel unnecessarily. Control/session APIs may pass through the server; streams route efficiently through the gateway to the responsible engine.
+
+## Mandatory target additions — 2026-08-17 — player audio
+
+- Validate maximum-volume policy and all gain/DSP bounds deterministically: >100 is invalid with a 100% max; >150 invalid with a 150% max; contradictory or unsupported settings must not silently appear active.
+- Validate versioned loudness-analysis reuse/invalidation and true-peak/limiter settings where they enter this subsystem.
 
 ## Exact work for this prompt
 

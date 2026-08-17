@@ -18,6 +18,7 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
+- `docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md`
 - `docs/MediaForge/architecture/polyglot-runtime-and-contracts.md`
 - `docs/MediaForge/architecture/target-monorepo.md`
 - `docs/MediaForge/modules/disc-engine.md`
@@ -42,6 +43,11 @@ Do **not** recursively open every document linked from the required reads. If a 
 
 
 Use Rust for new native MediaForge media tooling while reusing mature native libraries such as FFmpeg/libbluray through processes or safe bindings where appropriate.
+
+## Mandatory target additions — 2026-08-17 — player audio
+
+- Where native performance-sensitive helpers are needed, support loudness/EBU-R128 and true-peak analysis, channel-layout inspection, deterministic FFmpeg filter-graph construction, downmix/normalization/limiter helpers and effective-plan validation.
+- Rust MediaTools must not own user preferences or redefine MediaForge's canonical playback-audio semantics.
 
 ## Exact work for this prompt
 

@@ -18,6 +18,7 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
+- `docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md`
 - `docs/MediaForge/architecture/unified-application.md`
 - `docs/MediaForge/architecture/engine-contracts.md`
 - `docs/MediaForge/architecture/routing-and-public-urls.md`
@@ -36,6 +37,11 @@ Do **not** recursively open every document linked from the required reads. If a 
 ## Subsystem-specific rule
 
 Large media bytes must not proxy through Laravel unnecessarily. Control/session APIs may pass through the server; streams route efficiently through the gateway to the responsible engine.
+
+## Mandatory target additions — 2026-08-17 — player audio
+
+- Resolve requested audio settings into one deterministic effective audio plan, including profile precedence, device/engine capabilities, 0–200% simple volume semantics, advanced preamp, normalization, limiter, dialogue/DRC/EQ and downmix.
+- Prefer client/local DSP when it avoids unnecessary transcoding; unsupported features must degrade explicitly rather than being reported as active.
 
 ## Exact work for this prompt
 
