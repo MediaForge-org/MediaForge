@@ -51,3 +51,8 @@ Read only when the current prompt touches the matching concern:
 - UI localisation, canonical status localisation, metadata translation, glossary/translation memory/provider policy -> `docs/MediaForge/architecture/localization-and-professional-translation.md` + ADR-0026.
 - source search, Wanted/release scoring, naming, torrent hardlinks/seeding, post-processing DAG, ISO remux/transcodes -> `docs/MediaForge/modules/acquisition-automation-and-postprocessing.md` + ADR-0027.
 - player volume/gain (including 100/150/200%), loudness/LUFS, limiter, dialogue/DRC/EQ/downmix, device audio profiles and requested/effective audio state -> `docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md`.
+
+## 2026-08-18 routing additions — source preservation and books
+
+- books/ebooks, path-independent literary identity, retained Audiobookshelf metadata and reading state -> `docs/MediaForge/modules/books-ebooks-and-persistent-metadata.md`.
+- disappeared/delisted adult sources, Local Filename/Local Curated scenes, Source Vault, historical recovery and reupload identity -> `docs/MediaForge/modules/adult-source-vault-and-local-provenance.md`.

@@ -18,6 +18,7 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
+- `docs/MediaForge/modules/adult-source-vault-and-local-provenance.md`
 - `docs/MediaForge/architecture/managed-upstreams-and-product-surface.md`
 - `docs/MediaForge/modules/acquisition-automation-and-postprocessing.md`
 - `docs/MediaForge/architecture/localization-and-professional-translation.md`
@@ -57,6 +58,10 @@ Extensions run through versioned capabilities and permissions. Do not let plugin
 
 - Provider plugins may extend indexer/search, Browser Companion, automation and TranslationProvider capabilities without bypassing MediaForge security/provenance.
 - Plugin locale bundles integrate with the same localisation message schema and quality checks.
+
+## Mandatory target additions — 2026-08-18 — adult source vault
+
+- Provider contracts support Adult historical/public metadata sources, browser-companion captures and local-filename provenance; recovery preserves observation time and never bypasses access controls.
 
 ## Exact work for this prompt
 

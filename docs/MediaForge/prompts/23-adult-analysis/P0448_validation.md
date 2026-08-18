@@ -18,6 +18,7 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
+- `docs/MediaForge/modules/adult-source-vault-and-local-provenance.md`
 - `docs/MediaForge/modules/adult-analysis-and-taxonomy.md`
 - `docs/MediaForge/adr/0016-event-taxonomy-and-analysis.md`
 - `docs/MediaForge/architecture/polyglot-runtime-and-contracts.md`
@@ -51,6 +52,10 @@ Do **not** recursively open every document linked from the required reads. If a 
 
 
 Aim for 100% decode coverage. Expensive models may use temporal candidate refinement, but coverage must be measurable and event timestamps/evidence reproducible.
+
+## Mandatory target additions — 2026-08-18 — adult source vault
+
+- Use exact hashes plus robust video/frame/audio fingerprints and duration/technical evidence for exact-copy and reupload candidate detection; insufficient confidence never auto-merges.
 
 ## Exact work for this prompt
 

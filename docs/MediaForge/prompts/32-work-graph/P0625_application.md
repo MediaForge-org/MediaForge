@@ -18,6 +18,7 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
+- `docs/MediaForge/modules/books-ebooks-and-persistent-metadata.md`
 - `docs/MediaForge/modules/work-graph-and-cross-media.md`
 - `docs/MediaForge/modules/media-editions-and-lineage.md`
 - `docs/MediaForge/PRODUCT_DECISIONS_2026-08.md`
@@ -35,6 +36,10 @@ Do **not** recursively open every document linked from the required reads. If a 
 ## Subsystem-specific rule
 
 Cross-media relationships should be explicit typed edges, not free-form tags. Recommendations must be explainable enough to audit source signals.
+
+## Mandatory target additions — 2026-08-18 — books and persistent metadata
+
+- Relate textual BookEdition and AudiobookEdition through a shared LiteraryWork when evidence supports it, while keeping text reading progress and audio playback progress distinct.
 
 ## Exact work for this prompt
 

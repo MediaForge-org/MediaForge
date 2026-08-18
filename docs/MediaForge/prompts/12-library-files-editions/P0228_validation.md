@@ -18,6 +18,8 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
+- `docs/MediaForge/modules/adult-source-vault-and-local-provenance.md`
+- `docs/MediaForge/modules/books-ebooks-and-persistent-metadata.md`
 - `docs/MediaForge/modules/acquisition-automation-and-postprocessing.md`
 - `docs/MediaForge/architecture/localization-and-professional-translation.md`
 - `docs/MediaForge/adr/0027-acquisition-blueprint-processing-dag.md`
@@ -46,6 +48,15 @@ Keep Work/MediaItem, Edition and File separate. Never let physical filesystem la
 
 - Final file/folder naming is owned by MediaForge and follows explicit templates/policies; acquisition source names remain provenance, not canonical identity.
 - Torrent-safe imports must preserve seeding through hardlink/reflink/copy or qBittorrent-aware rename flows.
+
+## Mandatory target additions — 2026-08-18 — books and persistent metadata
+
+- Separate stable book/audiobook File identity from mutable FileLocation/path history; reconcile rename/move/re-root operations via controlled identity, hashes/fingerprints and strong identifiers.
+- Support textual BookEdition/BookFile as first-class library content and route ambiguous identity matches to Review.
+
+## Mandatory target additions — 2026-08-18 — adult source vault
+
+- Adult rename/move operations must preserve canonical Scene/File identity, original filename provenance and Source Vault history; ambiguous identity goes to Review.
 
 ## Exact work for this prompt
 

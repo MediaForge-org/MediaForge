@@ -52,3 +52,11 @@ No prompt IDs are added; total remains **720**.
 - Tracks 26–28 complete already-prepared engine cutovers.
 - Tracks 30/34/35/36 include backend-event normalisation, provider/translation plugins, update/rollback/resource management and compatibility/localisation release gates.
 - Tracks 10/16/19/25/26/28/29/33 now integrate the canonical player-audio policy: VLC-like optional 100/150/200% player volume, LUFS/true-peak analysis, limiter/clipping protection, dialogue/DRC/EQ/downmix, device/media profiles, engine capability negotiation and audiobook-specific spoken-word defaults.
+
+## 2026-08-18 scope clarifications — books and historical Adult metadata
+
+Prompt count remains **720**; no new prompt IDs are introduced.
+
+- Track 19 additionally owns first-class Books/Ebooks: textual works/editions/files, EPUB/PDF reader targets, reading progress, bookmarks/highlights/notes and path-independent metadata retention.
+- Tracks 08/12/13/19/28/32/33/34/35 guarantee that once book/audiobook metadata is captured, rename/move/rescan/provider-id changes do not erase it.
+- Tracks 08/12/13/15/21/23/27/34/35 implement Adult Source Vault, Local Filename/Local Curated metadata, availability history and fingerprint-assisted reupload recovery.

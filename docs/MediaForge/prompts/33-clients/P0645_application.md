@@ -18,6 +18,7 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
+- `docs/MediaForge/modules/books-ebooks-and-persistent-metadata.md`
 - `docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md`
 - `docs/MediaForge/architecture/target-monorepo.md`
 - `docs/MediaForge/architecture/routing-and-public-urls.md`
@@ -41,6 +42,10 @@ Clients consume the stable MediaForge API/SDK; they must not depend on Laravel/I
 ## Mandatory target additions — 2026-08-17 — player audio
 
 - Resolve platform/device capabilities into the canonical requested-vs-effective audio state. Device profiles may differ for TV, AVR, headphones, laptop speakers, mobile and other outputs while inheriting MediaForge defaults deterministically.
+
+## Mandatory target additions — 2026-08-18 — books and persistent metadata
+
+- Clients must support canonical Books reading state and EPUB/PDF reader surfaces where capable, including TOC/search/progress/bookmarks/highlights/notes and explicit unsupported-format states.
 
 ## Exact work for this prompt
 

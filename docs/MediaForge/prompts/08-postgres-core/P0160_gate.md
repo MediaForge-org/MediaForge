@@ -18,6 +18,8 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
+- `docs/MediaForge/modules/adult-source-vault-and-local-provenance.md`
+- `docs/MediaForge/modules/books-ebooks-and-persistent-metadata.md`
 - `docs/MediaForge/architecture/postgresql-source-of-truth.md`
 - `docs/MediaForge/modules/media-editions-and-lineage.md`
 - `docs/MediaForge/MediaForge_Master_Engineering.md`
@@ -42,6 +44,15 @@ Do **not** recursively open every document linked from the required reads. If a 
 
 
 PostgreSQL is the canonical MediaForge source of truth. Engine-local stores may exist during transitions but never become canonical cross-product identity stores.
+
+## Mandatory target additions — 2026-08-18 — books and persistent metadata
+
+- Make PostgreSQL the canonical owner of first-class Books/Ebooks plus retained audiobook/book source facts; path, filename and Audiobookshelf-local ids are never canonical identity.
+- Rename/move/rescan migration must preserve Work/Edition/File identity and already captured metadata.
+
+## Mandatory target additions — 2026-08-18 — adult source vault
+
+- PostgreSQL must own Adult Source Vault facts, source observations, URL/availability history, Local Filename/Local Curated facts and local-only canonical scene identity.
 
 ## Exact work for this prompt
 

@@ -18,6 +18,7 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
+- `docs/MediaForge/modules/adult-source-vault-and-local-provenance.md`
 - `docs/MediaForge/architecture/managed-upstreams-and-product-surface.md`
 - `docs/MediaForge/modules/acquisition-automation-and-postprocessing.md`
 - `docs/MediaForge/architecture/localization-and-professional-translation.md`
@@ -60,6 +61,11 @@ Scenes, performers, studios, brands, networks and historical sources need first-
 
 - Adult acquisition results/automation map to MediaForge performer/scene/studio identities; backend-specific entities never become canonical IDs.
 - Normal search/Wanted/download UI is MediaForge-owned; Whisparr/Prowlarr/qBittorrent/SAB remain implementation backends where configured.
+
+## Mandatory target additions — 2026-08-18 — adult source vault
+
+- Adult catalog supports VERIFIED_EXTERNAL, HISTORICAL_EXTERNAL, LOCAL_CURATED, LOCAL_FILENAME, PARTIAL and UNIDENTIFIED scenes plus explicit source availability states.
+- Scenes remain visible/canonical when external sources disappear.
 
 ## Exact work for this prompt
 

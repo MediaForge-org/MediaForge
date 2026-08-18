@@ -122,3 +122,11 @@ manual_override
 ```
 
 Manuelle Overrides werden nicht vom nächsten Sync überschrieben.
+
+## 2026-08-18 Source Vault and local-only scenes
+
+Canonical scenes remain valid when TPDB/StashDB/official pages disappear. MediaForge retains historical source facts/availability observations and can use deterministic filename-derived or explicitly confirmed Local Curated metadata.
+
+Default local naming profile is `{studio} - {date} - {performers} - {title}`; naming is bidirectional and preserves original-filename provenance.
+
+See `docs/MediaForge/modules/adult-source-vault-and-local-provenance.md`.

@@ -18,6 +18,7 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
+- `docs/MediaForge/modules/adult-source-vault-and-local-provenance.md`
 - `docs/MediaForge/architecture/managed-upstreams-and-product-surface.md`
 - `docs/MediaForge/modules/acquisition-automation-and-postprocessing.md`
 - `docs/MediaForge/adr/0025-managed-upstream-backends.md`
@@ -48,6 +49,11 @@ Downloads land in staging first. No completed download should be moved directly 
 - SABnzbd handles Usenet download/repair/unpack; MediaForge owns classification, final naming, provenance and library placement.
 - qBittorrent seed payload is preserved by default; prefer hardlink/reflink/copy for renamed library views, or rename active payload through qBittorrent APIs only.
 - Implement resumable post-processing stages rather than one opaque script; custom scripts are explicit contract-bound DAG nodes.
+
+## Mandatory target additions — 2026-08-18 — adult source vault
+
+- Adult naming/parser supports configurable templates with default `{studio} - {date} - {performers} - {title}` and preserves original filename plus parser version as provenance.
+- Support deterministic filename -> metadata and metadata -> safe rename preview; resolve performer/studio aliases and send ambiguity to Review.
 
 ## Exact work for this prompt
 

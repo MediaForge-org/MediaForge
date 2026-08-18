@@ -18,6 +18,7 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
+- `docs/MediaForge/modules/adult-source-vault-and-local-provenance.md`
 - `docs/MediaForge/architecture/managed-upstreams-and-product-surface.md`
 - `docs/MediaForge/adr/0025-managed-upstream-backends.md`
 - `docs/MediaForge/modules/adult-engine-target.md`
@@ -43,6 +44,10 @@ Keep upstream Stash-derived code recognizable and syncable. Preserve AGPL notice
 ## Mandatory target additions — 2026-08-17
 
 - Stash source should already be pinned/imported from Track 02; this track completes/adapts the internal Adult Engine while preserving MediaForge canonical/privacy layers.
+
+## Mandatory target additions — 2026-08-18 — adult source vault
+
+- Stash/StashDB-derived data is source/engine evidence, not canonical identity. Cutover/refresh must preserve local-only scenes and historical facts when upstream data disappears.
 
 ## Exact work for this prompt
 

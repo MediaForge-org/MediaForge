@@ -18,6 +18,8 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
+- `docs/MediaForge/modules/adult-source-vault-and-local-provenance.md`
+- `docs/MediaForge/modules/books-ebooks-and-persistent-metadata.md`
 - `docs/MediaForge/architecture/managed-upstreams-and-product-surface.md`
 - `docs/MediaForge/modules/acquisition-automation-and-postprocessing.md`
 - `docs/MediaForge/architecture/localization-and-professional-translation.md`
@@ -62,6 +64,14 @@ Measure before optimizing. Backups must be restorable, not merely created. Obser
 - Managed-upstream updates are pinned, compatibility-tested and rollback-capable; do not auto-promote an unverified upstream release.
 - Coordinate downloader bandwidth, torrent upload, playback, remux/transcode, AI and translation jobs through resource/storage budgets.
 - Expose peak temporary storage forecasts and translation/provider cost/queue controls.
+
+## Mandatory target additions — 2026-08-18 — books and persistent metadata
+
+- Backup/restore must preserve Books metadata, source facts, stable File/FileLocation mappings, reading progress, bookmarks, highlights and notes across moves and engine replacement.
+
+## Mandatory target additions — 2026-08-18 — adult source vault
+
+- Backup/restore must preserve Adult Source Vault, Local Filename/Local Curated facts, URL/availability history, mappings, review decisions and evidence references.
 
 ## Exact work for this prompt
 

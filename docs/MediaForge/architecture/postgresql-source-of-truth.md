@@ -65,3 +65,13 @@ PostgreSQL bleibt zunächst auch Search-/Graph-Basis. Zusätzliche Such-/Vector-
 ## Backup
 
 Backups müssen DB + relevante Sidecar/Config/Key-Metadaten konsistent erfassen. Große Mediafiles werden nicht zwingend in MediaForge-DB-Backups kopiert.
+
+## 2026-08-18 binding extension — books and source preservation
+
+PostgreSQL also owns canonical literary Works, textual BookEditions, book identifiers/contributors, reading progress/bookmarks/highlights/notes, durable provider source facts and stable File/FileLocation mappings.
+
+Useful Audiobookshelf/provider metadata already captured by MediaForge is retained even if path, filename or engine-local id changes.
+
+Adult Source Vault observations, URL/availability history and Local Filename/Local Curated facts are canonical provenance records. Large captures/evidence remain outside PostgreSQL and are referenced.
+
+See `docs/MediaForge/modules/books-ebooks-and-persistent-metadata.md` and `docs/MediaForge/modules/adult-source-vault-and-local-provenance.md`.

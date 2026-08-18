@@ -18,6 +18,7 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
+- `docs/MediaForge/modules/books-ebooks-and-persistent-metadata.md`
 - `docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md`
 - `docs/MediaForge/modules/acquisition-automation-and-postprocessing.md`
 - `docs/MediaForge/architecture/localization-and-professional-translation.md`
@@ -52,6 +53,11 @@ Model Work, Edition, Chapter and AudioFile separately. Verified official chapter
 ## Mandatory target additions — 2026-08-17 — player audio
 
 - Gate audiobook playback integration against the shared audio policy, proving spoken-word defaults differ appropriately from movie/TV defaults and that processing leaves chapter/progress/source identity unchanged.
+
+## Mandatory target additions — 2026-08-18 — books and persistent metadata
+
+- Expand Track 19 to full Books/Ebooks plus Audiobooks: LiteraryWork, BookEdition, BookFile, AudiobookEdition, Chapters/AudioFiles, contributors, series, identifiers and reading/listening state.
+- Provide first-class Books UX and EPUB/PDF reader targets with reading progress, bookmarks, highlights/notes; rename/move/ABS rescan must not reset metadata or state.
 
 ## Exact work for this prompt
 

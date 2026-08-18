@@ -18,6 +18,7 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
+- `docs/MediaForge/modules/books-ebooks-and-persistent-metadata.md`
 - `docs/MediaForge/architecture/managed-upstreams-and-product-surface.md`
 - `docs/MediaForge/adr/0025-managed-upstream-backends.md`
 - `docs/MediaForge/architecture/engine-contracts.md`
@@ -43,6 +44,11 @@ Keep upstream Audiobookshelf-derived code recognizable and syncable. MediaForge 
 ## Mandatory target additions — 2026-08-17
 
 - Audiobookshelf source should already be pinned/imported from Track 02; this track completes/adapts the internal Audio Engine while MediaForge remains the product UI/source of truth.
+
+## Mandatory target additions — 2026-08-18 — books and persistent metadata
+
+- Audiobookshelf is an internal source/engine, not canonical identity. Persist useful captured metadata in MediaForge PostgreSQL and reconcile changed path/ABS-local id back to existing records.
+- Engine refresh/cutover may add facts but must not erase retained metadata merely because ABS changes or stops returning a value.
 
 ## Exact work for this prompt
 

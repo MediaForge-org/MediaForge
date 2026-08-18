@@ -18,6 +18,8 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
+- `docs/MediaForge/modules/adult-source-vault-and-local-provenance.md`
+- `docs/MediaForge/modules/books-ebooks-and-persistent-metadata.md`
 - `docs/MediaForge/architecture/localization-and-professional-translation.md`
 - `docs/MediaForge/modules/acquisition-automation-and-postprocessing.md`
 - `docs/MediaForge/adr/0026-localization-and-translation.md`
@@ -48,6 +50,16 @@ Every important field should be traceable to evidence/source/observation where p
 
 - Preserve original and translated metadata separately with field-level provenance; machine-translated fields may later be superseded by authoritative locale metadata.
 - Acquisition provenance records source/decision/post-processing without storing secrets.
+
+## Mandatory target additions — 2026-08-18 — books and persistent metadata
+
+- Treat Audiobookshelf, embedded ebook metadata, sidecars, providers and manual edits as provenance-bearing source facts. Later empty/partial refreshes must not erase previously retained facts.
+- Books need edition-aware metadata/provenance and manual lock semantics.
+
+## Mandatory target additions — 2026-08-18 — adult source vault
+
+- Metadata Vault must retain historical Adult source facts even if TPDB/StashDB/official sources later omit or remove the scene; Local Filename/Local Curated values are first-class provenance.
+- Source disappearance is not canonical scene deletion, and manual locks are not silently overwritten.
 
 ## Exact work for this prompt
 

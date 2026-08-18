@@ -93,3 +93,11 @@ source edition position -> canonical content position -> target edition position
 So kann ein Benutzer von 1080p auf 4K wechseln und möglichst an derselben inhaltlichen Stelle fortsetzen.
 
 Dieses Mapping ist optional und muss bei unklaren Cuts deaktiviert werden.
+
+## 2026-08-18 literary editions and stable file identity
+
+A literary Work can own textual BookEditions and AudiobookEditions. Translations/revisions/abridgements are not collapsed merely because titles match.
+
+A physical path is a mutable location. Rename/move changes FileLocation/history while preserving Work/Edition/File identity, metadata provenance and user progress.
+
+See `docs/MediaForge/modules/books-ebooks-and-persistent-metadata.md`.

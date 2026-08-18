@@ -158,3 +158,11 @@ User Notes speichern genaue Audiopositionen und optional Transcript-Ausschnitt.
 ## 14. Hörspiele / Full Cast (P2)
 
 Später können Speaker/Character/Music/SFX-Timelines erzeugt werden. Automatische Charakterzuordnung ist nur bei verlässlicher Evidence erlaubt.
+
+## 15. Persistent metadata and Books relationship
+
+Once Audiobookshelf/provider metadata is captured, MediaForge stores it as provenance-bearing source facts in PostgreSQL. Renaming/moving the audio file or an ABS rescan must not erase it.
+
+Audiobooks are audio editions of a literary Work; textual BookEditions are first-class related media with their own reader/progress model.
+
+See `docs/MediaForge/modules/books-ebooks-and-persistent-metadata.md`.
