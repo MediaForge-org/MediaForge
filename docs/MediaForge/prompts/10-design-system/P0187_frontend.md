@@ -62,6 +62,13 @@ Use the reference images as visual specifications, not as pixel-perfect screensh
 - Implement the shared player-volume primitive so product surfaces can choose a 100%, 150% or 200% maximum. 100% is unity; the >100% boost zone must be visually distinguishable.
 - Provide accessible simple and advanced audio-control primitives that work with mouse, keyboard, touch and TV/remote focus navigation. Do not implement DSP in the design-system layer.
 
+
+## Mandatory target addition — 2026-08-28 — authored product UI
+
+- Apply the binding visual direction in `docs/MediaForge/ui-ux/design-system.md`: MediaForge must feel intentionally authored, premium and media-first, not like a generic generated SaaS dashboard.
+- Avoid card-grid, gratuitous gradient/glow/glassmorphism and decorative KPI defaults when a simpler hierarchy communicates the workflow better.
+- For Downloads/Acquisition, references 70–71 are hierarchy/density templates only; written specifications remain authoritative.
+
 ## Exact work for this prompt
 
 1. Inspect the existing implementation specifically for **MediaForge design system and UI primitives** and the current focus **frontend**.

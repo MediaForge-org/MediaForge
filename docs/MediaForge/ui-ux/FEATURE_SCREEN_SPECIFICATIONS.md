@@ -24,7 +24,7 @@ Zentrale Oberfläche für Download-/Acquisition-Jobs, Client Health und Importst
 ### Muss enthalten
 
 - Tabs: Active, Queue, Completed, Import Sandbox, Client Health;
-- SABnzbd/qBittorrent als MediaForge Cards mit Health/Speed/Queue;
+- NZBGet/qBittorrent als MediaForge Cards mit Health/Speed/Queue;
 - Active Jobs mit Fortschritt, Speed, ETA, Pause/Details;
 - Drag & Drop Intake;
 - Import Pipeline Status;
@@ -357,7 +357,7 @@ Zusammenfassende visuelle Referenz für Reconstruction, Viewer, Projection, Cali
 
 File: `reference-expanded/68_backend_capabilities_acquisition_overview.png`
 
-Purpose: visualise MediaForge as the single normal frontend over video/adult/audio engines plus Prowlarr, Sonarr, Radarr, Whisparr, SABnzbd and qBittorrent backend capabilities.
+Purpose: visualise MediaForge as the single normal frontend over video/adult/audio engines plus Prowlarr, Sonarr, Radarr, Whisparr, NZBGet and qBittorrent backend capabilities.
 
 Required ideas, not literal sample content:
 
@@ -381,3 +381,11 @@ Required ideas:
 - translation glossary/memory and provider settings;
 - no untranslated raw upstream statuses in normal UI;
 - responsive layouts across desktop/tablet/mobile.
+
+## Downloads visual/interaction clarification — 2026-08-28
+
+The normal Usenet download experience is fully MediaForge-owned and NZBGet-backed. The native downloader web UI is not embedded as the standard workflow.
+
+The screen must make the acquisition pipeline understandable from queue through verification/repair/unpack and import, with advanced technical details progressively disclosed.
+
+Use reference images 70–71 as visual templates while keeping this Markdown specification authoritative.

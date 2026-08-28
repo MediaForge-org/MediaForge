@@ -82,7 +82,7 @@ status()
 listFiles()
 ```
 
-SABnzbd/qBittorrent werden Adapter auf diesen Vertrag.
+NZBGet/qBittorrent werden Adapter auf diesen Vertrag.
 
 ## 9. Disc/MediaTools Contract
 

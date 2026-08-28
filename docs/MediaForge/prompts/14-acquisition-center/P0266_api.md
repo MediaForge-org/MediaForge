@@ -47,7 +47,7 @@ MediaForge may accept user-supplied NZB/torrent/magnet inputs and permitted cust
 
 - Acquisition is a MediaForge product surface: Search, Wanted, Releases, Downloads, Queue, History, Upgrades, Import and Sources use MediaForge UI.
 - Support broad provider capability adapters (Newznab/Torznab/Prowlarr/Jackett-compatible/native/RSS/Browser Companion/manual) instead of a hard-coded site list.
-- Sonarr/Radarr/Whisparr are transitional automation backends; Prowlarr/SAB/qBittorrent may remain specialised managed backends.
+- Sonarr/Radarr/Whisparr are transitional automation backends; Prowlarr/NZBGet/qBittorrent may remain specialised managed backends.
 
 ## Exact work for this prompt
 

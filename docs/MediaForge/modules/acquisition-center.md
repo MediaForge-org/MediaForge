@@ -5,7 +5,7 @@ Priorität: P1 nach Usable-Core-Gate; Datenmodell/Contracts P0 vorbereiten
 
 ## 1. Ziel
 
-MediaForge soll Medienbeschaffung und Import **innerhalb derselben Oberfläche** orchestrieren, ohne Benutzer zu SABnzbd/qBittorrent-Web-UIs zu zwingen.
+MediaForge soll Medienbeschaffung und Import **innerhalb derselben Oberfläche** orchestrieren, ohne Benutzer zu NZBGet/qBittorrent-Web-UIs zu zwingen.
 
 Unterstützte Eingänge:
 
@@ -68,7 +68,7 @@ ImportPlan
 
 ## 3. Download Client Contract
 
-Clients wie SABnzbd und qBittorrent implementieren ein gemeinsames Interface:
+Clients wie NZBGet und qBittorrent implementieren ein gemeinsames Interface:
 
 ```text
 health()
@@ -223,7 +223,7 @@ Acquisition Center zeigt:
 - Source/Provenance;
 - Drag & Drop Intake.
 
-Die UI soll wie MediaForge wirken, nicht wie ein eingebettetes qBittorrent/SABnzbd.
+Die UI soll wie MediaForge wirken, nicht wie ein eingebettetes qBittorrent/NZBGet.
 
 ## 13. Expanded acquisition architecture — 17 August 2026
 
@@ -231,7 +231,7 @@ Detailed automation/naming/post-processing requirements live in `acquisition-aut
 
 Binding additions:
 
-- MediaForge owns the normal Acquisition UI; SABnzbd/qBittorrent/Prowlarr/Sonarr/Radarr/Whisparr are backend capabilities, not separate day-to-day product surfaces.
+- MediaForge owns the normal Acquisition UI; NZBGet/qBittorrent/Prowlarr/Sonarr/Radarr/Whisparr are backend capabilities, not separate day-to-day product surfaces.
 - Support broad provider ecosystems through Newznab, Torznab, Prowlarr-managed definitions, Jackett-compatible Torznab endpoints, native provider plugins, RSS and a Browser Companion/manual fallback instead of a small hard-coded tracker whitelist.
 - Drag/drop intake classifies the target media/library before submission where evidence is sufficient.
 - `AcquisitionBlueprint` records expected identity, source, downloader, naming, seeding, disc/remux/transcode and final-library policy before automation begins.

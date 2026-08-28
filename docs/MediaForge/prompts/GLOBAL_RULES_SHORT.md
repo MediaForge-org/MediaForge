@@ -30,7 +30,7 @@ These rules are intentionally short. Do not replace them by rereading the whole 
 ## 2026-08-17 global product rules
 
 - MediaForge owns the normal product frontend. Integrated upstream applications are backend capabilities; native upstream UIs are admin/debug fallbacks only.
-- Jellyfin/Stash/Audiobookshelf baselines are prepared early and later adapted into internal engines. SAB/qBittorrent/Prowlarr/Sonarr/Radarr/Whisparr remain unmodified managed upstreams unless an explicit later ADR says otherwise.
+- Jellyfin/Stash/Audiobookshelf baselines are prepared early and later adapted into internal engines. NZBGet/qBittorrent/Prowlarr/Sonarr/Radarr/Whisparr remain unmodified managed upstreams unless an explicit later ADR says otherwise.
 - Never hard-code a small provider/site whitelist into domain logic when capability adapters (Newznab/Torznab/Prowlarr/plugin/etc.) can express the requirement.
 - User-visible product copy must use localisation keys. First-class launch locales are de, en-GB, it, es and fr.
 - Metadata translation fallback preserves the original value/provenance and may not fabricate facts or overwrite authoritative localised metadata.

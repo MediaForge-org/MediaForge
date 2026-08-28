@@ -207,7 +207,7 @@ docker compose -f deploy/dev/docker-compose.yml run --rm vite npm run build
 | Redis | 6390 | development only |
 | Mailpit web / SMTP | 8126 / 1126 | development only |
 
-The defaults deliberately leave SABnzbd (8080), Jellyfin (8096), and Audiobookshelf (13378) on their
+The defaults deliberately leave NZBGet (8080), Jellyfin (8096), and Audiobookshelf (13378) on their
 usual host ports untouched. External services can be reached from the app container via
 `host.docker.internal` or their LAN address.
 

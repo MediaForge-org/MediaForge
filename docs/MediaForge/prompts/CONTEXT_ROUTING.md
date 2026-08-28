@@ -47,7 +47,7 @@ If present in the live checkout, Track-01 generated governance artifacts (`GOVER
 
 Read only when the current prompt touches the matching concern:
 
-- managed upstream lifecycle, early Jellyfin/Stash/ABS import, SAB/qBit/Prowlarr/*Arr product boundaries -> `docs/MediaForge/architecture/managed-upstreams-and-product-surface.md` + ADR-0025.
+- managed upstream lifecycle, early Jellyfin/Stash/ABS import, NZBGet/qBit/Prowlarr/*Arr product boundaries -> `docs/MediaForge/architecture/managed-upstreams-and-product-surface.md` + ADR-0025.
 - UI localisation, canonical status localisation, metadata translation, glossary/translation memory/provider policy -> `docs/MediaForge/architecture/localization-and-professional-translation.md` + ADR-0026.
 - source search, Wanted/release scoring, naming, torrent hardlinks/seeding, post-processing DAG, ISO remux/transcodes -> `docs/MediaForge/modules/acquisition-automation-and-postprocessing.md` + ADR-0027.
 - player volume/gain (including 100/150/200%), loudness/LUFS, limiter, dialogue/DRC/EQ/downmix, device audio profiles and requested/effective audio state -> `docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md`.
@@ -56,3 +56,9 @@ Read only when the current prompt touches the matching concern:
 
 - books/ebooks, path-independent literary identity, retained Audiobookshelf metadata and reading state -> `docs/MediaForge/modules/books-ebooks-and-persistent-metadata.md`.
 - disappeared/delisted adult sources, Local Filename/Local Curated scenes, Source Vault, historical recovery and reupload identity -> `docs/MediaForge/modules/adult-source-vault-and-local-provenance.md`.
+
+## 2026-08-28 routing — NZBGet and download visual direction
+
+- Usenet downloader/backend choice, managed lifecycle, adapter boundary, queue/history/repair/unpack semantics -> `docs/MediaForge/architecture/managed-upstreams-and-product-surface.md` and `docs/MediaForge/modules/acquisition-automation-and-postprocessing.md`.
+- Downloads/Acquisition visual hierarchy and the "authored product, not generated SaaS dashboard" rule -> `docs/MediaForge/ui-ux/design-system.md`, `docs/MediaForge/ui-ux/SCREEN_REFERENCE_INDEX.md`, refs 70–71.
+- NZBGet's native UI is an advanced/admin fallback only; normal product workflows remain MediaForge-owned.

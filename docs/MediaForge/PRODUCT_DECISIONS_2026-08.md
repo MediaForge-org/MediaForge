@@ -55,7 +55,7 @@ Status: **verbindliche Ergänzung zur Master-Spezifikation**. `CURRENT_PHASE.md`
 ## Acquisition
 
 39. **Acquisition Center:** Download-/Import-Orchestrierung in MediaForge UI.
-40. **User-provided NZB/Torrent/Magnet:** SABnzbd/qBittorrent als Clients hinter Contracts.
+40. **User-provided NZB/Torrent/Magnet:** NZBGet/qBittorrent als Clients hinter Contracts.
 41. **Staging-first:** Download nie ungeprüft direkt in finale Library.
 42. **Import Sandbox:** Match/Probe/Duplicate/Quality/Rename/Move vor finalem Write.
 43. **Keine Piraterie-Suchmaschine:** offizielle/benutzerkonfigurierte Links und generische Downloader ja, Access-Control-/DRM-Bypass nein.
@@ -98,10 +98,10 @@ Status: **verbindliche Ergänzung zur Master-Spezifikation**. `CURRENT_PHASE.md`
 
 58. **MediaForge owns the product surface:** integrierte Programme liefern Backend-Fähigkeiten; normale Benutzer arbeiten in MediaForge UI/API. Native UIs sind Admin-/Fallback-Werkzeuge.
 59. **Forks früh, Cutover später:** Jellyfin/Stash/Audiobookshelf werden in Track 02 als gepinnte Upstream-Baselines ins Monorepo geholt; Tracks 26–28 vollenden die Integration.
-60. **Unveränderte Managed Upstreams:** SABnzbd, qBittorrent, Prowlarr, Sonarr, Radarr und Whisparr bleiben standardmäßig unveränderte Upstream-Komponenten mit MediaForge Lifecycle/Compatibility Layer.
+60. **Unveränderte Managed Upstreams:** NZBGet, qBittorrent, Prowlarr, Sonarr, Radarr und Whisparr bleiben standardmäßig unveränderte Upstream-Komponenten mit MediaForge Lifecycle/Compatibility Layer.
 61. **Breite Indexer-Unterstützung:** Newznab/Torznab/Prowlarr/Jackett-kompatible Definitionen, native Provider-Plugins, RSS und Browser Companion statt kleiner Hardcoded-Liste.
 62. **AcquisitionBlueprint:** Zielmedium, Release, Naming, Downloader, Seeding, Disc/Remux/Transcode und Library-Policy werden vor der Automation explizit modelliert.
-63. **MediaForge Naming Authority:** SAB/qBit liefern/seed-en; MediaForge entscheidet finale Library-Namen. Usenet-Passwörter sind Secrets und niemals finale Dateinamen.
+63. **MediaForge Naming Authority:** NZBGet/qBit liefern/seed-en; MediaForge entscheidet finale Library-Namen. Usenet-Passwörter sind Secrets und niemals finale Dateinamen.
 64. **Torrent-safe Library:** Hardlink bevorzugt, Reflink/Copy Fallback; aktives Seed-Payload nicht blind auf Dateisystemebene umbenennen.
 65. **Post-Processing DAG:** Probe/Identify/Disc/Remux/Rename/Subtitle/Transcode/Verify/Import/Cleanup sind resumable/idempotente Schritte.
 66. **Disc-to-library Automation:** verifizierte Serien-ISOs dürfen optional Episoden/Extras als MKV remuxen; danach optional H.264, H.265 und/oder AV1 als abgeleitete Editionen erzeugen.

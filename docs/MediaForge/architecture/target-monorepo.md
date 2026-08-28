@@ -44,7 +44,7 @@ MediaForge/
 │   ├── compose/                # dev/prod/test Compose
 │   ├── gateway/                # Reverse Proxy / Routing
 │   ├── database/               # PostgreSQL Bootstrap / Backup / Maintenance
-│   ├── managed-upstreams/      # SAB/qBit/Prowlarr/*Arr manifests + compatibility
+│   ├── managed-upstreams/      # NZBGet/qBit/Prowlarr/*Arr manifests + compatibility
 │   ├── observability/          # Logs, Metrics, Traces, Health
 │   └── releases/               # Release-/Image-/SBOM-Automation
 │
@@ -339,7 +339,7 @@ Große AI/3D-Funktionen sind Capability-gesteuert und optional. Große Binärart
 The detailed policy is defined by `managed-upstreams-and-product-surface.md` and ADR-0025.
 
 - Jellyfin, Stash and Audiobookshelf are imported as pinned source baselines during Track 02 so later contracts can be designed against their real capabilities. Tracks 26–28 complete the cutover rather than first importing the projects.
-- SABnzbd, qBittorrent, Prowlarr, Sonarr, Radarr and Whisparr are managed upstream services: upstream code remains unmodified by default while MediaForge owns lifecycle, compatibility, normalised API/events and the normal product UI.
-- Prowlarr/SAB/qBittorrent may remain long-term backend components. Sonarr/Radarr/Whisparr are transitional automation providers whose product-level Wanted/Release/Upgrade functions can progressively move into MediaForge.
+- NZBGet, qBittorrent, Prowlarr, Sonarr, Radarr and Whisparr are managed upstream services: upstream code remains unmodified by default while MediaForge owns lifecycle, compatibility, normalised API/events and the normal product UI.
+- Prowlarr/NZBGet/qBittorrent may remain long-term backend components. Sonarr/Radarr/Whisparr are transitional automation providers whose product-level Wanted/Release/Upgrade functions can progressively move into MediaForge.
 - Normal users see MediaForge concepts, not a collection of embedded product surfaces. Native upstream UIs are advanced/admin fallbacks only.
 - `packages/localization` owns first-class UI locale resources, glossary/translation-memory contracts and localisation QA.

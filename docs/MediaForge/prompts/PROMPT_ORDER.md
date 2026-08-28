@@ -326,7 +326,7 @@ Run one prompt at a time unless explicitly authorized otherwise. Tracks are orde
 - `P0279` — `14-acquisition-center/P0279_docs.md` — docs
 - `P0280` — `14-acquisition-center/P0280_gate.md` — gate
 
-## Track 15 — SABnzbd/qBittorrent intake, staging and import sandbox (P1)
+## Track 15 — NZBGet/qBittorrent intake, staging and import sandbox (P1)
 
 - `P0281` — `15-download-import/P0281_audit.md` — audit
 - `P0282` — `15-download-import/P0282_model.md` — model

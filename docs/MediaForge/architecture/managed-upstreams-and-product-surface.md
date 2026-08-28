@@ -37,7 +37,7 @@ Their normal product UIs, user/account concepts and canonical databases are tran
 
 These applications remain upstream products and should not accumulate MediaForge source patches unless a later ADR explicitly changes the rule:
 
-- SABnzbd -> Usenet download backend;
+- NZBGet -> Usenet download backend;
 - qBittorrent -> torrent download/seeding backend;
 - Prowlarr -> indexer/tracker abstraction and definition ecosystem;
 - Sonarr -> transitional series automation backend;
@@ -108,7 +108,7 @@ Managed applications do not need copied source trees in normal MediaForge Git hi
 
 ```text
 platform/managed-upstreams/
-├── sabnzbd/
+├── nzbget/
 ├── qbittorrent/
 ├── prowlarr/
 ├── sonarr/
@@ -183,7 +183,7 @@ These are initially valuable backends because they already implement wanted moni
 Long-term target:
 
 ```text
-Phase A: MediaForge UI -> *Arr backends -> Prowlarr -> SAB/qBit
+Phase A: MediaForge UI -> *Arr backends -> Prowlarr -> NZBGet/qBit
 Phase B: MediaForge owns naming/provenance/release scoring; *Arr still monitor/grab
 Phase C: MediaForge owns Wanted/Upgrade/Search/Download orchestration
 Phase D: Sonarr/Radarr/Whisparr are optional migration/compatibility providers
@@ -191,9 +191,9 @@ Phase D: Sonarr/Radarr/Whisparr are optional migration/compatibility providers
 
 Do not prematurely reimplement mature automation, but do not allow *Arr data models to become MediaForge's canonical product model.
 
-## 9. Prowlarr/SAB/qBittorrent long-term role
+## 9. Prowlarr/NZBGet/qBittorrent long-term role
 
-Prowlarr, SABnzbd and qBittorrent may remain long-term managed components because they provide specialised, actively maintained functionality that is not itself MediaForge's differentiator.
+Prowlarr, NZBGet and qBittorrent may remain long-term managed components because they provide specialised, actively maintained functionality that is not itself MediaForge's differentiator.
 
 MediaForge must still own:
 
@@ -218,3 +218,94 @@ A managed component update is accepted only after the relevant compatibility sui
 - MediaForge UI paths remain functional;
 - representative download/indexer/automation smoke flows still pass;
 - rollback to the previous pinned version remains possible.
+
+## 11. 2026-08-28 binding update — NZBGet and authored download experience
+
+### 11.1 Single managed Usenet backend
+
+NZBGet is the single MediaForge-managed Usenet download backend in the target architecture.
+
+SAB is not a second production backend, compatibility target or normal installation option. MediaForge avoids maintaining two Usenet adapter implementations when the required product capabilities can be provided by one specialised managed service.
+
+The decision is based on the complete system trade-off, not on programming language alone:
+
+- low resource overhead is desirable for an always-on media server;
+- NZBGet provides the queue, history, server, download, verification/repair, unpack and automation capabilities MediaForge needs;
+- a single backend reduces adapter, compatibility, upgrade, Docker, E2E and failure-state maintenance;
+- NZBGet remains as close to upstream as practical rather than becoming a MediaForge UI fork.
+
+If future evidence shows a missing hard requirement, changing this decision requires an ADR rather than silently adding another downloader.
+
+### 11.2 MediaForge owns 100% of the normal download UX
+
+The native NZBGet web interface is not the MediaForge product UI. It may exist only as a protected advanced/admin diagnostic fallback.
+
+Normal users use MediaForge surfaces for:
+
+```text
+Downloads
+├── Active
+├── Waiting
+├── Processing
+├── Completed
+├── Failed
+├── Queue controls
+├── History
+├── Speed / limits
+├── Server health
+├── PAR verify / repair
+├── Unpack
+├── Retry / failure review
+└── Post-processing / import progress
+```
+
+Backend terminology is mapped into stable MediaForge concepts and localized product copy. The frontend must not be structured around raw NZBGet RPC names or native-web-UI screens.
+
+### 11.3 Unified acquisition lifecycle
+
+The user-facing lifecycle is one continuous MediaForge workflow:
+
+```text
+Search / Intake
+ -> Release decision
+ -> Download
+ -> Verify
+ -> PAR repair if required
+ -> Unpack
+ -> Probe / Analyse
+ -> Identify
+ -> Rename
+ -> Import
+ -> Library registration
+```
+
+NZBGet owns the specialised Usenet phases. MediaForge owns the canonical acquisition, naming, provenance, staging, import, library and user experience around them.
+
+### 11.4 Required normalized capabilities
+
+The managed adapter/contract must cover the capabilities MediaForge actually exposes, including:
+
+- add/import NZB;
+- active queue and ordering;
+- pause/resume/cancel/delete;
+- priority and category/profile mapping;
+- per-job and global speed/status;
+- history and retry;
+- server state/health and configured priority;
+- verification/PAR repair state;
+- unpack/post-processing state;
+- meaningful warnings/failures;
+- job identifiers/mappings;
+- logs/diagnostic data where safe and useful;
+- lifecycle/health/version compatibility.
+
+Raw credentials, API secrets and server passwords are never sent to the normal frontend.
+
+### 11.5 Download UI references
+
+The following generated screens are layout/design references, not literal product data:
+
+- `docs/MediaForge/ui-ux/reference-expanded/70_nzbget_unified_downloads_dashboard.png`
+- `docs/MediaForge/ui-ux/reference-expanded/71_nzbget_download_manager_template.png`
+
+Covers, titles, counts, speeds, provider names and labels inside the images are placeholders. The Markdown product/architecture specifications remain authoritative.

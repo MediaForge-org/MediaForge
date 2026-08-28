@@ -82,7 +82,7 @@ Diese Datei ist Planungsorientierung, **keine Garantie**. Zeiten beziehen sich a
 
 **ca. 3–6 Wochen**
 
-- SABnzbd/qBittorrent Contracts;
+- NZBGet/qBittorrent Contracts;
 - Intake;
 - Staging;
 - Import Sandbox;

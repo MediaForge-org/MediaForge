@@ -57,7 +57,7 @@ Contracts are language-neutral. Generated code must be reproducible and committe
 ## Mandatory target additions — 2026-08-17
 
 - Contracts must cover ManagedComponent lifecycle/capabilities, provider capabilities, AcquisitionBlueprint/post-processing states and localisation/translation provenance.
-- Do not couple canonical identities to Sonarr/Radarr/Whisparr/Prowlarr/SAB/qBittorrent IDs.
+- Do not couple canonical identities to Sonarr/Radarr/Whisparr/Prowlarr/NZBGet/qBittorrent IDs.
 
 ## Exact work for this prompt
 

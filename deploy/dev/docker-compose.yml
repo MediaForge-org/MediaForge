@@ -6,7 +6,7 @@
 #   make setup      # first run
 #   make up / make down
 #
-# Ports avoid the host's existing 8080 (SABnzbd) / 8096 (Jellyfin) / 13378 (ABS).
+# Ports avoid commonly occupied host ports 8080, 8096 and 13378.
 # =============================================================================
 
 x-app-build: &app-build

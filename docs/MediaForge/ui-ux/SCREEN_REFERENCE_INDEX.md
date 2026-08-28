@@ -77,3 +77,12 @@ For exact interaction meaning, always prefer `FEATURE_SCREEN_SPECIFICATIONS.md` 
 - `69_localization_translation_acquisition_overview.png` — first-class locale controls, professional metadata translation workflow, translation memory and responsive unified UX.
 
 Artwork shown in reference images is illustrative. Production UI must bind posters/covers/thumbnails to the matched canonical media identity or show a neutral placeholder/review state.
+
+### 70–71 — NZBGet-backed Downloads and authored MediaForge operations UI
+
+| Image | Primary use | Key things to preserve |
+|---|---|---|
+| `70_nzbget_unified_downloads_dashboard.png` | Unified dashboard + Downloads + library/detail/settings relationship | one coherent MediaForge product, media-first dark quality, download pipeline legibility, restrained cards, integrated server/queue state |
+| `71_nzbget_download_manager_template.png` | Dedicated download/queue workbench template | high-density queue, stable columns, progress hierarchy, contextual detail pane, advanced technical data without leaving MediaForge |
+
+Both images are generated templates. Titles, artwork, providers, counts, speeds and exact copy are placeholders. Written architecture and feature specifications override any ambiguous mockup detail.

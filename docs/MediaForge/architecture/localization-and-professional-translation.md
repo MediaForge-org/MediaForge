@@ -77,7 +77,7 @@ qBittorrent: "Downloading metadata"
     ...
 ```
 
-The same rule applies to SABnzbd, Prowlarr, Sonarr, Radarr, Whisparr and all internal engines.
+The same rule applies to NZBGet, Prowlarr, Sonarr, Radarr, Whisparr and all internal engines.
 
 ## 6. Professional metadata translation fallback
 

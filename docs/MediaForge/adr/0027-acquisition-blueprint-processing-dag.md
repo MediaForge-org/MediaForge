@@ -11,7 +11,7 @@ The same orchestration covers Usenet, torrents and manual/local intake while pre
 
 ## Consequences
 
-- SABnzbd/qBittorrent remain specialised download backends.
+- NZBGet/qBittorrent remain specialised download backends.
 - MediaForge owns final classification, naming, provenance and library placement.
 - Torrent imports prefer hardlink/reflink/copy while keeping seed payload intact; direct renames go through qBittorrent APIs.
 - Disc/ISO workflows can branch into verified episode/extra extraction, MKV remux and optional H.264/H.265/AV1 derived outputs.

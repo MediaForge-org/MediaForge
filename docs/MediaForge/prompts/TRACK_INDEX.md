@@ -18,7 +18,7 @@ Each track contains 20 granular prompts using the same lifecycle: audit → mode
 - **12 Library, files, editions and storage model** (P0) — `P0221`–`P0240` — folder `12-library-files-editions/`
 - **13 Metadata vault, provenance, matching and review center** (P0) — `P0241`–`P0260` — folder `13-metadata-provenance-review/`
 - **14 Acquisition Center domain and source abstraction** (P1) — `P0261`–`P0280` — folder `14-acquisition-center/`
-- **15 SABnzbd/qBittorrent intake, staging and import sandbox** (P1) — `P0281`–`P0300` — folder `15-download-import/`
+- **15 NZBGet/qBittorrent intake, staging and import sandbox** (P1) — `P0281`–`P0300` — folder `15-download-import/`
 - **16 Unified playback sessions, gateway and stream routing** (P1) — `P0301`–`P0320` — folder `16-playback-gateway/`
 - **17 Series, seasons, episodes, orders and timeline features** (P1) — `P0321`–`P0340` — folder `17-series/`
 - **18 Movies, cuts, technical editions and extras** (P1) — `P0341`–`P0360` — folder `18-movies/`
@@ -47,7 +47,7 @@ No prompt IDs are added; total remains **720**.
 
 - Track 02 now includes pinned, buildable upstream baselines for Jellyfin/Stash/Audiobookshelf plus managed-upstream manifests/tooling.
 - Tracks 10–13 include launch-locale i18n and metadata translation/provenance.
-- Tracks 14–15 include unified provider search, managed *Arr/Prowlarr/SAB/qBit backends, naming, seeding-safe imports and post-processing.
+- Tracks 14–15 include unified provider search, managed *Arr/Prowlarr/NZBGet/qBit backends, naming, seeding-safe imports and post-processing.
 - Track 24 includes verified series/movie disc extraction/remux handoff.
 - Tracks 26–28 complete already-prepared engine cutovers.
 - Tracks 30/34/35/36 include backend-event normalisation, provider/translation plugins, update/rollback/resource management and compatibility/localisation release gates.
@@ -60,3 +60,13 @@ Prompt count remains **720**; no new prompt IDs are introduced.
 - Track 19 additionally owns first-class Books/Ebooks: textual works/editions/files, EPUB/PDF reader targets, reading progress, bookmarks/highlights/notes and path-independent metadata retention.
 - Tracks 08/12/13/19/28/32/33/34/35 guarantee that once book/audiobook metadata is captured, rename/move/rescan/provider-id changes do not erase it.
 - Tracks 08/12/13/15/21/23/27/34/35 implement Adult Source Vault, Local Filename/Local Curated metadata, availability history and fingerprint-assisted reupload recovery.
+
+## 2026-08-28 scope clarification — NZBGet and authored download UI
+
+Prompt count remains **720**; no new `Pxxxx` IDs are introduced.
+
+- Track 02 prepares NZBGet, qBittorrent, Prowlarr and transitional *Arr managed-upstream manifests rather than a second Usenet downloader.
+- Tracks 14–15 use NZBGet as the sole target Usenet download engine and MediaForge as the complete normal product UI.
+- Track 10 applies the authored-product visual direction across the whole application: modern/premium/media-first without generic generated SaaS-dashboard defaults.
+- Tracks 14–15 use UI references 70–71 for Downloads/Acquisition hierarchy and density, while Markdown remains authoritative.
+- Tracks 30/35/36 cover normalized NZBGet progress/events, health/compatibility, updates/rollback and release integration.

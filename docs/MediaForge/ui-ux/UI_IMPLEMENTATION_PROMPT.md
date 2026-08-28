@@ -197,3 +197,14 @@ AI-Ergebnisse zeigen immer:
 - Correct/Reject Action soweit sinnvoll.
 
 Kein UI-Text wie „AI verified“ ohne definierte Verifikationsregel.
+
+## 2026-08-28 authored-product direction
+
+Treat the entire MediaForge UI as an authored product, not a generated SaaS template. Use `design-system.md` as the authority for avoiding card-grid/gradient/glassmorphism defaults and for choosing hierarchy according to the current workflow.
+
+For Downloads/Acquisition, also inspect:
+
+- `reference-expanded/70_nzbget_unified_downloads_dashboard.png`
+- `reference-expanded/71_nzbget_download_manager_template.png`
+
+These are hierarchy/density references. Do not copy placeholder titles, artwork or backend terminology literally.

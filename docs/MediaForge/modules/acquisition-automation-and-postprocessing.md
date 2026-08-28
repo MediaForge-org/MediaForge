@@ -144,7 +144,7 @@ Avoid duplicate downloads and avoid downgrades unless the user explicitly reques
 
 ## 7. Usenet naming policy
 
-SABnzbd handles download/verification/repair/unpack. MediaForge is the final naming authority.
+NZBGet handles download/verification/repair/unpack. MediaForge is the final naming authority.
 
 For a normal single-media Usenet job, the default policy may be:
 
@@ -339,3 +339,35 @@ Never persist raw passwords, tracker session cookies or API secrets in provenanc
 For sites without stable APIs, the browser companion may accept user-selected data from an already authenticated browser session and send the selected file/link/title metadata to MediaForge.
 
 It must not automate bypass of CAPTCHA, access controls, paywalls, required forum participation or other anti-bot/security gates. Site-specific DOM helpers are optional plugins and must degrade gracefully when a site changes.
+
+## 19. NZBGet download-engine and MediaForge UX contract
+
+NZBGet is the target managed Usenet download engine. It performs the specialised Usenet work such as article download, verification, PAR repair and unpacking. MediaForge remains the orchestration and product layer.
+
+The normal UI presents canonical MediaForge states rather than a copied NZBGet screen:
+
+```text
+queued
+downloading
+paused
+verifying
+repairing
+unpacking
+post_processing
+ready_for_import
+importing
+completed
+warning
+failed
+```
+
+The adapter may retain backend-specific detail for diagnostics, but raw backend status strings are not the public UI contract.
+
+The download detail experience should make the complete acquisition state legible without card overload. Primary information is title/media identity, release/quality, progress, throughput, ETA and the current pipeline stage. Deep technical information is available progressively in an Advanced view.
+
+Use these visual references for the Downloads/Acquisition surfaces:
+
+- `docs/MediaForge/ui-ux/reference-expanded/70_nzbget_unified_downloads_dashboard.png`
+- `docs/MediaForge/ui-ux/reference-expanded/71_nzbget_download_manager_template.png`
+
+They are templates for hierarchy, density and interaction only. Their generated copy/artwork is not canonical product content.

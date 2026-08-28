@@ -47,7 +47,14 @@ MediaForge may accept user-supplied NZB/torrent/magnet inputs and permitted cust
 
 - Acquisition is a MediaForge product surface: Search, Wanted, Releases, Downloads, Queue, History, Upgrades, Import and Sources use MediaForge UI.
 - Support broad provider capability adapters (Newznab/Torznab/Prowlarr/Jackett-compatible/native/RSS/Browser Companion/manual) instead of a hard-coded site list.
-- Sonarr/Radarr/Whisparr are transitional automation backends; Prowlarr/SAB/qBittorrent may remain specialised managed backends.
+- Sonarr/Radarr/Whisparr are transitional automation backends; Prowlarr/NZBGet/qBittorrent may remain specialised managed backends.
+
+
+## Mandatory target addition — 2026-08-28 — authored product UI
+
+- Apply the binding visual direction in `docs/MediaForge/ui-ux/design-system.md`: MediaForge must feel intentionally authored, premium and media-first, not like a generic generated SaaS dashboard.
+- Avoid card-grid, gratuitous gradient/glow/glassmorphism and decorative KPI defaults when a simpler hierarchy communicates the workflow better.
+- For Downloads/Acquisition, references 70–71 are hierarchy/density templates only; written specifications remain authoritative.
 
 ## Exact work for this prompt
 

@@ -156,7 +156,7 @@ Die Zahl der Claude-Arbeitsschritte bleibt **720**. Neue Anforderungen werden in
 - **Track 02:** create managed-upstream structure and import/pin buildable Jellyfin/Stash/Audiobookshelf source baselines; record exact release/commit/licence and upstream-sync tooling.
 - **Track 07:** contracts for ManagedComponent, provider capabilities, AcquisitionBlueprint/DAG, translation/localisation and canonical upstream-state mapping.
 - **Tracks 10–13:** first-class five-locale UI, locale-aware search, localised metadata/provenance and professional translation fallback.
-- **Tracks 14–15:** unified Acquisition UX, broad Newznab/Torznab/Prowlarr/Jackett provider layer, *Arr transitional automation, SAB/qBit workflows, naming, hardlinks/seeding, release scoring, Wanted/upgrades and Browser Companion/manual fallback.
+- **Tracks 14–15:** unified Acquisition UX, broad Newznab/Torznab/Prowlarr/Jackett provider layer, *Arr transitional automation, NZBGet/qBit workflows, naming, hardlinks/seeding, release scoring, Wanted/upgrades and Browser Companion/manual fallback.
 - **Tracks 17–21:** normal media/adult workflows consume the unified acquisition model rather than exposing separate Sonarr/Radarr/Whisparr product surfaces.
 - **Track 24:** verified ISO/disc episode+extra extraction, remux and hand-off to optional derived codec profiles.
 - **Tracks 26–28:** complete internal engine cutovers for the already-imported Jellyfin/Stash/Audiobookshelf baselines.

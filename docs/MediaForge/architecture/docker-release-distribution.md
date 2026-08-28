@@ -36,7 +36,7 @@ video     -> video engine
 adult     -> adult engine
 audio     -> audio engine
 ai        -> AI worker
-downloads -> SABnzbd/qBittorrent optional
+downloads -> NZBGet/qBittorrent optional
 ```
 
 Ein normales All-in-One-Profil kann alles aktivieren.

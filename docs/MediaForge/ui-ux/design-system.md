@@ -159,3 +159,46 @@ Design Tokens und stabile CSS-Variablen sind öffentliche Theme-Schnittstellen. 
 ## Localization design constraints
 
 The design system must be locale-expansion safe for `de`, `en-GB`, `it`, `es`, `fr` from the initial release target. Components must not rely on fixed English/German label widths. Use semantic message keys, correct plural/select formatting and locale-aware number/date/size components. Raw upstream status strings are never styled directly as product copy; map them to canonical MediaForge states first.
+
+## Authored-product visual direction — 2026-08-28
+
+MediaForge must look intentionally designed by a coherent product/design system, not like a generic generated SaaS dashboard.
+
+### Positive direction
+
+- modern, premium and media-first;
+- strong information hierarchy before decoration;
+- cinematic breathing room where media is the focus;
+- dense but calm operational views where management is the focus;
+- restrained depth, border, radius and accent use;
+- consistent visual grammar across Movies, Series, Books, Audiobooks, Music, Downloads, Metadata, Player, Settings and Private Mode;
+- progressive disclosure for technical detail;
+- short functional motion rather than decorative animation;
+- typography, alignment and spacing that look deliberately authored.
+
+### Avoid the generic generated-dashboard aesthetic
+
+Do not default to:
+
+- a grid of interchangeable rounded statistic cards;
+- cards nested inside cards without information-hierarchy need;
+- gratuitous purple/blue gradients or neon glow;
+- glassmorphism as a blanket visual treatment;
+- oversized icon-plus-heading blocks;
+- pill controls for every action;
+- decorative charts or KPIs added only to fill space;
+- generic welcome/hero copy;
+- excessive shadows and floating surfaces;
+- every datum receiving equal visual weight.
+
+The test is not whether a component is fashionable; it is whether it makes the current media or workflow clearer.
+
+### Operational screens
+
+Downloads, Acquisition, Metadata Review, Analysis, Disc Verification and similar workbenches may be information-dense. They should use stable rows, timelines, tables, drawers, split panes and contextual details instead of turning every state into a separate card.
+
+### Downloads references
+
+`70_nzbget_unified_downloads_dashboard.png` and `71_nzbget_download_manager_template.png` establish an additional quality/density direction for the download experience.
+
+Preserve their useful hierarchy and integrated MediaForge feel, but do not reproduce generated placeholder artwork/text literally and do not treat every visible widget as mandatory.

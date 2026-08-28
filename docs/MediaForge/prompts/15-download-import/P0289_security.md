@@ -1,4 +1,4 @@
-# P0289 — SABnzbd/qBittorrent intake, staging and import sandbox: security
+# P0289 — NZBGet/qBittorrent intake, staging and import sandbox: security
 
 **Track:** 15-download-import  
 **Priority:** P1  
@@ -9,7 +9,7 @@
 
 Apply authorization, privacy and security rules to the subsystem.
 
-This is a deliberately narrow step inside **SABnzbd/qBittorrent intake, staging and import sandbox**. The goal is to make one verifiable increment while keeping the rest of MediaForge stable.
+This is a deliberately narrow step inside **NZBGet/qBittorrent intake, staging and import sandbox**. The goal is to make one verifiable increment while keeping the rest of MediaForge stable.
 
 ## Context budget — read only what is required
 
@@ -45,13 +45,24 @@ Downloads land in staging first. No completed download should be moved directly 
 
 ## Mandatory target additions — 2026-08-17
 
-- SABnzbd handles Usenet download/repair/unpack; MediaForge owns classification, final naming, provenance and library placement.
+- NZBGet handles Usenet download/repair/unpack; MediaForge owns classification, final naming, provenance and library placement.
 - qBittorrent seed payload is preserved by default; prefer hardlink/reflink/copy for renamed library views, or rename active payload through qBittorrent APIs only.
 - Implement resumable post-processing stages rather than one opaque script; custom scripts are explicit contract-bound DAG nodes.
 
+
+## Mandatory target additions — 2026-08-28 — NZBGet / MediaForge Downloads UI
+
+- NZBGet is the sole target managed Usenet download backend; do not implement a parallel second Usenet production adapter.
+- NZBGet remains an upstream-managed backend. Do not fork it merely to rebuild its native UI.
+- MediaForge owns the complete normal Downloads/Queue/History/Server/Verify/Repair/Unpack/Retry/Post-processing experience and maps backend states into canonical localized MediaForge states.
+- The native NZBGet UI is advanced/admin fallback only.
+- Keep Search/Intake -> Download -> Verify/Repair -> Unpack -> Analyse -> Rename -> Import -> Library visible as one coherent product workflow.
+- UI work must follow the authored-product design rule: modern, premium, media-first and information-led, without generic generated SaaS-dashboard/card-grid/gradient/glassmorphism defaults.
+- References 70–71 are layout/density templates only; generated artwork/text is not canonical product data.
+
 ## Exact work for this prompt
 
-1. Inspect the existing implementation specifically for **SABnzbd/qBittorrent intake, staging and import sandbox** and the current focus **security**.
+1. Inspect the existing implementation specifically for **NZBGet/qBittorrent intake, staging and import sandbox** and the current focus **security**.
 2. Keep these subsystem deliverables in view: download client adapters, staging layout, ImportCandidate/Plan, quality upgrade decision.
 3. Apply authorization, privacy and security rules to the subsystem.
 4. Preserve already-working V1/V2 behavior unless this prompt explicitly replaces it with the documented target architecture.
