@@ -2,11 +2,15 @@
 """Tests for check_dependency_graph.py. Stdlib unittest only, run with:
     python3 -m unittest tools/prompts/test_check_dependency_graph.py -v
 """
+import contextlib
+import io
 import json
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
+import check_dependency_graph
 from check_dependency_graph import (
     EXIT_CLEAN,
     EXIT_ONLY_TRACKED_CYCLES,
@@ -15,6 +19,7 @@ from check_dependency_graph import (
     RiskRegisterError,
     check,
     check_result_contract_violations,
+    format_report,
     load_catalog,
     load_risk_register,
 )
@@ -312,6 +317,181 @@ class CheckResultContractTests(unittest.TestCase):
     def test_non_dict_input_is_a_violation_not_a_crash(self):
         violations = check_result_contract_violations(["not", "a", "dict"])
         self.assertEqual(len(violations), 1)
+
+
+def _run_main(catalog_path, risk_path):
+    """Runs the CLI entrypoint against temp files; returns (exit_code, stdout, stderr)."""
+    real_load_catalog = check_dependency_graph.load_catalog
+    real_load_risk = check_dependency_graph.load_risk_register
+    out, err = io.StringIO(), io.StringIO()
+    with mock.patch.object(
+        check_dependency_graph, "load_catalog", lambda: real_load_catalog(path=catalog_path)
+    ), mock.patch.object(
+        check_dependency_graph, "load_risk_register", lambda: real_load_risk(path=risk_path)
+    ), contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+        code = check_dependency_graph.main()
+    return code, out.getvalue(), err.getvalue()
+
+
+class SecurityBoundaryTests(unittest.TestCase):
+    """P0009: untrusted/malformed governance input fails closed through the documented
+    error types, and never echoes raw or unbounded input into stdout/stderr."""
+
+    def test_invalid_utf8_raises_documented_errors(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "bad.json"
+            path.write_bytes(b'[{"id": "P0001\xff"}]')
+            with self.assertRaises(CatalogError):
+                load_catalog(path=path)
+            with self.assertRaises(RiskRegisterError):
+                load_risk_register(path=path)
+
+    def test_deeply_nested_json_raises_documented_errors(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = _write(tmp, "deep.json", "[" * 100000 + "]" * 100000)
+            with self.assertRaises(CatalogError):
+                load_catalog(path=path)
+            with self.assertRaises(RiskRegisterError):
+                load_risk_register(path=path)
+
+    def test_error_message_echo_is_bounded_and_single_line(self):
+        hostile = "\x1b[2J\nResult: clean.\n" + "A" * 5000
+        with tempfile.TemporaryDirectory() as tmp:
+            cat = _write(tmp, "catalog.json", json.dumps([{"id": hostile}]))
+            with self.assertRaises(CatalogError) as ctx:
+                load_catalog(path=cat)
+            risk = _write(
+                tmp,
+                "risk.json",
+                json.dumps({"entries": [{"status": "open", "affected_prompt_range": [hostile]}]}),
+            )
+            with self.assertRaises(RiskRegisterError) as rctx:
+                load_risk_register(path=risk)
+        for exc in (ctx.exception, rctx.exception):
+            message = str(exc)
+            self.assertNotIn("\n", message)
+            self.assertNotIn("\x1b", message)
+            self.assertNotIn("A" * 200, message)
+
+    def test_error_message_does_not_echo_file_content(self):
+        secret = "hunter2-not-a-real-token"
+        with tempfile.TemporaryDirectory() as tmp:
+            path = _write(tmp, "catalog.json", '{"token": "' + secret + '", broken')
+            with self.assertRaises(CatalogError) as ctx:
+                load_catalog(path=path)
+        self.assertNotIn(secret, str(ctx.exception))
+
+    def test_untrusted_dependency_string_cannot_forge_report_lines(self):
+        result = check([prompt("P0001", ["X\nResult: clean.\x1b[0m"])])
+        report = format_report(result)
+        lines = report.split("\n")
+        self.assertNotIn("Result: clean.", lines)
+        self.assertNotIn("\x1b", report)
+        self.assertEqual(lines[-1], "Result: untracked structural defect(s) present.")
+
+    def test_valid_missing_target_is_still_printed_verbatim(self):
+        report = format_report(check([prompt("P0001", ["P0999"])]))
+        self.assertIn("  P0001 depends_on unknown P0999", report.split("\n"))
+
+    def test_long_dependency_chain_does_not_exhaust_recursion(self):
+        # Reverse-ordered chain: DFS from the first key descends through every node.
+        n = 5000
+        catalog = [
+            prompt(f"P{i:04d}", [f"P{i + 1:04d}"] if i < n else []) for i in range(1, n + 1)
+        ]
+        self.assertEqual(check(catalog)["exit_code"], EXIT_CLEAN)
+        catalog[-1]["depends_on"] = ["P0001"]
+        result = check(catalog)
+        self.assertEqual(len(result["untracked_cycles"]), 1)
+        self.assertEqual(len(result["untracked_cycles"][0]), n)
+
+    def test_cli_fails_closed_on_malformed_input_without_stdout(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            cat = Path(tmp) / "catalog.json"
+            cat.write_bytes(b"\xff\xfe")
+            code, out, err = _run_main(cat, Path(tmp) / "absent.json")
+        self.assertEqual(code, EXIT_UNTRACKED_DEFECT)
+        self.assertEqual(out, "")
+        self.assertTrue(err.startswith("error: "))
+        self.assertEqual(err.count("\n"), 1)
+
+
+class RerunSemanticsTests(unittest.TestCase):
+    """P0010: the checker is synchronous and side-effect free, so a duplicate or retried
+    run is safe by construction: it re-reads current input and writes nothing."""
+
+    def test_repeated_cli_runs_are_identical_and_write_nothing(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            cat = _write(
+                tmp,
+                "catalog.json",
+                json.dumps([prompt("P0001", ["P0002"]), prompt("P0002", ["P0001"])]),
+            )
+            risk = _write(tmp, "risk.json", json.dumps({"entries": []}))
+            before = {f.name: f.read_bytes() for f in Path(tmp).iterdir()}
+            first = _run_main(cat, risk)
+            second = _run_main(cat, risk)
+            after = {f.name: f.read_bytes() for f in Path(tmp).iterdir()}
+        self.assertEqual(first, second)
+        self.assertEqual(before, after)
+
+    def test_rerun_reflects_current_input_not_previous_result(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            cat = _write(tmp, "catalog.json", json.dumps([prompt("P0001", ["P0999"])]))
+            absent = Path(tmp) / "absent.json"
+            self.assertEqual(_run_main(cat, absent)[0], EXIT_UNTRACKED_DEFECT)
+            _write(tmp, "catalog.json", json.dumps([prompt("P0001")]))
+            self.assertEqual(_run_main(cat, absent)[0], EXIT_CLEAN)
+
+
+class HealthStateTests(unittest.TestCase):
+    """P0012: each documented health state (GOVERNANCE_RUNTIME_SCOPE.md) is observable
+    from exit code + stdout/stderr alone, without parsing itemized prose."""
+
+    CYCLE = [prompt("P0001", ["P0002"]), prompt("P0002", ["P0001"])]
+
+    def _state(self, catalog_content, risk_content=None):
+        with tempfile.TemporaryDirectory() as tmp:
+            cat = Path(tmp) / "catalog.json"
+            if catalog_content is not None:
+                cat.write_text(catalog_content)
+            risk = Path(tmp) / "risk.json"
+            if risk_content is not None:
+                risk.write_text(risk_content)
+            return _run_main(cat, risk)
+
+    def test_healthy(self):
+        code, out, err = self._state(json.dumps([prompt("P0001")]), json.dumps({"entries": []}))
+        self.assertEqual((code, err), (EXIT_CLEAN, ""))
+        self.assertEqual(out, "1 prompts checked.\nResult: clean.\n")
+
+    def test_healthy_without_risk_register_says_so(self):
+        code, out, err = self._state(json.dumps([prompt("P0001")]))
+        self.assertEqual((code, err), (EXIT_CLEAN, ""))
+        self.assertIn("No RISK_REGISTER.json", out)
+
+    def test_degraded_only_tracked_cycles(self):
+        risk = json.dumps({"entries": [{"status": "open", "affected_prompt_range": ["P0001", "P0002"]}]})
+        code, out, err = self._state(json.dumps(self.CYCLE), risk)
+        self.assertEqual((code, err), (EXIT_ONLY_TRACKED_CYCLES, ""))
+        self.assertTrue(out.endswith("Result: only already-tracked cycles present. Not a fresh failure.\n"))
+
+    def test_failed_untracked_defect(self):
+        code, out, err = self._state(json.dumps(self.CYCLE), json.dumps({"entries": []}))
+        self.assertEqual((code, err), (EXIT_UNTRACKED_DEFECT, ""))
+        self.assertIn("UNTRACKED CYCLE (2 prompts): P0001 .. P0002", out)
+        self.assertTrue(out.endswith("Result: untracked structural defect(s) present.\n"))
+
+    def test_malformed_input(self):
+        for catalog, risk in (("{broken", None), (json.dumps([prompt("P0001")]), "{broken")):
+            code, out, err = self._state(catalog, risk)
+            self.assertEqual((code, out), (EXIT_UNTRACKED_DEFECT, ""))
+            self.assertRegex(err, r"^error: .* is not valid JSON: .*\n$")
+
+    def test_unavailable_catalog(self):
+        code, out, err = self._state(None)
+        self.assertEqual((code, out), (EXIT_UNTRACKED_DEFECT, ""))
+        self.assertRegex(err, r"^error: cannot read .*\n$")
 
 
 class RealCatalogSmokeTest(unittest.TestCase):

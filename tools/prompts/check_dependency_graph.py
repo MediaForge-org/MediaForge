@@ -26,6 +26,38 @@ EXIT_ONLY_TRACKED_CYCLES = 2
 # schema files must change with it (see GOVERNANCE_API_CONTRACT.md).
 _PROMPT_ID_PATTERN = re.compile(r"^P[0-9]{4}$")
 
+# Upper bound on how much of an untrusted input value any diagnostic may echo.
+_MAX_ECHO_CHARS = 80
+
+
+def _bounded_repr(value):
+    """repr() escapes newlines/control characters, so an echoed input value can never
+    span lines or emit terminal escapes; truncation bounds how much of it is echoed."""
+    text = repr(value)
+    if len(text) > _MAX_ECHO_CHARS:
+        text = text[: _MAX_ECHO_CHARS - 3] + "..."
+    return text
+
+
+def _read_json(path, error_cls):
+    """Reads `path` as strict UTF-8 JSON. Every failure mode -- unreadable, not UTF-8,
+    not JSON, nested too deeply for the parser -- becomes `error_cls`; messages carry
+    a position at most, never file content."""
+    try:
+        raw = path.read_bytes()
+    except OSError as exc:
+        raise error_cls(f"cannot read {path}: {exc}") from exc
+    try:
+        text = raw.decode("utf-8")
+    except UnicodeDecodeError as exc:
+        raise error_cls(f"{path} is not valid UTF-8 (byte offset {exc.start})") from exc
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError as exc:
+        raise error_cls(f"{path} is not valid JSON: {exc}") from exc
+    except RecursionError as exc:
+        raise error_cls(f"{path} is nested too deeply to parse") from exc
+
 
 class CatalogError(Exception):
     """Raised when PROMPT_CATALOG.json cannot be loaded, parsed, or contains a
@@ -64,7 +96,7 @@ def _validate_catalog_entry(record, index):
     prompt_id = record["id"]
     if not isinstance(prompt_id, str) or not _PROMPT_ID_PATTERN.match(prompt_id):
         raise CatalogError(
-            f"catalog entry at index {index} has an invalid id {prompt_id!r} "
+            f"catalog entry at index {index} has an invalid id {_bounded_repr(prompt_id)} "
             "(must be a string matching P####)"
         )
     if "depends_on" in record:
@@ -82,14 +114,7 @@ def _validate_catalog_entry(record, index):
 
 
 def load_catalog(path=CATALOG_PATH):
-    try:
-        raw = path.read_text()
-    except OSError as exc:
-        raise CatalogError(f"cannot read {path}: {exc}") from exc
-    try:
-        data = json.loads(raw)
-    except json.JSONDecodeError as exc:
-        raise CatalogError(f"{path} is not valid JSON: {exc}") from exc
+    data = _read_json(path, CatalogError)
     if not isinstance(data, list):
         raise CatalogError(f"{path} must be a JSON array of prompt records")
 
@@ -137,7 +162,7 @@ def _validate_risk_register_structure(data):
             if not valid_shape:
                 raise RiskRegisterError(
                     f"risk entry at index {index}: affected_prompt_range must be a "
-                    f"[low, high] pair of P#### ids (got {rng!r})"
+                    f"[low, high] pair of P#### ids (got {_bounded_repr(rng)})"
                 )
 
 
@@ -145,55 +170,61 @@ def load_risk_register(path=RISK_REGISTER_PATH):
     """Returns the parsed risk register, or None if this checkout does not have one."""
     if not path.exists():
         return None
-    try:
-        raw = path.read_text()
-    except OSError as exc:
-        raise RiskRegisterError(f"cannot read {path}: {exc}") from exc
-    try:
-        data = json.loads(raw)
-    except json.JSONDecodeError as exc:
-        raise RiskRegisterError(f"{path} is not valid JSON: {exc}") from exc
+    data = _read_json(path, RiskRegisterError)
     _validate_risk_register_structure(data)
     return data
 
 
 def _strongly_connected_components(graph):
-    """Tarjan's SCC algorithm. graph: id -> list of dependency ids (edges may point
+    """Tarjan's SCC algorithm, iterative so that dependency-chain depth can never hit
+    Python's recursion limit. graph: id -> list of dependency ids (edges may point
     outside the key set; such targets are treated as their own trivial component)."""
-    index_counter = [0]
-    stack = []
-    lowlink = {}
     index = {}
-    on_stack = {}
+    lowlink = {}
+    on_stack = set()
+    stack = []
     sccs = []
+    counter = 0
 
-    def strongconnect(node):
-        index[node] = index_counter[0]
-        lowlink[node] = index_counter[0]
-        index_counter[0] += 1
-        stack.append(node)
-        on_stack[node] = True
-        for succ in graph.get(node, []):
-            if succ not in graph:
-                continue
-            if succ not in index:
-                strongconnect(succ)
-                lowlink[node] = min(lowlink[node], lowlink[succ])
-            elif on_stack.get(succ):
-                lowlink[node] = min(lowlink[node], index[succ])
-        if lowlink[node] == index[node]:
-            comp = []
-            while True:
-                w = stack.pop()
-                on_stack[w] = False
-                comp.append(w)
-                if w == node:
+    for root in graph:
+        if root in index:
+            continue
+        index[root] = lowlink[root] = counter
+        counter += 1
+        stack.append(root)
+        on_stack.add(root)
+        work = [(root, iter(graph[root]))]
+        while work:
+            node, successors = work[-1]
+            descended = False
+            for succ in successors:
+                if succ not in graph:
+                    continue
+                if succ not in index:
+                    index[succ] = lowlink[succ] = counter
+                    counter += 1
+                    stack.append(succ)
+                    on_stack.add(succ)
+                    work.append((succ, iter(graph[succ])))
+                    descended = True
                     break
-            sccs.append(comp)
-
-    for n in list(graph):
-        if n not in index:
-            strongconnect(n)
+                if succ in on_stack:
+                    lowlink[node] = min(lowlink[node], index[succ])
+            if descended:
+                continue
+            work.pop()
+            if work:
+                parent = work[-1][0]
+                lowlink[parent] = min(lowlink[parent], lowlink[node])
+            if lowlink[node] == index[node]:
+                comp = []
+                while True:
+                    w = stack.pop()
+                    on_stack.discard(w)
+                    comp.append(w)
+                    if w == node:
+                        break
+                sccs.append(comp)
     return sccs
 
 
@@ -339,7 +370,9 @@ def format_report(result):
     if result["missing_targets"]:
         lines.append(f"MISSING DEPENDENCY TARGETS ({len(result['missing_targets'])}):")
         for pid, dep in result["missing_targets"]:
-            lines.append(f"  {pid} depends_on unknown {dep}")
+            # dep is unvalidated input; never echo it raw (it could forge report lines).
+            shown = dep if _PROMPT_ID_PATTERN.match(dep) else _bounded_repr(dep)
+            lines.append(f"  {pid} depends_on unknown {shown}")
     if result["self_dependencies"]:
         lines.append(f"SELF-DEPENDENCIES ({len(result['self_dependencies'])}):")
         for pid in result["self_dependencies"]:

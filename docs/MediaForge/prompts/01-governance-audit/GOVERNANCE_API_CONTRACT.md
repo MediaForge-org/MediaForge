@@ -1,6 +1,6 @@
 # Governance API/contract surface — Track 01 (governance, repository audit and execution discipline)
 
-Status: **P0006 output, extended by P0008**. Documentation and JSON Schema only — this track does
+Status: **P0006 output, extended by P0008 and P0009**. Documentation and JSON Schema only — this track does
 not implement product features (see `GLOBAL_RULES_SHORT.md` and each prompt's *Subsystem-specific
 rule*). This document formalizes the already-shipped P0005 tool
 (`tools/prompts/check_dependency_graph.py`); P0008 added deterministic structural validation to
@@ -75,6 +75,10 @@ structured data should call `check()` directly (section 4.3) rather than parse s
 The only content ever written to stderr by the current implementation is a single line,
 `f"error: {exc}"`, emitted when `load_catalog()` raises `CatalogError` **or** `load_risk_register()`
 raises `RiskRegisterError` (added P0008 — see §4.2). Nothing else is written to stderr.
+**Since P0009** that line is guaranteed to be a single line of bounded length: any input value it
+echoes is rendered with `repr` escaping and truncated to 80 characters, and no file content is ever
+echoed (the message holds only the path, a position/offset, and at most that bounded value). On a
+tier-1 error stdout stays empty. See [[GOVERNANCE_SECURITY.md]].
 
 ### 3.4 Exit code contract
 
@@ -83,6 +87,10 @@ raises `RiskRegisterError` (added P0008 — see §4.2). Nothing else is written 
 | `0` | `EXIT_CLEAN` | No defects of any kind. |
 | `1` | `EXIT_UNTRACKED_DEFECT` | A missing dependency target, a self-dependency, an untracked cycle, a `CatalogError`, **or** (added P0008) a `RiskRegisterError` — all collapse to the same exit code from the CLI. This is a deliberate, documented choice, not an oversight: this contract does not promise a caller can tell "malformed governance input" apart from "valid input with an untracked defect" *by exit code alone* — only by reading stderr (empty vs. one `error:` line) or by calling `load_catalog`/`load_risk_register`/`check` directly and catching the specific exception. |
 | `2` | `EXIT_ONLY_TRACKED_CYCLES` | Only already-tracked (open, risk-register-covered) cycles remain; no other defect. |
+
+The mapping of these exit codes, plus empty or non-empty stdout/stderr, onto the health states
+*healthy / degraded / failed / malformed / unavailable* is defined in
+[[GOVERNANCE_RUNTIME_SCOPE.md]] (P0012). It adds no exit code and changes no meaning.
 
 ### 3.5 Stability promise
 
@@ -103,6 +111,9 @@ share the same `id`. A `depends_on` item that *is* a string but does not match `
 does not resolve to a real id is deliberately **not** rejected here — it already surfaces
 correctly as a `missing_targets` entry in `check()`'s result (§4.3), which is the existing,
 documented behavior for an unresolved dependency, not a gap P0008 needed to close.
+**Added P0009:** the file is read as bytes and decoded as strict UTF-8 regardless of locale. Invalid
+UTF-8 and JSON nested too deeply for the parser also raise `CatalogError`, where they previously
+leaked an uncaught `UnicodeDecodeError` or `RecursionError`.
 
 ### 4.2 `load_risk_register(path=RISK_REGISTER_PATH) -> dict | None`
 
@@ -115,6 +126,7 @@ crashing later inside `_cycle_is_tracked` with a `ValueError`/`AttributeError` o
 absent `entries` key and an explicit `null` `affected_prompt_range` are both still tolerated —
 `check()` already defaults/skips them safely, so validation does not reject more than the code
 actually needs. `schema_version` is intentionally not validated: nothing in this module reads it.
+**Added P0009:** the same strict-UTF-8 and nesting-depth handling as §4.1, raising `RiskRegisterError`.
 **This is a documented breaking change per §8** (it changes *when* an exception is raised for this
 function), made because the old behavior — an unwrapped stdlib exception for JSON, and an
 uncontrolled crash for a structurally-wrong-but-valid-JSON file — was exactly the "silent/uncontrolled
@@ -131,7 +143,10 @@ exact, closed (`additionalProperties: false`) key set and types. Summary: `promp
 `missing_targets`, `self_dependencies`, `tracked_cycles`, `untracked_cycles`,
 `risk_register_present`, `exit_code`. **Unchanged by P0008** — the graph-defect logic itself
 (missing targets, self-dependencies, cycles) stays exactly as documented; only its two callers'
-*input* is now validated more strictly before it ever reaches this function.
+*input* is now validated more strictly before it ever reaches this function. **P0009:** the cycle
+pass is now iterative, so `check()` no longer raises `RecursionError` on dependency chains longer
+than Python's recursion limit. The result is identical, so this is a bug fix to the "never raises"
+promise, not a behavior change.
 
 ### 4.3a `check_result_contract_violations(result) -> list[str]` (added P0008)
 
@@ -148,7 +163,10 @@ its shape before trusting it.
 
 ### 4.4 `format_report(result) -> str`
 
-Pure function turning a `check()` result into the stdout text described in section 3.2.
+Pure function turning a `check()` result into the stdout text described in section 3.2. **Since
+P0009** an unresolved dependency that is not a well-formed `P####` id is printed through the same
+bounded, escaped `repr` as §3.3, so input data cannot inject extra report lines (such as a forged
+trailer) or terminal escapes. Well-formed ids still print verbatim.
 
 ### 4.5 `main(argv=None) -> int`
 
@@ -160,7 +178,8 @@ loads the risk register (**added P0008:** catching `RiskRegisterError` the same 
 ### 4.6 Out of contract
 
 `_strongly_connected_components`, `_prompt_number`, `_cycle_is_tracked`, and (added P0008)
-`_validate_catalog_entry`, `_validate_risk_register_structure` are private (leading-underscore)
+`_validate_catalog_entry`, `_validate_risk_register_structure`, and (added P0009) `_read_json`,
+`_bounded_repr`, `_MAX_ECHO_CHARS` are private (leading-underscore)
 implementation details. They are not part of this contract and may change signature or behavior at
 any time without notice. `check_result_contract_violations` (§4.3a) is deliberately public and
 **is** part of the contract, since it exists specifically to be called from outside the module.
@@ -243,6 +262,15 @@ prompt slots into tier 1, never into tier 2:
   rejecting previously-valid input; every catalog record this module could load before P0008 still
   loads unchanged after it). `check_result_contract_violations()` (§4.3a) is a wholly new, additive,
   opt-in function.
+
+- **P0009 changes (security hardening, see [[GOVERNANCE_SECURITY.md]]):** `CatalogError` and
+  `RiskRegisterError` are now also raised for invalid UTF-8 and for JSON nested too deeply to parse.
+  Under this section's own rule that is a change to *when* they are raised, so it is recorded here.
+  It rejects no previously loadable input: both cases previously crashed with an uncaught
+  exception, and exit code 1 is unchanged. Error messages and `format_report` lines that echo input
+  are now bounded and escaped. Only the prose of itemized lines changes, and §3.2 already declares
+  that prose out of the stable contract. The first line, the trailer sentences and the exit codes
+  are unchanged.
 
 ## 9. Explicit non-goals / out of scope
 
