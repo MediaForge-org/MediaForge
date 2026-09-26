@@ -1,166 +1,207 @@
 # MediaForge Engineering Roadmap
 
-Zurück zur [Masterdatei](MediaForge_Master_Engineering.md). Der reale Ist-Stand wird **nur** in `CURRENT_PHASE.md` gepflegt.
+`CURRENT_PHASE.md` remains the authority for implemented status.
 
-## Neue Architecture Foundation vor weiteren großen UI-/Feature-Schritten
+Updated target architecture: **2026-09-27 — external specialist services through versioned adapters**.
 
-Die Zielarchitektur wurde präzisiert: React Router + API-first, Polyglot-Monorepo, schöne Deep Links, Contracts und Gateway sollen **vor** dem großen Premium-UI-Ausbau eingerichtet werden, damit keine neue Oberfläche auf einer später zu entfernenden Inertia-Grenze aufgebaut wird.
+The old mandatory deep-fork/cutover destination is superseded by ADR-0028.
 
-Siehe:
+## Current status
 
-- `architecture/target-monorepo.md`
-- `architecture/polyglot-runtime-and-contracts.md`
-- `architecture/routing-and-public-urls.md`
-- `DEVELOPMENT_PHASES_DETAILED.md`
+V1 complete. V2 A–E implemented according to `CURRENT_PHASE.md`.
 
-## Aktueller Status
+Existing V2 connector/catalog/import work is retained and becomes the foundation of the adapter model.
 
-Stand August 2026: V1 abgeschlossen; V2 aktiv, A–E umgesetzt. Diese Aussage darf nur geändert werden, wenn `CURRENT_PHASE.md` und Code dies beweisen.
+## Phase A — Architecture foundation
 
-## Foundation Gate A
+- land adapter-first ADR and source-of-truth matrix;
+- formalize API-first boundary;
+- React Router migration plan;
+- adapter capability/version contracts;
+- compatibility fixtures;
+- keep current V2 behavior green;
+- no upstream source-tree imports.
 
-Vor V3/V4-Großumbauten:
+## Phase B — Unified canonical catalog
 
-- Monorepo-Zielstruktur angelegt;
-- API v1/Contracts vorhanden;
-- React Router App-Shell;
-- Inertia-Migration begonnen/abgeschlossen gemäß Plan;
-- Gateway `localhost:8100`;
-- Deep Links;
-- CI/Compose funktionieren;
-- bestehende V2-Funktionalität erhalten.
+- finish V2 consistency;
+- external mappings;
+- Work/MediaItem/Edition/File semantics;
+- file/location identity;
+- source facts / field provenance;
+- canonical/manual locks;
+- unified search;
+- collections;
+- review and health.
 
-## Usable-Core-Gate B
+## Phase C — Media client core
 
-Vor Disc/AI Full Analysis/tiefen Spezialfeatures:
+MediaForge product surfaces:
 
-- Security/Auth/Backup stabil;
-- Premium App Shell;
-- Work/MediaItem/Edition/File Modell;
-- Search/Metadata/Review/Health;
-- normale Filme/Serien/Hörbücher brauchbar;
-- Background Jobs/Observability;
-- keine kritischen Datenverlustprobleme.
+- Home;
+- Movies;
+- TV;
+- Scenes;
+- Performers;
+- Studios;
+- Music;
+- Audiobooks;
+- Books;
+- Podcasts;
+- Search;
+- Collections.
 
-## Phasen
+The source backend must not dominate the UX.
 
-| Phase | Schwerpunkt | Status/Notiz |
-|---|---|---|
-| V0 | Repository/Developer Baseline | abgeschlossen |
-| V1 | Local Core Alpha | abgeschlossen |
-| V2 | Connector/Katalog/Normalisierung/erster Import | aktiv; A–E umgesetzt |
-| **V2-F** | **Architecture Foundation: API-first Monorepo, React Router, Contracts, Gateway, Deep Links** | **als nächster Architekturblock** |
-| V3 | Security Hardening / Privacy Baseline | geplant |
-| V4 | Premium React UI/Design System/App Shell | geplant |
-| V5 | i18n / locale-aware slugs/content | geplant |
-| V6 | Work/MediaItem/Edition/File, Series Orders, Cuts, Chapters | geplant |
-| V7 | Metadata Protection / Manual Locks | geplant |
-| V8 | Metadata Vault / Field Provenance / Source History | geplant |
-| V9 | Backup/Restore/DR | geplant |
-| V10 | Universal Search / Finder | geplant |
-| V11 | External/Official Source Discovery / Provider Marketplace | geplant |
-| V12 | Smart Matching / Review Center / Bulk Review | geplant |
-| V13 | Integrity/Health/Repair – **Usable-Core-Gate B** | geplant |
-| V14 | Acquisition Foundation / Download Client Contracts | geplant |
-| V15 | NZB/Torrent/Magnet Manual Intake / Acquisition Center | geplant |
-| V16 | Staging / Import Sandbox / Rename-Move / Provenance | geplant |
-| V17 | Quality Intelligence / Source Caps / Upgrades / Editions | geplant |
-| V18 | Transcoding/optimized editions/lineage | geplant |
-| V19 | Remote Access | geplant |
-| V20 | Device API/Profile | geplant |
-| V21 | Mobile Client | geplant |
-| V22 | Realtime Watch State / Handoff / Cross-Edition Mapping | geplant |
-| V23 | Desktop Server Packaging | geplant |
-| V24 | Desktop Client | geplant |
-| V25 | TV/Desktop Runtime optimization | geplant |
-| V26 | High-Fidelity Player / Streaming UX | geplant |
-| V27 | Streaming Advisor / GPU / Resource Monitor | geplant |
-| V28 | Disc Detection / ISO/BDMV/VIDEO_TS | nach Gate B |
-| V29 | Verified-only Disc Mapping / Menüs / episode watch state | nach Gate B |
-| V30 | Audiobook Chapter Intelligence + Audio Enhancement foundation | nach Gate B |
-| V31 | Adult Privacy Foundation / `/adult` / Zero Leak | geplant |
-| V32 | Adult Metadata/Coverage/Taxonomy/Scene Lineage | geplant |
-| V33 | Adult Full Analysis / AI Evidence / Smart Tags + Plugin/AI SDK | fortgeschritten |
-| V34 | Deep upstream fork/bundling in monorepo + official Docker releases | spät, nach stabilen Contracts |
+## Phase D — Playback adapters
 
-## P0/P1/P2 Feature Priorität
+### Jellyfin
 
-### P0 – Datenmodell/Contracts früh vorbereiten
+- playback preparation/session integration;
+- direct play/remux/transcode negotiation;
+- subtitles/audio tracks;
+- device capabilities;
+- technical media mirror;
+- progress reconciliation.
 
-- Scene/Event/Attribute/Evidence;
-- Field Provenance;
-- Scene Lineage;
-- Work/Edition/File;
-- Movie Cut vs Edition;
-- Episode Orders;
-- Audiobook Work/Edition/Chapter;
-- Work Graph;
-- Acquisition/Import Lineage;
-- Slug History.
+### Audiobookshelf
 
-### P1 – nach brauchbarem Core
+- audiobook/podcast playback;
+- chapters;
+- progress;
+- book/ebook capabilities where supported.
 
-- Acquisition Center;
-- Evidence Viewer;
-- Review Center;
-- Smart Collections;
-- Timeline Skip Segments;
-- official Chapter Discovery;
-- Transcript Search;
-- Cross-Edition Progress.
+PHP does not become a bulk media proxy.
 
-### P2 – fortgeschritten
+## Phase E — PWA / TV / client polish
 
-- Full Adult AI Analysis at scale;
-- Active Learning;
-- Speaker/Character Recognition;
-- reichhaltige Graph-Visualisierung;
-- komplexe Historical Source Archive UI;
-- weitere spezialisierte multimodale Modelle.
+- responsive PWA;
+- remote/focus navigation;
+- 10-foot mode;
+- fullscreen player;
+- native packaging only when it provides real value.
 
-## Fork-Strategie
+## Phase F — Library intelligence
 
-Forks liegen langfristig im selben Monorepo unter `engines/`. Der Import/Bundling-Schritt bleibt spät, aber Contracts/Ordner/Upstream-Sync-Regeln werden früh vorbereitet.
+- field provenance;
+- metadata history/rollback;
+- safe matching;
+- review center;
+- library health/repair;
+- dedup/fingerprinting;
+- Work graph;
+- cross-edition relationships.
 
-## Disc
+## Phase G — Acquisition
 
-Confidence sortiert höchstens Review-Kandidaten. Automatisches Episodenmapping nur bei `verified` Evidenz gemäß Disc Verification Policy.
+- Prowlarr/Newznab/Torznab/provider adapters;
+- NZBGet;
+- qBittorrent;
+- requests/wanted state;
+- release scoring;
+- staging;
+- safe import;
+- naming/move/hardlink;
+- seeding preservation;
+- upgrade policy;
+- provenance;
+- resumable post-processing DAG.
 
-## Adult
+Sonarr/Radarr/Whisparr remain optional/transitional integrations, not canonical models.
 
-Adult ist normal gesperrt vollständig unsichtbar. Nach Unlock sind schöne `/adult/...` URLs Standard; Strict Private URLs optional.
+## Phase H — Scene Tracker / private domain
 
-## Zeitplanung
+- versioned Scene Tracker adapter;
+- scene/performer/studio/source mappings;
+- Jellyfin local-playback mapping;
+- Adult zero-leak privacy;
+- source history;
+- advanced taxonomy;
+- local filename/curated fallback.
 
-Siehe `DEVELOPMENT_PHASES_DETAILED.md` für grobe Korridore.
+Stash may be an optional adapter, not a required fork.
 
-## Roadmap-Ergänzungen 2026-08-16
+## Phase I — Advanced media
 
-Die Zahl der Claude-Arbeitsschritte bleibt **720**. Neue Anforderungen werden in vorhandene Tracks integriert:
+- Disc/ISO/BDMV/VIDEO_TS;
+- verified-only mapping;
+- remux;
+- optimized editions;
+- AV1/H.265 where justified;
+- lineage;
+- audiobook chapter intelligence;
+- audio enhancement.
 
-- Track 02: Plugin-/Theme-SDK-Ordner, Artifact-/Reconstruction-Struktur vorbereiten;
-- Track 05: React Router Framework Mode und Inertia-Strangler-Migration;
-- Track 07: Anatomy/Reconstruction/Plugin/Capability Contracts;
-- Track 08: Analysis-/Reconstruction-Metadaten in PostgreSQL, keine großen BLOBs;
-- Track 09: private 3D/Evidence/Model-Zugriffe;
-- Track 10: Theme Tokens und Custom CSS;
-- Track 21/22: Tattoo Coverage, Body Regions und Filter;
-- Track 23: optionale Full Analysis + 3D Reconstruction + Tattoo Projection;
-- Track 29: Rust Mesh/Projection/Evidence Hotpaths ohne rückwärtsgerichtete Dependency;
-- Track 34: Plugin SDK, Theme SDK, Marketplace;
-- Track 35: Artifact Store, Quotas/GC, AI Model Registry, GPU Scheduler;
-- Track 36: optionale AI Docker Profiles/Model Downloads und vollständige CI-Matrix.
+## Phase J — Extensibility and optional advanced systems
 
-## Roadmap refinement — managed upstreams, acquisition and localisation (2026-08-17)
+- plugin SDK;
+- theme SDK/custom CSS;
+- metadata/acquisition/analyzer providers;
+- Rust MediaTools growth;
+- AI analysis;
+- semantic search;
+- artifact/model store;
+- GPU scheduler;
+- optional 3D/reconstruction/research features.
 
-- **Track 02:** create managed-upstream structure and import/pin buildable Jellyfin/Stash/Audiobookshelf source baselines; record exact release/commit/licence and upstream-sync tooling.
-- **Track 07:** contracts for ManagedComponent, provider capabilities, AcquisitionBlueprint/DAG, translation/localisation and canonical upstream-state mapping.
-- **Tracks 10–13:** first-class five-locale UI, locale-aware search, localised metadata/provenance and professional translation fallback.
-- **Tracks 14–15:** unified Acquisition UX, broad Newznab/Torznab/Prowlarr/Jackett provider layer, *Arr transitional automation, NZBGet/qBit workflows, naming, hardlinks/seeding, release scoring, Wanted/upgrades and Browser Companion/manual fallback.
-- **Tracks 17–21:** normal media/adult workflows consume the unified acquisition model rather than exposing separate Sonarr/Radarr/Whisparr product surfaces.
-- **Track 24:** verified ISO/disc episode+extra extraction, remux and hand-off to optional derived codec profiles.
-- **Tracks 26–28:** complete internal engine cutovers for the already-imported Jellyfin/Stash/Audiobookshelf baselines.
-- **Track 30:** normalised backend events, translation jobs and post-processing DAG execution.
-- **Track 34:** indexer/translation/browser-companion/provider plugins and extension contracts.
-- **Track 35:** managed component updater/rollback, compatibility matrix, storage forecast, bandwidth/resource scheduler and translation cost/queue controls.
-- **Track 36:** managed-upstream compatibility E2E, full acquisition→import/disc/transcode flows and 100% first-class locale release gates.
+These must not complicate the stable core install.
+
+## Deployment/release maturity
+
+Ongoing across phases:
+
+- default MediaForge + PostgreSQL + Redis;
+- connect existing Jellyfin/ABS;
+- optional separate Jellyfin/ABS Compose containers;
+- integration version matrix;
+- contract/E2E compatibility tests;
+- backups/restore validation;
+- multi-arch images/SBOM/signing;
+- upgrade/rollback policy.
+
+## Historical 720-prompt system
+
+The 720 IDs remain useful as lifecycle-sized work units.
+
+Reinterpret affected tracks:
+
+- Track 02: adapter/compatibility/platform preparation, not Jellyfin/Stash/ABS source import.
+- Track 07: capability/adapter contracts.
+- Tracks 14–15: acquisition remains valid.
+- Tracks 26–28: external playback/library adapter maturity, not fork cutover.
+- Adult tracks: Scene Tracker + Jellyfin split, optional Stash adapter.
+- Track 29: Rust MediaTools remains.
+- Track 36: integration compatibility/release gates.
+
+A dedicated prompt rewrite should synchronize affected numbered prompts before those tracks execute.
+
+## Gates
+
+### Foundation gate
+
+Before large UI/client expansion:
+
+- API/adapter target documented;
+- current V2 functionality preserved;
+- contract tests in place;
+- no direct upstream DB access;
+- React Router/API migration path proven.
+
+### Usable-core gate
+
+Before Disc/full AI/3D:
+
+- auth/security/backup stable;
+- canonical catalog;
+- normal movies/TV/audiobooks/books usable;
+- playback stable;
+- metadata provenance/review/search/health;
+- background jobs/observability;
+- no critical data-loss behavior.
+
+## Long-term principle
+
+MediaForge is **one product**.
+
+Jellyfin, Audiobookshelf, Scene Tracker, NZBGet, qBittorrent and other integrations are capabilities,
+not separate user journeys.

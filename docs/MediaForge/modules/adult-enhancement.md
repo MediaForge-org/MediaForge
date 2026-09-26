@@ -2,7 +2,7 @@
 
 Zurück zur [Masterdatei](../MediaForge_Master_Engineering.md).
 UI: [Adult UI Enhancement](../ui-ux/adult-ui-enhancement.md).
-Zielengine: [Adult Engine Target](adult-engine-target.md).
+Zielarchitektur: [Adult / Scene Domain Target](adult-engine-target.md).
 
 ## Produktregel: unsichtbarer Private Mode
 
@@ -38,7 +38,7 @@ Adult wird langfristig ein vollständiger, schöner, privater Media-Server inner
 - Historical Sources;
 - Review/Matching.
 
-Das sichtbare UI ist MediaForge. Der spätere Media-Core ist Stash-derived.
+Das sichtbare UI ist MediaForge. Scene Tracker liefert externe Scene-/Performer-/Studio-/Source-Metadaten über eine versionierte API; Jellyfin kann lokale Scene-Wiedergabe/Streaming übernehmen. Ein Stash-Fork ist kein Pflichtbestandteil.
 
 ## Library-driven Aktivierung
 

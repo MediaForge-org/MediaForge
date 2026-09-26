@@ -18,23 +18,26 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
-- `docs/MediaForge/architecture/managed-upstreams-and-product-surface.md`
-- `docs/MediaForge/adr/0025-managed-upstream-backends.md`
 - `docs/MediaForge/architecture/target-monorepo.md`
-- `docs/MediaForge/adr/0014-target-polyglot-monorepo.md`
+- `docs/MediaForge/architecture/external-specialist-services-and-adapters.md`
+- `docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md`
 - `docs/MediaForge/architecture/unified-application.md`
 - `docs/MediaForge/architecture/artifact-store-and-derived-assets.md`
 - `docs/MediaForge/modules/plugin-theme-sdk.md`
+- `docs/MediaForge/architecture/managed-upstreams-and-product-surface.md`
 
 Inspect these source paths/symbol neighborhoods first:
 - `repository root`
 - `composer.json`
 - `package.json`
 - `docker-compose.yml`
+- `app/Connectors`
+- `packages/contracts`
 - `packages/plugin-sdk`
 - `packages/theme-sdk`
-- `packages/contracts/domains`
 - `services/ai/reconstruction`
+- `platform/integrations`
+- `platform/managed-upstreams`
 - `platform/storage`
 
 ### UI references for this prompt
@@ -48,11 +51,13 @@ Do **not** recursively open every document linked from the required reads. If a 
 Preserve Git history and working behavior while introducing the target top-level layout. Avoid a big-bang move that makes the application unbuildable for multiple prompts.
 
 
-## Mandatory target additions — 2026-08-17
+## Mandatory target architecture — 2026-09-27
 
-- Import/pin buildable Jellyfin, Stash and Audiobookshelf upstream baselines early in the monorepo; record exact release/tag, commit SHA and licence provenance at the time of import.
-- Prepare `platform/managed-upstreams/` and `tools/upstream-sync/` seams without prematurely performing the later engine cutover.
-- Keep normal product UX owned by MediaForge; source import is not permission to expose upstream UIs as the product.
+- Do **not** import Jellyfin, Stash or Audiobookshelf source trees merely to integrate them.
+- Prepare versioned adapter/capability contracts, compatibility fixtures, optional separate-service Compose integration and provider health/version seams.
+- Keep `platform/managed-upstreams/` for specialised upstream components such as NZBGet/qBittorrent/Prowlarr/*Arr; use `platform/integrations/` (or the smallest equivalent target seam) for Jellyfin/Audiobookshelf/Scene Tracker compatibility metadata.
+- Preserve the existing `app/Connectors` implementation during migration; do not create duplicate adapter stacks just to match a target folder diagram.
+- MediaForge remains the normal product UI; native upstream UIs are admin/debug fallbacks.
 
 ## Exact work for this prompt
 

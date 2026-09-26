@@ -1,76 +1,81 @@
 # Unified Application Architecture
 
-Status: verbindliche Zielarchitektur
+Status: **binding target architecture**
+Updated: **2026-09-27**
 
-## Produktgrenze
+## Product boundary
 
-MediaForge ist **eine App mit einer Oberfläche, einer Domain/Origin, einem Auth-Modell und einem kanonischen Katalog**.
+MediaForge is one visible product with one domain model and canonical catalog.
 
-Der Nutzer soll nicht wissen müssen, ob Playback intern aus C#, Go oder Node kommt.
+Specialist servers remain external implementation details behind MediaForge adapters.
 
 ```text
-Browser / Desktop / Mobile / TV
-            |
-        MediaForge
-            |
-   +--------+---------+
-   |        |         |
- Video    Adult     Audio
- Engine   Engine    Engine
+Browser / PWA / TV / desktop / mobile
+                 |
+                 v
+             MediaForge
+                 |
+          MediaForge API
+                 |
+      +----------+-----------+
+      |          |           |
+      v          v           v
+ PostgreSQL   Jellyfin   Audiobookshelf
+ canonical     adapter       adapter
+ catalog         |             |
+                 v             v
+              Jellyfin       ABS
+
+Scene metadata:
+MediaForge -> SceneTrackerAdapter -> Scene Tracker
 ```
 
-## Sichtbare UI
+## Visible UI
 
-Normaler Modus kann zeigen:
+Normal navigation is MediaForge-owned:
 
 - Home;
-- Filme;
-- Serien;
+- Movies;
+- TV Shows;
+- Scenes;
+- Performers;
+- Studios;
+- Music;
 - Audiobooks;
+- Books;
 - Podcasts;
 - Collections;
 - Search;
 - Acquisition;
 - Settings.
 
-Adult ist im gesperrten Zustand **nicht sichtbar**. Nach Unlock wird `/adult/...` aktiv und dieselbe Design-Sprache verwendet.
+Backend names appear only when relevant for integration settings, provenance or diagnostics.
 
-## Eine Origin
+## API/frontend
 
-Standard:
+React Router is the target visible routing layer.
+Inertia is transitional.
 
-```text
-http://localhost:8100
-```
+The frontend calls MediaForge API, never provider APIs directly.
 
-Gateway-Verteilung:
+## Catalog resilience
 
-```text
-/           React
-/api/v1     Laravel
-/_stream    Engine
-```
+Normal browsing reads MediaForge PostgreSQL.
 
-## Katalog
+When a specialist service is offline, stored catalog/metadata remains available while live
+capabilities such as playback are degraded.
 
-PostgreSQL ist die einzige MediaForge Source of Truth. Engines liefern technische Spezialfunktionen, aber die sichtbare Identität und Relationen gehören MediaForge.
+## Playback
 
-## Frontend
+Jellyfin/ABS remain specialist playback runtimes.
+MediaForge prepares/controls sessions through adapters without turning PHP into a media-byte proxy.
 
-React Router besitzt die sichtbaren Routen. Inertia ist nur historischer Migrationsbestand und wird aus der Zielarchitektur entfernt.
+## Native upstream UIs
 
-## Engine-Ausfall
-
-Teilweiser Ausfall degradiert Funktionen statt die gesamte App zu zerstören. Katalog bleibt lesbar, wenn Playback Engine temporär offline ist.
-
-## Developer UIs
-
-Originale Jellyfin/Stash/ABS UIs dürfen für Debug/Upstream-Vergleich existieren, werden aber nicht in normale Navigation eingebunden.
-
-## Keine iframe-Integration
-
-MediaForge baut eigene Seiten/Player/Workflows. Ein iframe ist keine Produktintegration.
+Optional admin/debug fallback only.
+No iframe-as-product architecture.
 
 ## Monorepo
 
-Alle Komponenten werden langfristig aus demselben GitHub-Repository gebaut. Details: [target-monorepo.md](target-monorepo.md).
+The MediaForge monorepo contains MediaForge-owned code and integration manifests/contracts.
+It does not need copied upstream source trees merely to provide a unified product.

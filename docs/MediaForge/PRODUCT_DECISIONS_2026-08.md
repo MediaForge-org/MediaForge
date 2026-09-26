@@ -110,3 +110,21 @@ Status: **verbindliche Ergänzung zur Master-Spezifikation**. `CURRENT_PHASE.md`
 69. **Translation Memory/Glossary:** Wiederverwendung, Terminologie und Kostenkontrolle sind Teil der Plattform; Cloud-Übersetzung bleibt optional.
 70. **Weitere Sprachen später:** zusätzliche Locales werden schrittweise ergänzt und dürfen die fünf initialen First-Class-Locales nicht verwässern.
 71. **Artwork correctness:** UI-Referenzbilder sind Templates; das echte Produkt zeigt nur Artwork des tatsächlich gematchten Media-Objekts, andernfalls Placeholder/Review statt falschem Cover.
+
+## Superseding architecture decisions — September 2026
+
+The following decisions supersede August items 26 and 59 where they require deep forks:
+
+72. **External specialist services by default:** Jellyfin and Audiobookshelf remain independent
+    servers integrated through versioned adapters.
+73. **No mandatory Stash fork:** Scene Tracker is the preferred separate scene metadata/community
+    service; Jellyfin can provide local scene playback. Stash may be an optional external adapter.
+74. **Upstream databases remain upstream-owned:** MediaForge never migrates or directly queries
+    Jellyfin/ABS/Scene-Tracker internal databases.
+75. **MediaForge PostgreSQL owns MediaForge state:** canonical IDs, cross-service mappings, unified
+    catalog/provenance/search/review/acquisition state.
+76. **Local mirror, not live fan-out:** normal browsing reads synchronized PostgreSQL projections.
+77. **Bundled means separate containers:** optional Jellyfin/ABS Compose services, never one giant
+    runtime container.
+78. **Fork only by evidence-backed ADR:** a future deep fork requires a hard API limitation that
+    cannot reasonably be solved through supported public APIs.

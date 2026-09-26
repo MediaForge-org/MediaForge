@@ -4,7 +4,7 @@
 
 ## Scope
 
-MediaForge supports textual books/ebooks as a first-class domain alongside audiobooks. Useful metadata already learned from Audiobookshelf, embedded files, sidecars or providers must survive renames, moves, library-root changes, rescans and engine-local id changes.
+MediaForge supports textual books/ebooks as a first-class domain alongside audiobooks. Useful metadata already learned from Audiobookshelf, embedded files, sidecars or providers must survive renames, moves, library-root changes, rescans and upstream-local id changes.
 
 PostgreSQL is canonical. Paths, filenames and upstream ids are observations/mappings, never book identity.
 
@@ -45,7 +45,7 @@ The canonical model must support provenance-bearing values for at least:
 - acquisition/import provenance;
 - manual values and locks.
 
-Provider/engine ids are mappings, not MediaForge primary ids.
+Provider/upstream ids are mappings, not MediaForge primary ids.
 
 ## Rename/move invariants
 
@@ -82,7 +82,7 @@ For large audio, quick fingerprints may precede a full cryptographic hash. For e
 
 When MediaForge successfully reads Audiobookshelf metadata, useful values are persisted as MediaForge source facts/snapshots in PostgreSQL.
 
-A later ABS response that omits a value, changes a path, changes an engine-local id or no longer exposes the item must not delete those retained facts.
+A later ABS response that omits a value, changes a path, changes an upstream-local id or no longer exposes the item must not delete those retained facts.
 
 Refresh may append newer facts and change a canonical choice according to policy, but:
 
@@ -171,7 +171,7 @@ Sources may include:
 - PDF/XMP;
 - OPF/sidecars;
 - explicit filename/folder parsers;
-- Audiobookshelf-derived metadata;
+- Audiobookshelf-sourced metadata;
 - provider plugins;
 - manual edits.
 

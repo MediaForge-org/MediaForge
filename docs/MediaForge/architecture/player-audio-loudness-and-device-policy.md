@@ -4,7 +4,7 @@
 
 ## Purpose
 
-MediaForge owns the visible player and audio-control experience even when playback is ultimately served by a Jellyfin-derived video engine, an Audiobookshelf-derived audio engine or a platform-native client. Upstream engines expose capabilities; MediaForge defines the canonical user-facing policy, settings and UX.
+MediaForge owns the visible player and audio-control experience even when playback is ultimately served by Jellyfin, Audiobookshelf or a platform-native client. External playback adapters expose capabilities; MediaForge defines the canonical user-facing policy, settings and UX.
 
 The primary goals are:
 
@@ -138,7 +138,7 @@ The playback gateway and engine adapters negotiate capabilities such as:
 
 Prefer local/client DSP when it provides the requested result without forcing a transcode. If processing requires a server/engine audio transform, the system may select an audio-transcode path while keeping large media bytes out of Laravel. Unsupported processing must degrade explicitly to a known subset, not silently produce a different sound.
 
-The Jellyfin-derived and Audiobookshelf-derived engines remain internal specialists. Their native UI settings are not the primary product contract; MediaForge settings are.
+Jellyfin and Audiobookshelf remain external specialist playback services behind MediaForge adapters. Their native UI settings are not the primary product contract; MediaForge settings are.
 
 ## Native MediaTools responsibility
 

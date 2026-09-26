@@ -2,12 +2,12 @@
 
 These rules are intentionally short. Do not replace them by rereading the whole master specification every time.
 
-1. **One product / one visible UI.** MediaForge is the user-facing application. Jellyfin-, Stash- and Audiobookshelf-derived components are internal engines.
+1. **One product / one visible UI.** MediaForge is the user-facing application. Jellyfin, Audiobookshelf and Scene Tracker are specialist external services behind versioned adapters; deep forks are not the default architecture.
 2. **Target monorepo.** `apps/`, `engines/`, `services/`, `packages/`, `platform/`, `tests/`, `tools/`, `docs/` are the long-term responsibility boundaries.
 3. **Web target.** React 19 + TypeScript + React Router **Framework Mode** + Vite + real MediaForge API. Inertia is transitional; do not introduce Next.js as a second Full-Stack server without a new ADR.
 4. **Server.** Laravel/PHP is the control plane/BFF/domain orchestration layer; it must not proxy large media bytes unnecessarily or reimplement specialist engines.
 5. **Canonical DB.** PostgreSQL is the MediaForge source of truth. Engine/provider IDs belong in mapping tables, not as canonical identities.
-6. **Engine isolation.** No direct cross-engine DB coupling. Communicate through versioned contracts/capabilities/events.
+6. **Integration isolation.** No direct cross-service DB coupling. Communicate through versioned adapters/contracts/capabilities/events.
 7. **Native tooling.** Prefer Rust for new MediaForge-native media tooling; reuse mature FFmpeg/libbluray/native libraries instead of rewriting codecs.
 8. **AI.** Python is appropriate for ML inference/training. Heavy AI/3D is optional and must never be a Core hard dependency. Outputs retain model/version/license/evidence/confidence; large artifacts live outside PostgreSQL.
 9. **Media identity.** Work/MediaItem != Edition != File. Episode != File. Scene != File. Audiobook Work != Edition != Chapter != AudioFile.
@@ -30,9 +30,11 @@ These rules are intentionally short. Do not replace them by rereading the whole 
 ## 2026-08-17 global product rules
 
 - MediaForge owns the normal product frontend. Integrated upstream applications are backend capabilities; native upstream UIs are admin/debug fallbacks only.
-- Jellyfin/Stash/Audiobookshelf baselines are prepared early and later adapted into internal engines. NZBGet/qBittorrent/Prowlarr/Sonarr/Radarr/Whisparr remain unmodified managed upstreams unless an explicit later ADR says otherwise.
+- Jellyfin and Audiobookshelf remain independent specialist servers; Scene Tracker remains a separate metadata/community product. MediaForge integrates them through versioned adapters and never accesses their internal databases directly. NZBGet/qBittorrent/Prowlarr/Sonarr/Radarr/Whisparr remain managed/optional upstream integrations.
 - Never hard-code a small provider/site whitelist into domain logic when capability adapters (Newznab/Torznab/Prowlarr/plugin/etc.) can express the requirement.
 - User-visible product copy must use localisation keys. First-class launch locales are de, en-GB, it, es and fr.
 - Metadata translation fallback preserves the original value/provenance and may not fabricate facts or overwrite authoritative localised metadata.
 - UI reference artwork is illustrative; production artwork must belong to the canonical matched media item or use a neutral placeholder/review state.
 - Numbered prompt IDs remain P0001–P0720; do not create new IDs for these additions.
+
+- **2026-09-27 architecture supersession:** where an older numbered prompt requires Jellyfin/Stash/Audiobookshelf source import or fork cutover, `ARCHITECTURE_SUPERSESSION_2026-09-27.md` + ADR-0028 override that fork-specific wording.

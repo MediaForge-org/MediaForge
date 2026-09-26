@@ -25,52 +25,56 @@ Wer das System implementieren will, liest in dieser Reihenfolge: zuerst diese Ma
 
 MediaForge ist das offizielle Produkt und die **einzige sichtbare Anwendung** für den Benutzer. Es vereinigt Filme, Serien, Musik, Hörbücher, Podcasts, Disc-Images und — nur nach expliziter Entsperrung — Adult-Medien unter einer gemeinsamen React-/TypeScript-Oberfläche.
 
-Jellyfin, Audiobookshelf und der spätere Stash-derived Adult-Stack werden langfristig nicht als getrennte Benutzeroberflächen verstanden, sondern als spezialisierte **Engines** hinter stabilen MediaForge-Verträgen. In frühen Phasen dürfen bestehende Installationen über Connectoren angebunden bleiben. Diese Connector-Phase ist ein risikoarmer Migrationspfad; sie definiert nicht die endgültige Produktgrenze. Direkte Fork-/Bundling-Arbeit bleibt bewusst eine späte Engineering-Phase.
+Jellyfin und Audiobookshelf bleiben langfristig eigenständig updatebare Spezialdienste hinter versionierten MediaForge-Adaptern. Scene Tracker bleibt ein separates Metadata-/Community-Produkt mit eigener Datenbank. MediaForge besitzt die einheitliche Produktoberfläche, kanonische Cross-Service-Identität, Suche, Provenienz, Review und Orchestrierung. Ein Deep Fork dieser Dienste ist **kein** Standardziel; dafür wäre ein späterer evidenzbasierter ADR erforderlich.
 
-Die kanonische Identität und der systemübergreifende Zustand liegen in MediaForge/PostgreSQL. Eine Engine darf intern ihre eigene Implementierung und während Übergangsphasen ihre eigene Datenhaltung besitzen, aber sie ist nicht Eigentümer der MediaForge-Identität.
+Die kanonische MediaForge-Identität und der systemübergreifende Zustand liegen in MediaForge/PostgreSQL. Upstream-Dienste behalten ihre internen Datenbanken und technischen Runtime-Zustände. MediaForge synchronisiert über unterstützte APIs und greift nie direkt auf fremde Datenbanken zu.
 
 ```mermaid
 flowchart TB
     UI["MediaForge — einzige sichtbare UI"]
-    CORE["MediaForge Core / Control Plane"]
-    PG[("PostgreSQL — kanonischer Katalog")]
-    VIDEO["Video/TV Engine\nJellyfin-compatible / später Fork"]
-    ADULT["Adult Engine\nStash-derived / später Fork"]
-    AUDIO["Audiobook/Podcast Engine\nAudiobookshelf-compatible / später Fork"]
-    DISC["Disc Engine\nISO / BDMV / VIDEO_TS"]
-    TOOLS["Media Tools / FFmpeg / native Worker"]
+    CORE["MediaForge Core / API / Control Plane"]
+    PG[("PostgreSQL — kanonischer MediaForge-Katalog")]
+    JF["Jellyfin
+Video/Music Playback + Transcoding"]
+    ABS["Audiobookshelf
+Audiobook/Podcast Playback"]
+    ST["Scene Tracker
+Scene Metadata / Community"]
+    DISC["MediaForge Disc / ISO Capabilities"]
+    TOOLS["MediaForge MediaTools / FFmpeg / Rust"]
+    AI["Optional MediaForge AI"]
 
     UI --> CORE
     CORE --> PG
-    CORE --> VIDEO
-    CORE --> ADULT
-    CORE --> AUDIO
+    CORE -->|JellyfinAdapter| JF
+    CORE -->|AudiobookshelfAdapter| ABS
+    CORE -->|SceneTrackerAdapter| ST
     CORE --> DISC
-    VIDEO --> TOOLS
-    ADULT --> TOOLS
     DISC --> TOOLS
+    CORE --> TOOLS
+    CORE --> AI
 ```
 
-**Produktregel:** Ein Benutzer wechselt niemals sichtbar in die originale Jellyfin-, Audiobookshelf- oder Stash-Weboberfläche, um normale MediaForge-Funktionen zu benutzen. Diese Oberflächen dürfen während Entwicklung/Debugging erreichbar bleiben, sind aber kein Teil des finalen normalen Workflows.
+**Produktregel:** Ein Benutzer wechselt für normale MediaForge-Workflows nicht sichtbar in Jellyfin, Audiobookshelf oder Scene Tracker. Deren native Oberflächen dürfen für Administration/Debugging erreichbar bleiben, sind aber keine normale Produktoberfläche.
 
 ### Lokal bedeutet lokal
 
-Alle Kernfunktionen müssen ohne Cloudpflicht, ohne SaaS-Abhängigkeit und ohne Online-Zwang funktionieren. API bedeutet in dieser Dokumentation zuerst lokale Kommunikation zwischen lokalen Diensten: MediaForge zu lokaler Jellyfin-API, lokaler Audiobookshelf-API, lokaler Laravel-API, PostgreSQL, Redis, lokalen Worker-Containern und lokalen Dateien. Optionale externe Metadatenquellen sind erlaubt, wenn sie explizit als optional markiert sind. Externe AI-Dienste sind höchstens Zusatzoptionen; der Kern der AI Engine ist lokal gedacht.
+Alle Kernfunktionen müssen ohne Cloudpflicht, ohne SaaS-Abhängigkeit und ohne Online-Zwang funktionieren. API bedeutet in dieser Dokumentation zuerst lokale Kommunikation zwischen lokalen Diensten: MediaForge zu lokaler Jellyfin-API, lokaler Audiobookshelf-API, lokaler Scene-Tracker-API, PostgreSQL, Redis, lokalen Worker-Containern und lokalen Dateien. Optionale externe Metadatenquellen sind erlaubt, wenn sie explizit als optional markiert sind. Externe AI-Dienste sind höchstens Zusatzoptionen; MediaForge-native AI bleibt optional.
 
 ### Systemgrenzen
 
-
 MediaForge besitzt die sichtbare Produktgrenze, den kanonischen Katalog, Benutzer-/Berechtigungsmodell, Suche, Collections, Review/Matching, Metadaten-Provenienz, Health, Automation, Audit und die systemübergreifende UI.
 
-Die spezialisierten Engines besitzen ihre jeweiligen technischen Stärken:
+Die Spezialdienste besitzen ihre jeweiligen technischen Stärken:
 
-- **Video/TV Engine:** Streaming, Transcoding, Client-/Codec-Logik und klassische Movie/Series-Wiedergabe; zunächst über Jellyfin-Connector, später optional als gebündelter/maintaineter Fork.
-- **Audiobook/Podcast Engine:** Audio-Playback, Kapitel-/Progress-Integration und Audiobook-spezifische Clientlogik; zunächst Audiobookshelf-Connector, später optional Fork/Bundling.
-- **Adult Engine:** Stash-derived Media-Core für lokale Scene-Dateien, Fingerprints, FFmpeg, Previews, Sprites und Adult-Library-Verarbeitung; langfristig als MediaForge-Komponente/Fork. StashDB/TPDB/FansDB sowie Studio-/Creator-/relevante offizielle Tube-Quellen sind Metadatenquellen, nicht die kanonische Datenbank.
-- **Disc Engine:** ISO/BDMV/VIDEO_TS-Strukturanalyse und später Disc-Menü-/episodengenauer Playback-Bridge.
-- **MediaForge Core:** koordiniert Engines über stabile Verträge; Fachidentität wird nicht durch Engine-IDs bestimmt.
+- **Jellyfin:** Video-/Music-Playback, Streaming/Transcoding, Tracks/Subtitles, technische Media-Informationen, Sessions und Device-/Codec-Logik. MediaForge spricht die unterstützte Jellyfin-API über einen versionierten Adapter.
+- **Audiobookshelf:** Audiobook-/Podcast-Playback, Kapitel-/Audio-spezifische Runtime-Funktionen und Listening-State. MediaForge spricht die unterstützte ABS-API über einen versionierten Adapter und behält synchronisierte Metadaten unabhängig von ABS-Pfaden/IDs.
+- **Scene Tracker:** separates Scene-/Performer-/Studio-/Source-/Community-Metadatensystem. MediaForge konsumiert eine versionierte API; Scene Tracker bleibt Eigentümer seiner eigenen Datenbank.
+- **Stash:** kein verpflichtender interner MediaForge-Fork. Ein späterer externer Adapter bleibt möglich, falls konkrete Fähigkeiten ihn rechtfertigen.
+- **Disc / MediaTools:** MediaForge-eigene ISO/BDMV/VIDEO_TS-, Probe-, Fingerprint- und Transformationsfähigkeiten dürfen als native Rust-/Tooling-Dienste entstehen.
+- **MediaForge Core:** koordiniert Spezialdienste über stabile Contracts; Fachidentität wird nie durch Upstream-IDs bestimmt.
 
-Der Core darf während früher Phasen weiterhin Laravel 12 + PostgreSQL + Redis nutzen. Eine Engine darf in ihrer nativen Sprache bleiben (z. B. C#/.NET, Go, Node). „Eine App“ bedeutet eine Produktoberfläche und einen integrierten Lebenszyklus, **nicht** zwangsläufig eine einzige Programmiersprache oder Binary.
+„Eine App“ bedeutet eine Produktoberfläche, ein kanonisches MediaForge-Modell und einen integrierten Lebenszyklus — nicht eine einzige Binary und nicht das Kopieren des Quellcodes aller integrierten Spezialdienste.
 
 **PostgreSQL ist dauerhaft der kanonische Persistenzspeicher von MediaForge.** Der aktuelle Alpha-Stand verwendet PostgreSQL 17. Ein Upgrade auf eine neuere unterstützte Major-Version (Zielpfad: PostgreSQL 18.x) erfolgt als eigener Infrastruktur-Schritt nach Backup-/Restore- und Migrationstests; es wird nicht mit fachlichen V2-Änderungen vermischt.
 

@@ -1,4 +1,4 @@
-# P0521 — Stash-derived adult engine integration and fork boundary: audit
+# P0521 — Scene Tracker metadata integration, private scene domain and Jellyfin playback mapping: audit
 
 **Track:** 27-adult-engine  
 **Priority:** P2  
@@ -9,7 +9,7 @@
 
 Audit the current implementation and establish the exact baseline for this subsystem.
 
-This is a deliberately narrow step inside **Stash-derived adult engine integration and fork boundary**. The goal is to make one verifiable increment while keeping the rest of MediaForge stable.
+This is a deliberately narrow step inside **Scene Tracker metadata integration, private scene domain and Jellyfin playback mapping**. The goal is to make one verifiable increment while keeping the rest of MediaForge stable.
 
 ## Context budget — read only what is required
 
@@ -18,16 +18,21 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
-- `docs/MediaForge/architecture/managed-upstreams-and-product-surface.md`
-- `docs/MediaForge/adr/0025-managed-upstream-backends.md`
+- `docs/MediaForge/architecture/external-specialist-services-and-adapters.md`
+- `docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md`
 - `docs/MediaForge/modules/adult-engine-target.md`
+- `docs/MediaForge/modules/adult-enhancement.md`
+- `docs/MediaForge/architecture/postgresql-source-of-truth.md`
 - `docs/MediaForge/architecture/engine-contracts.md`
-- `docs/MediaForge/architecture/target-monorepo.md`
+- `docs/MediaForge/architecture/unified-application.md`
 
 Inspect these source paths/symbol neighborhoods first:
-- `engines/adult`
+- `app/Connectors/Sdk`
+- `app/Connectors/Jellyfin`
+- `app/Integrations/SceneTracker`
 - `packages/contracts`
 - `services/media-tools`
+- `docs/MediaForge/modules/adult-source-vault-and-local-provenance.md`
 
 ### UI references for this prompt
 - `docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png`
@@ -37,17 +42,22 @@ Do **not** recursively open every document linked from the required reads. If a 
 
 ## Subsystem-specific rule
 
-Keep upstream Stash-derived code recognizable and syncable. Preserve AGPL notices/history and isolate MediaForge integration seams.
+Treat Scene Tracker as a separate metadata/community service with its own database and Jellyfin as the preferred local scene playback/streaming service. MediaForge owns private-domain identity/provenance/review/privacy and integrates through versioned APIs only. Stash is optional, not a mandatory fork.
 
 
-## Mandatory target additions — 2026-08-17
+## Mandatory target architecture — 2026-09-27
 
-- Stash source should already be pinned/imported from Track 02; this track completes/adapts the internal Adult Engine while preserving MediaForge canonical/privacy layers.
+- Build/extend a versioned Scene Tracker adapter for scenes, performers, studios, tags/taxonomy, source provenance and matching/community data.
+- Map local playable scene media to Jellyfin through MediaForge IDs/external mappings; Jellyfin remains responsible for specialist playback/streaming runtime.
+- Preserve Adult Zero Leak and keep all private-domain authorization/filtering server-side in MediaForge.
+- Preserve local filename/local-curated/source-vault facts when Scene Tracker or another upstream changes/disappears.
+- Never query Scene Tracker's PostgreSQL directly and do not migrate it into MediaForge.
+- Do not import/fork Stash by default. A future Stash adapter requires an actual capability need, not historical architecture inertia.
 
 ## Exact work for this prompt
 
-1. Inspect the existing implementation specifically for **Stash-derived adult engine integration and fork boundary** and the current focus **audit**.
-2. Keep these subsystem deliverables in view: upstream import boundary, MediaForge adapter, Stash media-core reuse, upgrade/sync workflow.
+1. Inspect the existing implementation specifically for **Scene Tracker metadata integration, private scene domain and Jellyfin playback mapping** and the current focus **audit**.
+2. Keep these subsystem deliverables in view: Scene Tracker API adapter, canonical private-domain mapping/provenance, Jellyfin playback mapping, compatibility/privacy workflow.
 3. Audit the current implementation and establish the exact baseline for this subsystem.
 4. Preserve already-working V1/V2 behavior unless this prompt explicitly replaces it with the documented target architecture.
 5. Do not implement the next focus or a later feature just because you notice it while editing.
@@ -55,10 +65,10 @@ Keep upstream Stash-derived code recognizable and syncable. Preserve AGPL notice
 ## Expected deliverables
 
 The implementation/report for this prompt should address the relevant subset of:
-- upstream import boundary
-- MediaForge adapter
-- Stash media-core reuse
-- upgrade/sync workflow
+- Scene Tracker API adapter boundary
+- canonical MediaForge scene/performer/studio mappings
+- Jellyfin local playback mapping and optional provider adapters
+- compatibility/sync/privacy workflow
 
 Do not create placeholder abstractions that have no immediate use in this prompt unless the target architecture explicitly requires the seam now.
 

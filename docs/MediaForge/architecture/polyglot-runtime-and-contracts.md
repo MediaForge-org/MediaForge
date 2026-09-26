@@ -1,156 +1,134 @@
-# Polyglot Runtime, APIs und Engine-Verknüpfung
+# Runtime, APIs and Adapter Contracts
 
-## Zielbild
+Status: **binding target architecture**
+Updated: **2026-09-27**
 
-MediaForge darf mehrere Sprachen verwenden, aber nur **eine Fachsprache und einen Satz Contracts** besitzen.
-
-```text
-React/TypeScript
-      |
-      | HTTPS / WS / SSE
-      v
-Laravel/PHP MediaForge Server
-      |
-      +------ PostgreSQL
-      +------ Redis
-      |
-      +------ Engine Registry
-                 |
-         +-------+--------+---------+
-         |                |         |
-       C#/.NET           Go      Node/TS
-       Video            Adult      Audio
-         |                |
-         +--------+-------+
-                  |
-                 Rust
-              MediaTools
-                  |
-                Python
-                  AI
-```
-
-## 1. Browser -> Server
-
-Normale Fachkommunikation läuft über MediaForge API v1. Das Frontend kennt keine Jellyfin-/Stash-/ABS-API direkt.
-
-Beispiele:
+## Target runtime
 
 ```text
-GET  /api/v1/home
-GET  /api/v1/media/{id}
-GET  /api/v1/search
-POST /api/v1/playback/sessions
-POST /api/v1/libraries/{id}/scan
-POST /api/v1/acquisition/intake
-GET  /api/v1/jobs/{id}
+React / TypeScript
+        |
+        | MediaForge API v1
+        v
+Laravel / PHP
+   |           \
+   |            \ versioned adapters
+   v             +----------------+----------------+
+PostgreSQL       |                |                |
+Redis            v                v                v
+             Jellyfin       Audiobookshelf    Scene Tracker
+             external          external          external
+
+Optional MediaForge-native services:
+  Rust MediaTools
+  Python AI
 ```
 
-## 2. Server -> Engines
+The old requirement for internal C# Jellyfin-derived, Go Stash-derived and Node Audiobookshelf-derived
+runtime trees is superseded.
 
-Der Server spricht Engine Contracts. Jede Engine meldet `capabilities()` und `health()`.
+## Browser -> MediaForge
 
-Beispiel-Capabilities:
+The browser talks to MediaForge only.
 
-```json
-{
-  "playback": true,
-  "transcoding": true,
-  "trickplay": true,
-  "audiobookChapters": false,
-  "adultSceneAnalysis": false,
-  "discMenus": false
-}
-```
+Provider APIs are never a frontend contract.
 
-Frontend-Features werden aus MediaForge-DTOs/Capabilities aufgebaut, nicht aus `engine === jellyfin`-Verzweigungen.
+## MediaForge -> external services
 
-## 3. Jobs und Events
+Adapters normalize:
 
-Dauerhafte Fachjobs werden serverseitig registriert. Engines/Worker melden Fortschritt als Events:
+- identity/mappings;
+- libraries/catalog;
+- version/capabilities;
+- health;
+- artwork references;
+- playback/session operations where supported;
+- progress;
+- refresh/events/sync.
+
+A provider capability may be absent without changing the MediaForge domain model.
+
+## Catalog vs live runtime
+
+Normal browsing reads MediaForge PostgreSQL.
+
+Live upstream calls are reserved for actions that actually require live service state, such as:
+
+- starting playback;
+- testing a connection;
+- explicit refresh;
+- current session operations.
+
+Do not fan out to every upstream on page render.
+
+## Jobs/events
+
+MediaForge jobs operate on MediaForge state and adapter operations.
+
+External events/webhooks are treated as triggers/evidence and reconciled against upstream state;
+they are not trusted as the sole source of canonical identity.
+
+Redis remains technical queue/cache/realtime infrastructure.
+
+## Playback
+
+Video:
 
 ```text
-job.created
-job.started
-job.progress
-job.warning
-job.failed
-job.completed
+MediaForge UI
+ -> MediaForge playback endpoint
+ -> JellyfinAdapter
+ -> Jellyfin session/stream decision
+ -> client receives usable stream/session information
 ```
 
-Domänenevents:
+Laravel must not become a large media-byte proxy.
 
-```text
-library.scan.progress
-analysis.event.detected
-analysis.completed
-acquisition.download.progress
-import.candidate.ready
-playback.progress
-engine.health.changed
-```
+Audiobooks/podcasts follow the same principle with Audiobookshelf.
 
-Redis ist zunächst Queue-/Realtime-Infrastruktur. NATS/Kafka werden nicht eingeführt, solange gemessene Anforderungen das nicht rechtfertigen.
+## Progress
 
-## 4. Playback
+Distinguish:
 
-PHP orchestriert, aber streamt die Medienbytes nicht unnötig:
+- upstream raw runtime/listening/watch state;
+- MediaForge normalized cross-service/user-facing projection.
 
-```text
-React -> POST playback session -> Laravel
-Laravel -> zuständige Engine -> Session
-Laravel -> Stream Token/URL -> React
-React -> /_stream/... -> Gateway -> Engine
-```
+Bidirectional write-back requires an explicit conflict policy.
+Never create accidental multi-master semantics.
 
-Dadurch bleibt eine einzige Origin/URL sichtbar, ohne den PHP-Prozess zum Video-Proxy zu machen.
+## Rust/Python
 
-## 5. AI und MediaTools
+Rust and Python remain valid for MediaForge-owned capabilities:
 
-Rust und Python sind Worker/Services hinter Contracts.
+- probing/hashing/disc/timeline/FFmpeg hotpaths;
+- ML inference/embeddings/analysis.
 
-### Rust
+They communicate through contracts and do not replace specialist upstream server APIs.
 
-- dekodiert/koordiniert Frames;
-- extrahiert PTS/Timestamps;
-- verwaltet FFmpeg-Prozesse;
-- erzeugt Sprites/Sidecars;
-- analysiert Disc-Strukturen;
-- erstellt sichere Evidence Assets.
+## Contract tests
 
-### Python
+Every adapter should have:
 
-- erhält Frames/Features/Audio-Chunks;
-- führt ML-Inferenz aus;
-- liefert Detektionen mit Modellversion/Confidence zurück;
-- verändert keine kanonischen Tabellen direkt.
+- recorded/synthetic fixtures;
+- supported-version matrix;
+- auth/health test;
+- pagination/catalog test;
+- failure normalization test;
+- capability contract test;
+- representative playback test when applicable.
 
-## 6. Contract-Tests
+## Failure boundaries
 
-Für jede Sprache existieren Fixtures mit denselben Requests/Responses. CI schlägt fehl, wenn eine Runtime vom Schema abweicht.
+If Jellyfin is down:
+- MediaForge catalog remains browsable;
+- video playback is unavailable/degraded.
 
-Pflichtfelder für interoperable Daten:
+If Audiobookshelf is down:
+- synchronized books/audiobooks remain browsable;
+- specialist playback is unavailable/degraded.
 
-- eindeutige IDs;
-- UTC-Zeitstempel;
-- Dauer in Millisekunden/Microseconds nach definiertem Contract;
-- klare Enum-Versionierung;
-- Fehlercodes statt nur freie Texte;
-- Model-/Detector-Version bei AI-Ergebnissen;
-- Source/Provenance bei Metadaten.
+If Scene Tracker is down:
+- synchronized metadata remains available;
+- enrichment/matching waits.
 
-## 7. Fehlergrenzen
-
-Eine kaputte Engine darf MediaForge nicht komplett unbrauchbar machen. Der Server meldet Capability-/Health-Degradation und versteckt/markiert nur die betroffenen Funktionen.
-
-Beispiel:
-
-```text
-Video Engine offline -> Katalog weiterhin browsbar, Playback deaktiviert
-AI Worker offline -> Library/Playback funktioniert, Analyse wartet
-Adult Engine locked -> keine Adult-Daten sichtbar
-```
-
-## 13. Reconstruction / Artifact Boundary
-
-3D ist kein eigener Monolith. Python besitzt ML-Inference/Multi-view-Reconstruction/Segmentation; Rust besitzt Frame-/PTS-, Mesh-, Projection-, Surface- und Artifact-IO-Hotpaths. Beide sprechen versionierte Contracts. Track 23 darf deshalb nicht hart von der vollständigen Track-29-Implementierung abhängen; Track 29 optimiert hinter vorher definierten Contracts.
+Provider failure must not become full MediaForge failure.

@@ -15,3 +15,10 @@ Neue native MediaForge-Dienste verwenden bevorzugt Rust; ML-Dienste Python. Jell
 - alle Clients können dieselbe API verwenden;
 - Claude kann Cross-Language-Änderungen in einem Checkout durchführen;
 - Contract-/E2E-Tests werden wichtiger.
+
+## 2026-09-27 supersession note
+
+ADR-0028 supersedes the fork-specific assumption that Jellyfin/Stash/Audiobookshelf-derived runtimes
+must live inside the MediaForge monorepo. The polyglot-monorepo decision remains accepted for
+MediaForge-owned server/web/contracts/Rust/Python code. Specialist upstream media servers are now
+integrated through versioned adapters by default.

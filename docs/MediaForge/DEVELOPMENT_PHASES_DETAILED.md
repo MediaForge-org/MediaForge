@@ -1,180 +1,137 @@
 # Detailed Development Phases and Rough Time Ranges
 
-Diese Datei ist Planungsorientierung, **keine Garantie**. Zeiten beziehen sich auf konzentrierte Entwicklung mit Claude-Unterstützung, guter Testdisziplin und ohne größere Upstream-/Hardware-Blocker.
+Planning guidance only. Updated **2026-09-27** for the adapter-first architecture.
 
-## Phase A – Target Architecture Foundation
+## Phase A — Adapter/API architecture foundation
 
-**ca. 2–4 Wochen**
+**~2–4 weeks**
 
-- Monorepo-Zielstruktur;
-- `apps/server`, `apps/web`;
-- React Router;
-- Inertia-Ausbau;
-- API v1;
-- OpenAPI/Event Contracts;
-- Gateway;
-- Engine Registry Stubs;
-- Rust/Python Skeletons;
-- Compose/CI-Umstellung;
-- schöne Deep Links;
-- V2-Funktionalität unverändert erhalten.
+- ADR/source-of-truth update;
+- API v1 foundation;
+- React Router transition boundary;
+- adapter capability/version contracts;
+- compatibility fixtures;
+- gateway/deep links;
+- preserve V2;
+- no upstream source imports.
 
-## Phase B – V2 Completion / Canonical Catalog
+## Phase B — Canonical catalog completion
 
-**ca. 1–2 Wochen**
+**~2–4 weeks**
 
-- aktuelle V2-Pakete sauber abschließen;
-- Import-/Mapping-Konsistenz;
-- Datenmodelltests;
-- keine riskanten File Writes.
+- V2 consistency;
+- Work/MediaItem/Edition/File decision/backfill;
+- external mappings;
+- stable file/location identity;
+- source facts/field provenance;
+- review/search/collections/health.
 
-## Phase C – Security/Privacy Foundation
+## Phase C — Security / backup / reliability
 
-**ca. 1–2 Wochen**
+**~1–3 weeks**
 
-- Auth Hardening;
-- API Policy;
-- Audit;
-- Zero-Leak-Architektur vorbereiten;
-- Secret/Credential Storage;
-- Backup-Baseline.
+- auth/API hardening;
+- privacy baseline;
+- audit;
+- backup/restore;
+- integration secret policy;
+- sync/job observability.
 
-## Phase D – Premium UI System
+## Phase D — Premium client core
 
-**ca. 2–4 Wochen**
+**~3–6 weeks**
 
-- Design Tokens;
-- App Shell;
-- Navigation;
+- API-first React product shell;
 - Home;
-- Cards/Hero/Rows/Tables/Modals;
-- Skeleton/Error/Empty States;
-- Responsive Desktop/TV-Basis;
-- Referenzscreens als Quality Gate.
+- Movies/TV;
+- Audiobooks/Books/Podcasts;
+- Search/Collections;
+- polished loading/error/offline states;
+- responsive foundation.
 
-## Phase E – Canonical Media/File/Edition Model
+## Phase E — Jellyfin + Audiobookshelf rich adapters/playback
 
-**ca. 2–4 Wochen**
+**~3–6 weeks**
 
-- Work/MediaItem/Edition/File;
-- Series orders;
-- Movie cuts;
-- Audiobook editions/chapters;
-- Adult Scene/File/Release lineage;
-- Path mappings;
-- sidecars.
+- richer catalog sync;
+- version/capability compatibility;
+- technical media mirror;
+- Jellyfin playback sessions/tracks/subtitles/device profiles;
+- ABS playback/chapters/progress;
+- resilient progress reconciliation.
 
-## Phase F – Metadata Vault/Search/Matching/Review
+## Phase F — Scene Tracker / private scene product
 
-**ca. 3–6 Wochen**
+**~3–6 weeks**
 
-- feldgenaue Provenienz;
-- Source Facts;
-- Date Types;
-- Review Center;
-- Universal Search;
-- Smart Collections foundation;
-- Library Health.
+- Scene Tracker versioned adapter;
+- scene/performer/studio/source mapping;
+- Jellyfin local playback mapping;
+- zero-leak private domain;
+- source history/local fallback.
 
-**Danach sollte MediaForge als Katalog-/Management-App bereits deutlich brauchbar sein.**
+No mandatory Stash fork.
 
-## Phase G – Acquisition & Safe Imports
+## Phase G — Acquisition
 
-**ca. 3–6 Wochen**
+**~3–6 weeks**
 
-- NZBGet/qBittorrent Contracts;
-- Intake;
-- Staging;
-- Import Sandbox;
-- Rename/Move;
-- quality comparison;
+- NZBGet/qBittorrent/Prowlarr;
+- requests/intake;
+- release scoring;
+- staging;
+- safe import;
+- naming/hardlinks/seeding;
 - provenance;
-- safe automation.
+- retry/recovery/DAG.
 
-## Phase H – Unified Playback / Existing Engine Integration
+## Phase H — TV/PWA/client polish
 
-**ca. 3–6 Wochen**
+**~2–5 weeks**
 
-- Video/Audio Engine APIs hinter MediaForge;
-- unified player;
-- progress;
-- handoff;
-- stream gateway;
-- client/device profiles.
+- PWA;
+- remote/focus navigation;
+- 10-foot mode;
+- fullscreen playback;
+- casting/native features when justified.
 
-## Phase I – Adult Privacy + Metadata Core
+## Phase I — Advanced media
 
-**ca. 3–6 Wochen**
+**~4–10+ weeks**
 
-- `/adult/...` protected mode;
-- Strict Private URLs optional;
-- Scene/Performer/Studio/Coverage;
-- library-driven sync;
-- source history;
-- advanced taxonomy schema.
+- Disc/ISO;
+- verified mapping;
+- remux/optimized editions;
+- audiobook chapter intelligence;
+- audio enhancement;
+- advanced lineage.
 
-## Phase J – Adult Stash-derived Engine
+## Phase J — Optional AI/extensibility/research
 
-**ca. 4–8 Wochen**
+**open-ended**
 
-- upstream import/fork integration;
-- media scanner;
-- playback/previews/trickplay;
-- PostgreSQL/MediaForge mapping;
-- UI integration;
-- upstream sync tooling.
+- plugin/theme SDK;
+- Rust MediaTools optimization;
+- AI event analysis;
+- semantic search;
+- artifact/model registry;
+- GPU scheduling;
+- optional 3D/reconstruction/tattoo projection.
 
-## Phase K – Adult Full Analysis
+## Distribution maturity
 
-**ca. 6–12+ Wochen**, je nach Modellen/Hardware/Genauigkeitsziel
+Runs alongside the phases:
 
-- full video/audio coverage;
-- temporal events;
-- audio events;
-- attributes;
-- evidence;
-- exact boundaries;
-- review/active learning;
-- performance tuning.
-
-## Phase L – Disc/ISO
-
-**ca. 4–8+ Wochen**
-
-- ISO/BDMV/VIDEO_TS detection;
-- libbluray/media-tools;
-- exact runtimes;
-- verified-only external reference mapping;
-- episode/watch state;
-- menu/external player path.
-
-## Phase M – Audiobook Chapter Intelligence + Audio Enhancement
-
-**ca. 4–8 Wochen** für Chapter/Storage Features, **weitere 4–8+ Wochen** für AI Audio Enhancement
-
-- official chapter discovery;
-- edition verification;
-- CUE/JSON;
-- split/merge storage workflow;
-- transcript semantic search;
-- restoration worker.
-
-## Phase N – Deep Fork/Bundling and Official Distribution
-
-**ca. 6–12 Wochen**
-
-- Jellyfin/ABS/Adult engines vollständig im Monorepo;
-- upstream sync process;
-- release pipeline;
-- Docker images;
-- multi-arch;
+- official MediaForge images;
+- optional Jellyfin/ABS Compose profiles as separate containers;
+- compatibility matrices;
+- integration/E2E gates;
 - SBOM/signing;
-- install/upgrade docs.
+- rollback-tested upgrades.
 
-## Grobe Gesamtsicht
+## Rough overall view
 
-- **erste deutlich brauchbare MediaForge-Version:** ungefähr 2–4 Monate konzentrierte Entwicklung;
-- **große integrierte Vision:** eher 8–14+ Monate;
-- hochpräzise AI-/Disc-/Fork-Arbeit kann den Zeitraum verlängern.
+Removing mandatory deep-fork work should reduce long-term maintenance and implementation risk.
 
-Diese Werte werden nach jeder größeren Phase anhand realer Velocity neu geschätzt.
+The schedule still depends heavily on playback/API compatibility, catalog migration complexity,
+Disc/AI scope and UI quality targets. Re-estimate after each major gate.

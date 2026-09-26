@@ -2,7 +2,7 @@
 
 MediaForge is an open-source, local-first **unified media application**.
 
-The long-term product has **one MediaForge interface** for movies, series, music, audiobooks, podcasts, discs and private adult media. During the early engineering phases MediaForge integrates existing Jellyfin and Audiobookshelf installations through connectors. Later phases may bundle and maintain compatible forks/engines behind stable MediaForge interfaces. Users should not need to switch between Jellyfin, Audiobookshelf or Stash web interfaces in the final product.
+The long-term product has **one MediaForge interface** for movies, series, music, audiobooks, books, podcasts, discs and private media. MediaForge integrates mature specialist services through versioned adapters instead of deep-forking them by default. Jellyfin and Audiobookshelf keep their own runtimes/databases; Scene Tracker remains a separate metadata/community product. MediaForge owns the unified UX, canonical PostgreSQL catalog, cross-service identity, search, provenance, review and orchestration.
 
 The current alpha is intentionally much smaller than that target: it is still building the canonical catalog, connector and safety foundations before playback engines, fork integration, Disc/ISO, enhancement engines and Adult are activated.
 
@@ -18,20 +18,20 @@ preparing future sync.
 ```text
 MediaForge UI (React + TypeScript)
             |
-       MediaForge Core
+       MediaForge API
        PostgreSQL catalog
             |
-    +-------+---------+
-    |       |         |
- Video   Adult     Audio
- Engine  Engine    Engine
-    |       |         |
-Jellyfin  Stash-   Audiobookshelf
-derived/  derived/ derived/
-compatible compatible compatible
+    +-------+------------------+
+    |                          |
+ adapters                MediaForge-native
+    |                     Rust/Python services
+    +----+-----------+
+    |    |           |
+Jellyfin ABS    Scene Tracker
+ API    API        API
 ```
 
-The engine implementation is deliberately hidden behind MediaForge contracts. The current connector phase is a migration path, not the final visible product boundary. Fork/bundling work remains a later engineering phase so the existing alpha can mature first.
+Specialist-service implementations are hidden behind MediaForge adapter/capability contracts. The current connector work is therefore a direct foundation of the target architecture, not throwaway migration code. Optional bundling means separate upstream containers, not mandatory source forks.
 
 Adult content is a special privacy domain: while Private/Adult Mode is locked, adult routes, navigation, search results, thumbnails, preload requests, activity, history, notifications and API existence must not leak into the normal UI.
 

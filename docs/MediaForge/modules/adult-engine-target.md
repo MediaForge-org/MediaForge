@@ -1,72 +1,96 @@
-# Adult Engine Target
+# Adult / Scene Domain Target
 
-## Ziel
+Status: **binding target architecture**
+Updated: **2026-09-27**
 
-Langfristig wird der Adult-Media-Core als **direkter Stash-derived Fork** in das MediaForge-Ecosystem integriert. Das ist keine bloße Theme- oder Connector-Lösung.
+This document supersedes the previous mandatory Stash-derived-fork target.
 
-## Warum Stash als Basis
+## Goal
 
-Wiederverwendet werden sollen insbesondere:
-- Go Media-Core;
-- File/Library Scan;
-- FFmpeg-Integration;
-- Fingerprinting;
-- Thumbnails/Previews/Sprites;
-- Streaming/Transcoding-Grundlagen;
-- Scene/Performer/Studio-Domäne;
-- Scraper-/Plugin-Konzepte.
+MediaForge provides a rich private scene/performer/studio product surface while keeping playback
+and external metadata ownership explicit.
 
-## Was MediaForge darüber baut
+## Preferred split
 
-- komplett neue MediaForge React/TypeScript-UI;
-- kanonische PostgreSQL-Identität;
-- library-driven Performer Discovery;
-- Source Provenance und Source History;
-- StashDB + TPDB + FansDB + Studio/Creator/Tube/Historical Adapters;
-- Coverage;
-- Quality/Versions;
-- Zero-Leak Private Mode;
-- MediaForge Engine Contracts;
-- gemeinsame Auth/Lifecycle/Health.
+### Jellyfin
 
-## Fork-Timing
+For local scene media where appropriate:
 
-Der direkte Fork bleibt in der großen Fork-/Ecosystem-Phase spät, damit MediaForge-Core und Engine Contracts zuerst stabil werden. Ein separater experimenteller Adult-Fork darf vorher entstehen, aber:
-- keine MediaForge-Core-IDs duplizieren;
-- keine endgültigen Engine-Verträge erfinden;
-- Upstream-Stash-Historie erhalten;
-- Lizenz-/NOTICE-Pflichten erhalten;
-- keine Abhängigkeit vom originalen Stash-Frontend erzeugen.
+- local file/library presence;
+- playback/streaming/transcoding;
+- technical media information;
+- playback session/progress.
 
-## Datenbanken
+### Scene Tracker
 
-PostgreSQL bleibt MediaForge Source of Truth. Falls der Stash-Fork während der Migration noch SQLite nutzt, ist das **interne Übergangspersistenz**. Der Core greift niemals direkt darauf zu.
+Separate external metadata/community product:
 
-Langfristig kann der Adult-Fork selbst auf PostgreSQL migriert werden, aber diese Migration ist getrennt von der ersten Fork-Integration zu planen.
+- scenes;
+- performers;
+- studios;
+- tags/taxonomy;
+- source provenance;
+- community/matching/discovery data.
 
-## Lizenz
+### MediaForge PostgreSQL
 
-Der Fork muss AGPL-kompatibel gepflegt werden. MediaForge ist bereits AGPL-3.0-or-later; genaue Copyright-/NOTICE- und Upstream-Hinweise müssen beim Fork erhalten bleiben.
+Owns:
 
-## Monorepo Placement and Upstream Sync
+- canonical MediaForge scene/performer/studio IDs;
+- mappings to Jellyfin and Scene Tracker;
+- local canonical choices;
+- field provenance/manual locks;
+- collections/search;
+- review decisions;
+- private-domain policy;
+- derived analysis/evidence references;
+- local scene lineage/edition relationships where MediaForge owns them.
 
-Zielpfad:
+## Stash
+
+Stash is not a mandatory internal engine or fork.
+
+A future Stash adapter may be added if it provides useful capabilities, but its database remains its
+own implementation detail and it is not a prerequisite for the MediaForge scene product.
+
+## Matching
+
+Filename and filesystem metadata remain valuable evidence.
+
+Example convention:
 
 ```text
-engines/adult/
+Studio - YYYY-MM-DD - Performer(s) - Title
 ```
 
-Der Stash-derived Code liegt im selben MediaForge-GitHub-Repository. Das Verzeichnis erhält mindestens:
+Combine:
 
-- `UPSTREAM.md` mit Stash-Remote/Commit/Importhistorie;
-- erhaltene Lizenz-/Copyright-Dateien;
-- dokumentierte Upstream-Sync-Kommandos;
-- MediaForge-spezifische Integrationsbereiche, soweit ohne unnötige Fork-Divergenz möglich.
+- studio;
+- date;
+- performer names;
+- title;
+- runtime;
+- technical metadata;
+- external IDs.
 
-### Kein Frontend-Duplikat
+Ambiguity goes to Review.
 
-Der Stash-derived Fork soll nicht langfristig ein zweites normales React-Frontend parallel zu MediaForge pflegen. Die MediaForge Web-App ist die Produktoberfläche. Eine Upstream-/Debug-UI darf nur für Entwicklung erhalten bleiben, wenn sie Upstream-Merges erleichtert.
+## Privacy
 
-### API/Events
+Preserve Adult Zero Leak.
 
-Adult Engine spricht `packages/contracts/engines`. Fachobjekte werden auf MediaForge-ULIDs gemappt. Full Analysis kann Rust/Python Services nutzen, ohne Stash-Core-Funktionen unnötig neu zu implementieren.
+When locked, no adult/private existence leaks through normal:
+
+- routes;
+- API;
+- search;
+- artwork/preload;
+- notifications;
+- logs/activity surfaces.
+
+## Optional analysis
+
+Advanced taxonomy, audio/video event timelines, evidence, AI and 3D remain optional MediaForge
+capabilities behind the core product.
+
+Do not make them hard dependencies for browsing/playback.

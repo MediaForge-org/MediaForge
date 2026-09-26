@@ -114,3 +114,15 @@ Der Release-CI-Lauf enthält einen **Compose-Integrationstest**: frischer Stack 
 * **Podman/rootless-Kompatibilität**: angestrebt, ungetestet — GPU-Passthrough und Netz-Isolation abweichend; Prüfauftrag vor Release.
 * **ARM64-Images** (Heimserver-NAS mit ARM): Build-Matrix-Frage; media-tools-Abhängigkeiten (libbluray) sind ARM-verfügbar, ai-worker CUDA-los als CPU-Variante.
 * **Automatische Updates** (Watchtower-Klasse): bewusst nicht empfohlen (Pre-Flight braucht Aufmerksamkeit bei Major-Sprüngen); eine differenzierte Empfehlung (Patch-Level ja, Minor nein?) braucht Release-Erfahrung.
+
+## 2026-09-27 external-service architecture clarification
+
+ADR-0028 makes the already-shipped separate-service topology the preferred long-term model.
+
+Jellyfin and Audiobookshelf remain independently updateable services with their own databases.
+MediaForge may connect existing installations or optionally start compatible upstream images as
+separate Compose containers. Scene Tracker normally remains separately deployed because it is a
+separate product.
+
+No source-fork import, Docker-in-Docker, giant multi-service container or direct cross-database
+access is required.

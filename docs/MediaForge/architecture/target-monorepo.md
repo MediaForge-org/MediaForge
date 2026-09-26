@@ -1,52 +1,73 @@
 # Target Monorepo Architecture
 
-Status: **verbindliche Zielarchitektur**
-Gilt für: neue Architekturarbeit ab August 2026
-Historischer Ist-Stand bleibt in `CURRENT_PHASE.md` maßgeblich.
+Status: **binding target architecture**
+Updated: **2026-09-27**
 
-## 1. Ziel
+This document supersedes the older plan that placed copied Jellyfin/Stash/Audiobookshelf source
+trees under `engines/`.
 
-MediaForge wird als **ein einziges GitHub-Repository und ein einziges sichtbares Produkt** entwickelt. Das Repository darf mehrere Programmiersprachen enthalten. Die Grenze wird nach fachlicher Verantwortung gezogen, nicht nach Sprache.
+## 1. Product/repository boundary
 
-Der Benutzer installiert und öffnet **MediaForge**. Jellyfin-, Stash- und Audiobookshelf-derived Komponenten sind interne Engines. Ihre ursprünglichen Web-UIs sind höchstens Developer-/Fallback-Werkzeuge, aber keine normale Produktoberfläche.
+MediaForge remains one GitHub repository and one visible product.
 
-## 2. Root-Struktur
+The repository contains **MediaForge-owned code, contracts, integration adapters, platform manifests
+and optional MediaForge-native services**.
+
+Mature specialist servers normally remain separate upstream projects and processes.
+
+```text
+MediaForge repository
+├── MediaForge server
+├── MediaForge web/client code
+├── adapter implementations
+├── canonical contracts/models
+├── optional Rust MediaTools
+├── optional Python AI
+└── platform/Compose integration
+
+External/upstream specialist services
+├── Jellyfin
+├── Audiobookshelf
+├── Scene Tracker
+├── NZBGet
+├── qBittorrent
+├── Prowlarr
+└── optional/transitional *Arr services
+```
+
+## 2. Target root structure
 
 ```text
 MediaForge/
 ├── apps/
-│   ├── server/                 # PHP 8.4 + Laravel – Control Plane / API
-│   ├── web/                    # React 19 + TypeScript + React Router Framework Mode + Vite
-│   ├── desktop/                # später: Desktop-Client
-│   ├── mobile/                 # später: Mobile-Client
-│   └── tv/                     # später: TV-Client
-│
-├── engines/
-│   ├── video/                  # Jellyfin-derived – C#/.NET
-│   ├── adult/                  # Stash-derived – Go
-│   └── audio/                  # Audiobookshelf-derived – Node/TypeScript
+│   ├── server/                 # Laravel control plane / API / domain
+│   ├── web/                    # React 19 + TypeScript + React Router Framework Mode
+│   ├── desktop/                # later
+│   ├── mobile/                 # later
+│   └── tv/                     # later
 │
 ├── services/
-│   ├── media-tools/            # Rust – native Media-Pipeline / FFI / Worker
-│   └── ai/                     # Python – ML/AI Inference und Training
+│   ├── media-tools/            # Rust, MediaForge-native native media tooling
+│   └── ai/                     # Python, optional ML/AI
 │
 ├── packages/
-│   ├── contracts/              # OpenAPI, JSON Schema, Events
-│   ├── sdk/                    # generierte/handgeschriebene Clients
-│   ├── media-model/            # gemeinsame kanonische Begriffe/Schema-Artefakte
-│   ├── localization/           # UI-i18n, Glossare, Translation Memory, Locale-QA
-│   ├── design-tokens/          # Farben, Typo, Spacing, Motion
-│   ├── ui-web/                 # wiederverwendbare React-Komponenten
-│   └── icons/                  # MediaForge Icon-Set
+│   ├── contracts/              # OpenAPI / JSON Schema / events / adapter contracts
+│   ├── sdk/
+│   ├── media-model/
+│   ├── localization/
+│   ├── design-tokens/
+│   ├── ui-web/
+│   └── icons/
 │
 ├── platform/
-│   ├── docker/                 # Dockerfiles je Runtime-Komponente
-│   ├── compose/                # dev/prod/test Compose
-│   ├── gateway/                # Reverse Proxy / Routing
-│   ├── database/               # PostgreSQL Bootstrap / Backup / Maintenance
-│   ├── managed-upstreams/      # NZBGet/qBit/Prowlarr/*Arr manifests + compatibility
-│   ├── observability/          # Logs, Metrics, Traces, Health
-│   └── releases/               # Release-/Image-/SBOM-Automation
+│   ├── docker/
+│   ├── compose/
+│   ├── gateway/
+│   ├── database/
+│   ├── integrations/           # manifests/version matrices for Jellyfin/ABS/etc.
+│   ├── managed-upstreams/      # NZBGet/qBit/Prowlarr/*Arr manifests
+│   ├── observability/
+│   └── releases/
 │
 ├── tests/
 │   ├── e2e/
@@ -57,289 +78,163 @@ MediaForge/
 │
 ├── tools/
 │   ├── codegen/
-│   ├── upstream-sync/
+│   ├── compatibility/
 │   ├── migrations/
 │   ├── release/
 │   └── dev/
 │
-├── docs/
-├── compose.yaml
-├── Makefile
-├── README.md
-├── CONTRIBUTING.md
-└── LICENSE
+└── docs/
 ```
 
-## 3. Warum ein Monorepo
+There is no required `engines/video`, `engines/audio` or `engines/adult` copied-upstream tree.
 
-Das Monorepo ist eine bewusste Produktivitätsentscheidung:
+## 3. Why the monorepo still matters
 
-- Claude sieht Server, Frontend, Engine-Verträge und Worker gleichzeitig.
-- Eine Vertragsänderung kann in einem Pull Request über PHP, TypeScript, Go, C#, Rust und Python aktualisiert werden.
-- Cross-Engine-E2E-Tests laufen aus einem Checkout.
-- UI und Backend können nicht still auseinanderlaufen.
-- Docker-/Release-Artefakte werden aus einem konsistenten Commit gebaut.
-- Architekturentscheidungen liegen an einer Stelle.
+- server/web/contracts change atomically;
+- generated SDKs and contract tests share one commit;
+- adapter compatibility fixtures live next to product code;
+- Rust/Python services remain coordinated with the control plane;
+- Compose/release artifacts are built from one MediaForge revision.
 
-Das Monorepo bedeutet **nicht**, dass alle Prozesse zu einer Binary verschmelzen. Die Engines bleiben getrennte Prozesse, damit Lizenz-, Runtime-, Fehler- und Update-Grenzen sauber bleiben.
+A monorepo does **not** imply importing the source of every service MediaForge integrates with.
 
-## 4. Apps
+## 4. `apps/server`
 
-### `apps/server`
+Laravel owns:
 
-Laravel ist das MediaForge Control Plane und besitzt vor allem:
+- auth/users/roles/sessions;
+- MediaForge canonical catalog and ULIDs;
+- Work/MediaItem/Edition/File model;
+- external mappings;
+- synchronized external snapshots;
+- provenance/manual locks/review;
+- search/collections/preferences;
+- adapter registry/capabilities/version compatibility;
+- acquisition orchestration;
+- audit/settings/health/backup coordination;
+- MediaForge API v1.
 
-- Authentifizierung, Benutzer, Rollen, Sessions;
-- kanonischen Katalog und MediaForge-ULIDs;
-- Bibliotheken, Editionen, Dateien, Source-/Provider-Mappings;
-- Suche/Filter-API;
-- Collections und Work Graph;
-- Metadata Vault, Provenienz, Review;
-- Engine Registry und Capability Discovery;
-- Acquisition-Orchestrierung;
-- Queue-/Job-Steuerung;
-- Privacy/Adult Mode;
-- Audit, Settings, Health und Backup-Koordination;
-- öffentliche API v1.
+Provider-specific adapter implementations remain behind contracts and do not leak into Core.
 
-Laravel **transcodiert kein Video**, decodiert keine Blu-ray und führt keine großen ML-Modelle aus.
+## 5. `apps/web`
 
-### `apps/web`
-
-Das Web-Frontend ist eine echte React-App:
+Target:
 
 - React 19;
 - TypeScript;
 - React Router Framework Mode;
 - Vite;
-- Tailwind + MediaForge Design System;
 - MediaForge API v1;
-- WebSocket/SSE für Live-Status.
+- capability-driven UI.
 
-**Inertia ist keine Zielarchitektur mehr.** Es darf während der Migration kurzfristig existieren, aber neue Ziel-UI-Funktionen werden nicht an Inertia gebunden.
+Inertia is transitional.
 
-### spätere Clients
+The frontend must not call Jellyfin, Audiobookshelf or Scene Tracker APIs directly.
 
-Desktop/Mobile/TV sprechen dieselbe API und dieselben Playback-/Event-Verträge. Keine Fachfunktion darf nur deshalb ausschließlich im Web verfügbar sein, weil sie direkt an einen Inertia-Controller gekoppelt wurde.
+## 6. Integration adapters
 
-## 5. Engines
+Adapters run inside or beside the MediaForge server boundary as appropriate.
 
-### `engines/video`
-
-Jellyfin-derived C#/.NET-Engine für:
-
-- Streaming;
-- Transcoding;
-- Codec-/Client-Profile;
-- Untertitel;
-- Video-/TV-Playback;
-- Live-TV optional;
-- technische Video-Library-Fähigkeiten.
-
-MediaForge besitzt UI und kanonischen Katalog. Engine-IDs sind nur Mappings.
-
-### `engines/adult`
-
-Stash-derived Go-Engine für:
-
-- Adult-File-Scan;
-- Scene/Performer/Studio Media-Core;
-- FFmpeg-Integration;
-- Fingerprints;
-- Thumbnails/Preview/Trickplay;
-- Adult Streaming;
-- lokale Scene-Media-Pipeline.
-
-Die detailliertere Taxonomie, Provenienz, Full-Analysis-Timeline und MediaForge-spezifische Metadatenlogik werden über MediaForge Contracts integriert.
-
-### `engines/audio`
-
-Audiobookshelf-derived Node/TypeScript-Engine für:
-
-- Hörbuch-/Podcast-Playback;
-- Kapitel und Audiofiles;
-- Listen-State;
-- Audio-spezifische Bibliotheksfunktionen.
-
-## 6. Services
-
-### `services/media-tools` – Rust
-
-Neue native MediaForge-eigene Systemkomponenten werden standardmäßig in Rust gebaut, sofern keine bestehende Library einen zwingenden anderen Weg vorgibt.
-
-Aufgaben können sein:
-
-- Filesystem-Scanning;
-- Hashing;
-- Fingerprint-Orchestrierung;
-- genaue PTS-/Timeline-Verarbeitung;
-- FFmpeg/libbluray/libdvdnav-Anbindung;
-- Thumbnail/Trickplay-Pipeline-Helfer;
-- Disc-Strukturanalyse;
-- Sidecar-Generatoren;
-- schnelle Transformationen und IPC.
-
-C/C++-Libraries dürfen über FFI verwendet werden. Eigener C++-Code ist **kein Pflichtbestandteil**.
-
-### `services/ai` – Python
-
-Python wird nur dort eingesetzt, wo das ML-Ökosystem klar überlegen ist:
-
-- Audio Event Detection;
-- Visual/Temporal Event Detection;
-- Multimodal Fusion;
-- Speech-to-Text;
-- Embeddings;
-- Audio Restoration;
-- spätere personalisierte/fine-tuned Modelle.
-
-## 7. Packages und Contracts
-
-`packages/contracts` ist eine der wichtigsten Monorepo-Grenzen.
-
-### API Contract
+Conceptually:
 
 ```text
-packages/contracts/api/mediaforge-v1.openapi.yaml
+apps/server/app/Integrations/
+├── Contracts/
+├── Jellyfin/
+├── Audiobookshelf/
+├── SceneTracker/
+└── ...
 ```
 
-### Engine Contract
+The existing `app/Connectors` tree is the current foundation and should be evolved incrementally,
+not renamed/moved merely for aesthetics.
+
+## 7. External specialist services
+
+### Jellyfin
+
+Owns specialist playback/streaming/transcoding/session/device functionality and its internal DB.
+
+### Audiobookshelf
+
+Owns audiobook/podcast specialist playback/runtime functionality and its internal DB.
+
+### Scene Tracker
+
+Separate metadata/community product with a versioned integration API and its own database.
+
+### Acquisition backends
+
+NZBGet, qBittorrent and Prowlarr remain strong long-term candidates for managed external components.
+Sonarr/Radarr/Whisparr may remain transitional/optional automation adapters.
+
+## 8. MediaForge-native services
+
+Rust MediaTools and Python AI remain valid because they are MediaForge-specific capabilities rather
+than copied upstream media servers.
+
+They communicate through versioned contracts and never mutate unrelated domain tables directly.
+
+## 9. PostgreSQL
+
+MediaForge PostgreSQL owns MediaForge state, not upstream internal state.
+
+External IDs are mappings.
+External snapshots are mirrors/source facts.
+Media bytes remain outside PostgreSQL.
+
+## 10. No cross-database integration
+
+Forbidden:
 
 ```text
-packages/contracts/engines/engine-v1.openapi.yaml
+Laravel -> Jellyfin DB
+Laravel -> Audiobookshelf DB
+Laravel -> Scene Tracker DB
+Scene Tracker -> MediaForge DB
 ```
 
-### Events
+Allowed:
 
 ```text
-packages/contracts/events/
-├── playback.started.schema.json
-├── playback.progress.schema.json
-├── library.scan.progress.schema.json
-├── analysis.progress.schema.json
-├── acquisition.progress.schema.json
-└── engine.health.schema.json
+MediaForge -> versioned adapter -> supported upstream API
 ```
 
-Alle Sprachen verwenden daraus generierte oder contract-getestete Clients. Keine Engine darf still ein abweichendes Feld erfinden.
+## 11. Deployment
 
-## 8. Datenbank
-
-PostgreSQL bleibt dauerhaft MediaForge Source of Truth für:
-
-- MediaItem/Work/Edition/File;
-- Scene/Performer/Studio Canonical IDs;
-- Audiobook Work/Edition/Chapter;
-- Serien/Episoden/Orders;
-- Source Facts und Provenienz;
-- Tags/Taxonomy/Events;
-- Acquisition/Import Lineage;
-- Collections/Work Graph;
-- Playback/Progress-Mappings;
-- Privacy/Auth/Audit.
-
-Engine-interne Persistenz darf während Fork-/Migration bestehen, ist aber niemals Eigentümer der MediaForge-Identität.
-
-## 9. Kein direkter DB-Zugriff zwischen Komponenten
-
-Verboten:
+Existing-server mode:
 
 ```text
-Laravel -> direkt in Jellyfin DB schreiben
-Adult Engine -> MediaForge Tabellen direkt verändern
-AI Worker -> PostgreSQL Business-Tabellen selbst mutieren
+MediaForge + PostgreSQL + Redis
+          |
+          +-> external Jellyfin
+          +-> external Audiobookshelf
+          +-> external Scene Tracker API
 ```
 
-Stattdessen:
+All-in-one convenience mode may add Jellyfin/Audiobookshelf as **separate** Compose containers.
 
-```text
-Engine/Worker -> Contract/API/Event -> MediaForge Server -> PostgreSQL
-```
+## 12. Migration from the current repository
 
-Ausnahmen für rein technische, bewusst definierte Shared Stores müssen als ADR dokumentiert werden.
+1. Land architecture supersession/ADR.
+2. Preserve V2 connector/catalog/import code.
+3. Formalize adapter capability/version contracts.
+4. Create API v1 and React Router migration boundary.
+5. Move server/web into target folders only when safe.
+6. Expand Jellyfin/ABS adapters.
+7. Add Scene Tracker adapter.
+8. Implement playback through upstream APIs.
+9. Continue acquisition/advanced MediaForge features.
+10. Never make copied upstream source import a prerequisite.
 
-## 10. Upstream-Forks im Monorepo
+## 13. Definition of Done for the architecture foundation
 
-Die Forks sollen im selben GitHub-Repository liegen, aber ihre Upstream-Historie und Lizenzgrenzen müssen nachvollziehbar bleiben.
-
-Bevorzugte Strategie:
-
-- dedizierte Upstream-Remotes;
-- kontrollierte subtree/vendor-history-Imports;
-- keine undurchsichtigen Git-Submodules als normale Developer-Abhängigkeit;
-- `engines/<name>/UPSTREAM.md` mit Upstream-URL, Commit, Lizenz, Importdatum und Sync-Prozess;
-- MediaForge-spezifische Integrationsschicht möglichst in klar markierten Verzeichnissen.
-
-Beispiel:
-
-```text
-engines/adult/
-├── ... upstream-derived Stash code ...
-└── mediaforge/
-    ├── integration/
-    ├── events/
-    ├── api/
-    └── compatibility/
-```
-
-## 11. Migration vom heutigen Repo
-
-Die Umstrukturierung ist ein eigener Architecture-Foundation-Schritt:
-
-1. Contracts und Zielordner anlegen.
-2. API v1 definieren.
-3. React Router App-Shell aufbauen.
-4. bestehende React-Seiten schrittweise aus `resources/js` nach `apps/web` verschieben.
-5. Laravel nach `apps/server` verschieben, ohne fachliche Funktionalität zu verlieren.
-6. Inertia-Endpunkte durch API-/Router-Flows ersetzen.
-7. Gateway einführen.
-8. Stub Engine Registry und Contract Tests anlegen.
-9. Rust/Python Service-Skeletons anlegen.
-10. Compose/CI auf Monorepo umstellen.
-
-Währenddessen bleibt `CURRENT_PHASE.md` die Wahrheit über den ausgelieferten Funktionsumfang.
-
-## 12. Definition of Done
-
-Die Foundation gilt als abgeschlossen, wenn:
-
-- Web-App ohne Inertia-Seitenabhängigkeit navigiert;
-- API v1 contract-getestet ist;
-- server/web getrennt buildbar sind;
-- Gateway `localhost:8100` bereitstellt;
-- PostgreSQL/Redis funktionieren;
-- Engine Registry mindestens Stubs/Health unterstützt;
-- Docker Compose und CI grün sind;
-- keine existierende V2-Katalogfunktion verloren ging;
-- schöne Deep Links direkt im Browser geladen/reloaded werden können.
-
-## 18. Erweiterungen 2026-08-16
-
-Die Root-Struktur wird ergänzt um:
-
-```text
-packages/plugin-sdk/
-packages/theme-sdk/
-packages/contracts/domains/anatomy/
-packages/contracts/domains/reconstruction/
-packages/contracts/domains/plugins/
-platform/storage/
-services/media-tools/crates/mesh/
-services/media-tools/crates/evidence/
-services/ai/reconstruction/
-services/ai/evaluation/
-```
-
-Web-Ziel ist **React Router Framework Mode**, nicht nur ein nackter Router und nicht Next.js als zweite Full-Stack-Serverruntime. Details: `frontend-framework.md`.
-
-Große AI/3D-Funktionen sind Capability-gesteuert und optional. Große Binärartefakte liegen nicht in PostgreSQL, sondern im content-addressed Artifact Store. Details: `ai-capabilities-model-registry.md` und `artifact-store-and-derived-assets.md`.
-
-## 17. Upstream integration update — 17 August 2026
-
-The detailed policy is defined by `managed-upstreams-and-product-surface.md` and ADR-0025.
-
-- Jellyfin, Stash and Audiobookshelf are imported as pinned source baselines during Track 02 so later contracts can be designed against their real capabilities. Tracks 26–28 complete the cutover rather than first importing the projects.
-- NZBGet, qBittorrent, Prowlarr, Sonarr, Radarr and Whisparr are managed upstream services: upstream code remains unmodified by default while MediaForge owns lifecycle, compatibility, normalised API/events and the normal product UI.
-- Prowlarr/NZBGet/qBittorrent may remain long-term backend components. Sonarr/Radarr/Whisparr are transitional automation providers whose product-level Wanted/Release/Upgrade functions can progressively move into MediaForge.
-- Normal users see MediaForge concepts, not a collection of embedded product surfaces. Native upstream UIs are advanced/admin fallbacks only.
-- `packages/localization` owns first-class UI locale resources, glossary/translation-memory contracts and localisation QA.
+- current V2 behavior preserved;
+- API v1 contract-tested;
+- server/web separable;
+- connector/adapters capability-driven;
+- local catalog browsable during upstream outage;
+- no upstream DB access;
+- Jellyfin/ABS version compatibility surfaced;
+- optional bundled services remain separate containers;
+- old fork plan clearly superseded.

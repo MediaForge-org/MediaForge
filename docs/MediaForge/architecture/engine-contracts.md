@@ -1,75 +1,85 @@
-# Engine Contracts
+# Adapter and Capability Contracts
 
-Status: verbindliche Zielarchitektur; konkrete v1-Schemas werden in `packages/contracts` versioniert.
+Status: **binding target architecture**
+Updated: **2026-09-27**
 
-## 1. Zweck
+The filename is retained for compatibility with existing references, but the old deep-fork
+"engine contract" assumption is superseded.
 
-Engine Contracts entkoppeln MediaForge UI/Katalog von Jellyfin-, Stash- und Audiobookshelf-derived Implementierungen. Ein Engine-Wechsel darf keine MediaForge-IDs oder sichtbaren URLs brechen.
+## 1. Goal
 
-## 2. Basiskontrakt
+Decouple MediaForge UI/domain/catalog from concrete specialist services.
+
+A Jellyfin/ABS/Scene-Tracker version change should normally affect the adapter/compatibility layer,
+not MediaForge IDs or public routes.
+
+## 2. Base adapter contract
 
 ```text
-Engine
-├── health()
-├── version()
-├── capabilities()
-├── diagnostics()
-└── lifecycleStatus()
+key()
+label()
+version()
+supportedVersionRange()
+capabilities()
+health()
+diagnostics()
 ```
 
-## 3. Library Engine
+## 3. Catalog capability
 
 ```text
 listLibraries()
-scan(request)
-scanStatus(jobId)
-listItems(cursor/filter)
-resolveExternalIdentity()
+listItems(cursor, filters)
+getItem(externalId)
+refresh()
 ```
 
-Scan-Ergebnisse werden normalisiert und vom Server kanonisiert; Engine schreibt nicht direkt in Core-Tabellen.
+Results are normalized before becoming MediaForge canonical state.
 
-## 4. Playback Engine
+## 4. Playback capability
+
+Where supported:
 
 ```text
-preparePlayback(mediaRef, deviceProfile, userPreferences)
+preparePlayback(mediaRef, deviceProfile, preferences)
 startSession()
 stopSession()
-reportEngineProgress()
 listTracks()
 selectTrack()
 ```
 
-Antwort beschreibt Direct Play/Remux/Transcode, Stream Endpoint, Tracks und Capabilities.
+Provider-specific transport/session details remain inside the adapter DTO/translation layer.
 
-## 5. Artwork/Preview Engine
-
-```text
-getArtwork()
-generateThumbnail()
-generatePreview()
-generateTrickplay()
-```
-
-Jobs sind asynchron; Ergebnisse erhalten Content Hash/Version.
-
-## 6. Progress Engine
-
-MediaForge ist Eigentümer des systemübergreifenden Progress. Engines können technischen Playback-State liefern, aber Core normalisiert und speichert canonical progress.
-
-## 7. Analysis Engine
-
-Optional:
+## 5. Progress capability
 
 ```text
-analyzeMedia()
-analysisProgress()
-getAnalysisArtifacts()
+readProgress()
+writeProgress()  # optional; only with explicit ownership/conflict policy
 ```
 
-AI-/Adult-Analyseergebnisse folgen dem Event/Evidence-Schema.
+MediaForge keeps cross-service identity separate from raw provider runtime state.
 
-## 8. Download Client Contract
+## 6. Artwork capability
+
+```text
+getArtworkReference()
+```
+
+Prefer upstream URLs/references or controlled cache/artifact policies rather than DB blobs.
+
+## 7. Event/sync capability
+
+```text
+pollChanges(cursor)
+handleWebhook(event)
+refreshItem(externalId)
+```
+
+Not every provider supports all forms.
+
+Events trigger reconciliation; they do not bypass normalization/provenance rules.
+
+## 8. Download client capability
 
 ```text
 health()
@@ -79,60 +89,72 @@ resume()
 cancel()
 remove()
 status()
+history()
 listFiles()
 ```
 
-NZBGet/qBittorrent werden Adapter auf diesen Vertrag.
+NZBGet/qBittorrent implement normalized download capabilities.
 
-## 9. Disc/MediaTools Contract
+## 9. MediaTools capability
+
+Rust MediaTools remains a MediaForge-native contract, not an upstream-server adapter:
 
 ```text
 probeFile()
 analyzeDiscStructure()
-extractPlaylistDurations()
 generateSidecar()
 splitAudioChapters()
 ```
 
-## 10. Capability-first
+## 10. Capability-first UI
 
-UI fragt MediaForge, was verfügbar ist. Keine Seite soll `if engine == jellyfin` enthalten.
+UI asks MediaForge for capabilities.
+
+Forbidden pattern:
+
+```text
+if provider == jellyfin ...
+```
+
+Normal product pages operate on MediaForge DTOs.
 
 ## 11. IDs
 
-Engine IDs sind External Mappings:
+Provider IDs remain external mappings.
+
+Core foreign keys reference MediaForge IDs.
+
+## 12. Errors
+
+Normalize provider errors:
 
 ```text
-media_external_mappings
-engine_external_mappings
-```
-
-Core-FKs referenzieren nur MediaForge IDs.
-
-## 12. Fehler
-
-Engine-spezifische Fehler werden auf stabile Error Codes normalisiert:
-
-```text
-ENGINE_UNAVAILABLE
+INTEGRATION_UNAVAILABLE
 CAPABILITY_NOT_SUPPORTED
-PLAYBACK_PREPARATION_FAILED
-SCAN_FAILED
-ANALYSIS_FAILED
-RATE_LIMITED
 AUTH_FAILED
+RATE_LIMITED
+INCOMPATIBLE_VERSION
+UPSTREAM_RESPONSE_INVALID
+PLAYBACK_PREPARATION_FAILED
 ```
 
-Details dürfen diagnostics enthalten, aber UI muss mit Codes arbeiten können.
+Diagnostic details must be sanitized.
 
-## 13. Contract Versioning
+## 13. Contract versioning
 
-Breaking Change -> neue Contract-Version. Während Migration können zwei Versionen parallel unterstützt werden.
+Breaking adapter/public DTO changes require contract versioning/migration.
+
+Supported upstream version ranges are tracked separately from MediaForge API versions.
 
 ## 14. Tests
 
-- JSON Schema/OpenAPI validation;
-- generated client compilation;
-- provider fixtures;
-- contract conformance in jeder Engine;
-- end-to-end playback/scan smoke tests.
+Required per adapter/capability:
+
+- fixtures;
+- auth/health;
+- version detection;
+- pagination;
+- response normalization;
+- failure mapping;
+- compatibility range;
+- representative playback/session smoke tests where applicable.

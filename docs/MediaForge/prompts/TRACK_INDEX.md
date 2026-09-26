@@ -29,9 +29,9 @@ Each track contains 20 granular prompts using the same lifecycle: audit → mode
 - **23 Full video/audio analysis, timestamps and multimodal detection** (P2) — `P0441`–`P0460` — folder `23-adult-analysis/`
 - **24 Disc, ISO, BDMV, VIDEO_TS and verified-only mapping** (P2) — `P0461`–`P0480` — folder `24-disc-iso/`
 - **25 Audio restoration, upscaler and reconstructed editions** (P2) — `P0481`–`P0500` — folder `25-audio-enhancement/`
-- **26 Jellyfin-derived video engine integration and fork boundary** (P2) — `P0501`–`P0520` — folder `26-video-engine/`
-- **27 Stash-derived adult engine integration and fork boundary** (P2) — `P0521`–`P0540` — folder `27-adult-engine/`
-- **28 Audiobookshelf-derived audio engine integration and fork boundary** (P2) — `P0541`–`P0560` — folder `28-audio-engine/`
+- **26 Jellyfin external video/playback adapter and compatibility** (P2) — `P0501`–`P0520` — folder `26-video-engine/`
+- **27 Scene Tracker metadata integration, private scene domain and Jellyfin playback mapping** (P2) — `P0521`–`P0540` — folder `27-adult-engine/`
+- **28 Audiobookshelf external audio/book/playback adapter and compatibility** (P2) — `P0541`–`P0560` — folder `28-audio-engine/`
 - **29 Rust MediaTools service and native media plumbing** (P1) — `P0561`–`P0580` — folder `29-rust-media-tools/`
 - **30 Background jobs, events, realtime progress and orchestration** (P0) — `P0581`–`P0600` — folder `30-jobs-events-realtime/`
 - **31 Music, podcasts and general audio media support** (P2) — `P0601`–`P0620` — folder `31-music-podcasts/`
@@ -45,11 +45,11 @@ Each track contains 20 granular prompts using the same lifecycle: audit → mode
 
 No prompt IDs are added; total remains **720**.
 
-- Track 02 now includes pinned, buildable upstream baselines for Jellyfin/Stash/Audiobookshelf plus managed-upstream manifests/tooling.
+- Track 02 now prepares adapter/version/capability seams for Jellyfin/Audiobookshelf/Scene Tracker plus managed-upstream manifests/tooling; it does not import their source trees by default.
 - Tracks 10–13 include launch-locale i18n and metadata translation/provenance.
 - Tracks 14–15 include unified provider search, managed *Arr/Prowlarr/NZBGet/qBit backends, naming, seeding-safe imports and post-processing.
 - Track 24 includes verified series/movie disc extraction/remux handoff.
-- Tracks 26–28 complete already-prepared engine cutovers.
+- Tracks 26–28 mature Jellyfin, Scene Tracker/private-domain and Audiobookshelf API adapters, playback mappings and compatibility; they do not perform mandatory fork cutovers.
 - Tracks 30/34/35/36 include backend-event normalisation, provider/translation plugins, update/rollback/resource management and compatibility/localisation release gates.
 - Tracks 10/16/19/25/26/28/29/33 now integrate the canonical player-audio policy: VLC-like optional 100/150/200% player volume, LUFS/true-peak analysis, limiter/clipping protection, dialogue/DRC/EQ/downmix, device/media profiles, engine capability negotiation and audiobook-specific spoken-word defaults.
 
@@ -70,3 +70,14 @@ Prompt count remains **720**; no new `Pxxxx` IDs are introduced.
 - Track 10 applies the authored-product visual direction across the whole application: modern/premium/media-first without generic generated SaaS-dashboard defaults.
 - Tracks 14–15 use UI references 70–71 for Downloads/Acquisition hierarchy and density, while Markdown remains authoritative.
 - Tracks 30/35/36 cover normalized NZBGet progress/events, health/compatibility, updates/rollback and release integration.
+
+## 2026-09-27 adapter-first reinterpretation
+
+Prompt IDs remain exactly P0001–P0720.
+
+- Track 02 prepares adapter contracts, compatibility/version fixtures and optional separate-service
+  manifests; it does not import Jellyfin/Stash/Audiobookshelf source trees by default.
+- Tracks 26–28 mature Jellyfin/Scene-domain/Audiobookshelf API integrations and playback/capability
+  adapters rather than performing mandatory fork cutovers.
+- Existing lifecycle/testing/gate structure remains valid.
+- See `ARCHITECTURE_SUPERSESSION_2026-09-27.md` and ADR-0028 before executing fork-era wording.

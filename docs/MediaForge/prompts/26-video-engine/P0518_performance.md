@@ -1,4 +1,4 @@
-# P0518 — Jellyfin-derived video engine integration and fork boundary: performance
+# P0518 — Jellyfin external video/playback adapter and compatibility: performance
 
 **Track:** 26-video-engine  
 **Priority:** P2  
@@ -9,7 +9,7 @@
 
 Profile and harden the subsystem for realistic library sizes and failure conditions.
 
-This is a deliberately narrow step inside **Jellyfin-derived video engine integration and fork boundary**. The goal is to make one verifiable increment while keeping the rest of MediaForge stable.
+This is a deliberately narrow step inside **Jellyfin external video/playback adapter and compatibility**. The goal is to make one verifiable increment while keeping the rest of MediaForge stable.
 
 ## Context budget — read only what is required
 
@@ -18,16 +18,21 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
-- `docs/MediaForge/architecture/managed-upstreams-and-product-surface.md`
-- `docs/MediaForge/adr/0025-managed-upstream-backends.md`
+- `docs/MediaForge/architecture/external-specialist-services-and-adapters.md`
+- `docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md`
 - `docs/MediaForge/architecture/engine-contracts.md`
-- `docs/MediaForge/architecture/target-monorepo.md`
+- `docs/MediaForge/architecture/postgresql-source-of-truth.md`
 - `docs/MediaForge/architecture/unified-application.md`
+- `docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md`
+- `docs/MediaForge/architecture/managed-upstreams-and-product-surface.md`
 
 Inspect these source paths/symbol neighborhoods first:
-- `engines/video`
+- `app/Connectors/Jellyfin`
+- `app/Connectors/Sdk`
 - `packages/contracts`
+- `platform/integrations`
 - `platform/gateway`
+- `deploy/dev/docker-compose.yml`
 
 ### UI references for this prompt
 - `docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png`
@@ -37,18 +42,22 @@ Do **not** recursively open every document linked from the required reads. If a 
 
 ## Subsystem-specific rule
 
-Keep upstream Jellyfin-derived code recognizable and syncable. MediaForge integration belongs behind explicit compatibility/integration boundaries.
+Treat Jellyfin as an independently updateable external specialist service. Integrate only through supported/versioned APIs behind MediaForge adapter contracts; never read/write Jellyfin's internal database and do not copy its source tree by default.
 
 
-## Mandatory target additions — 2026-08-17
+## Mandatory target architecture — 2026-09-27
 
-- Jellyfin source should already be pinned/imported from Track 02; this track completes/adapts the internal Video Engine rather than first copying the upstream project.
-- At actual import/update time verify the current official stable upstream; prefer Jellyfin 12.x stable as the initial long-lived baseline when available.
+- Detect Jellyfin version/capabilities and maintain an explicit supported-version compatibility range.
+- Expand the existing Jellyfin adapter rather than creating a second integration stack.
+- Keep MediaForge PostgreSQL as canonical MediaForge identity/catalog state; Jellyfin IDs remain mappings.
+- Support richer catalog/technical-media synchronization and, when the prompt focus reaches it, playback/session/track/subtitle/device-profile capabilities through Jellyfin's supported API.
+- Normal browsing must use synchronized MediaForge state and remain usable during temporary Jellyfin outage; only Jellyfin-dependent live capabilities degrade.
+- No Jellyfin source import, fork cutover or direct Jellyfin DB access is required.
 
 ## Exact work for this prompt
 
-1. Inspect the existing implementation specifically for **Jellyfin-derived video engine integration and fork boundary** and the current focus **performance**.
-2. Keep these subsystem deliverables in view: upstream import boundary, MediaForge adapter, capability surface, upgrade/sync workflow.
+1. Inspect the existing implementation specifically for **Jellyfin external video/playback adapter and compatibility** and the current focus **performance**.
+2. Keep these subsystem deliverables in view: Jellyfin API adapter boundary, capability/version surface, catalog/playback integration, compatibility/sync workflow.
 3. Profile and harden the subsystem for realistic library sizes and failure conditions.
 4. Preserve already-working V1/V2 behavior unless this prompt explicitly replaces it with the documented target architecture.
 5. Do not implement the next focus or a later feature just because you notice it while editing.
@@ -56,10 +65,10 @@ Keep upstream Jellyfin-derived code recognizable and syncable. MediaForge integr
 ## Expected deliverables
 
 The implementation/report for this prompt should address the relevant subset of:
-- upstream import boundary
-- MediaForge adapter
-- capability surface
-- upgrade/sync workflow
+- Jellyfin API adapter boundary
+- MediaForge adapter/canonical mapping
+- capability/version surface
+- compatibility/sync/offline workflow
 
 Do not create placeholder abstractions that have no immediate use in this prompt unless the target architecture explicitly requires the seam now.
 

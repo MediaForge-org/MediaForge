@@ -1,6 +1,6 @@
 # ADR-0025 — MediaForge owns the frontend; specialised programs are backend capabilities
 
-**Status:** Accepted
+**Status:** Superseded by ADR-0028
 **Date:** 2026-08-17
 
 ## Decision
@@ -28,3 +28,16 @@ NZBGet replaces the previously planned Usenet downloader as the sole managed Use
 This does not make NZBGet's native web UI part of the normal product surface. MediaForge owns the complete normal queue/history/server/repair/unpack/download UX and consumes NZBGet as an upstream-managed capability through a normalized adapter/contract.
 
 Maintaining a second Usenet production adapter is explicitly out of scope unless a later ADR demonstrates a hard missing capability or compatibility requirement.
+
+## Supersession — 2026-09-27
+
+The decision to import Jellyfin/Stash/Audiobookshelf source baselines and transform them into
+internal engines is superseded by ADR-0028.
+
+The parts of this ADR that remain valid are:
+- MediaForge owns the normal product UI;
+- native upstream UIs are admin/fallback surfaces;
+- NZBGet is the sole target Usenet backend;
+- managed acquisition backends remain behind MediaForge contracts.
+
+Historical text is preserved for context.

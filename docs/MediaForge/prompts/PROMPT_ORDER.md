@@ -579,7 +579,7 @@ Run one prompt at a time unless explicitly authorized otherwise. Tracks are orde
 - `P0499` — `25-audio-enhancement/P0499_docs.md` — docs
 - `P0500` — `25-audio-enhancement/P0500_gate.md` — gate
 
-## Track 26 — Jellyfin-derived video engine integration and fork boundary (P2)
+## Track 26 — Jellyfin external video/playback adapter and compatibility (P2)
 
 - `P0501` — `26-video-engine/P0501_audit.md` — audit
 - `P0502` — `26-video-engine/P0502_model.md` — model
@@ -602,7 +602,7 @@ Run one prompt at a time unless explicitly authorized otherwise. Tracks are orde
 - `P0519` — `26-video-engine/P0519_docs.md` — docs
 - `P0520` — `26-video-engine/P0520_gate.md` — gate
 
-## Track 27 — Stash-derived adult engine integration and fork boundary (P2)
+## Track 27 — Scene Tracker metadata integration, private scene domain and Jellyfin playback mapping (P2)
 
 - `P0521` — `27-adult-engine/P0521_audit.md` — audit
 - `P0522` — `27-adult-engine/P0522_model.md` — model
@@ -625,7 +625,7 @@ Run one prompt at a time unless explicitly authorized otherwise. Tracks are orde
 - `P0539` — `27-adult-engine/P0539_docs.md` — docs
 - `P0540` — `27-adult-engine/P0540_gate.md` — gate
 
-## Track 28 — Audiobookshelf-derived audio engine integration and fork boundary (P2)
+## Track 28 — Audiobookshelf external audio/book/playback adapter and compatibility (P2)
 
 - `P0541` — `28-audio-engine/P0541_audit.md` — audit
 - `P0542` — `28-audio-engine/P0542_model.md` — model

@@ -62,3 +62,13 @@ Read only when the current prompt touches the matching concern:
 - Usenet downloader/backend choice, managed lifecycle, adapter boundary, queue/history/repair/unpack semantics -> `docs/MediaForge/architecture/managed-upstreams-and-product-surface.md` and `docs/MediaForge/modules/acquisition-automation-and-postprocessing.md`.
 - Downloads/Acquisition visual hierarchy and the "authored product, not generated SaaS dashboard" rule -> `docs/MediaForge/ui-ux/design-system.md`, `docs/MediaForge/ui-ux/SCREEN_REFERENCE_INDEX.md`, refs 70–71.
 - NZBGet's native UI is an advanced/admin fallback only; normal product workflows remain MediaForge-owned.
+
+## 2026-09-27 routing — external specialist services
+
+- specialist media server ownership, adapter boundary, sync/offline behavior, playback ownership,
+  version compatibility and no-cross-DB policy ->
+  `docs/MediaForge/architecture/external-specialist-services-and-adapters.md` + ADR-0028.
+- if an older numbered prompt conflicts by requiring Jellyfin/Stash/Audiobookshelf source import,
+  internal fork cutover or upstream DB migration -> read
+  `docs/MediaForge/prompts/ARCHITECTURE_SUPERSESSION_2026-09-27.md` and apply the superseding
+  adapter-first interpretation.

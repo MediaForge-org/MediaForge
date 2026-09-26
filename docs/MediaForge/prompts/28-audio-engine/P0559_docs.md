@@ -1,4 +1,4 @@
-# P0559 — Audiobookshelf-derived audio engine integration and fork boundary: docs
+# P0559 — Audiobookshelf external audio/book/playback adapter and compatibility: docs
 
 **Track:** 28-audio-engine  
 **Priority:** P2  
@@ -9,7 +9,7 @@
 
 Update only the documentation/ADR sections made true by the implementation.
 
-This is a deliberately narrow step inside **Audiobookshelf-derived audio engine integration and fork boundary**. The goal is to make one verifiable increment while keeping the rest of MediaForge stable.
+This is a deliberately narrow step inside **Audiobookshelf external audio/book/playback adapter and compatibility**. The goal is to make one verifiable increment while keeping the rest of MediaForge stable.
 
 ## Context budget — read only what is required
 
@@ -18,16 +18,21 @@ First read:
 - `docs/MediaForge/prompts/CONTEXT_ROUTING.md`
 
 Then read these required documents only:
-- `docs/MediaForge/architecture/managed-upstreams-and-product-surface.md`
-- `docs/MediaForge/adr/0025-managed-upstream-backends.md`
+- `docs/MediaForge/architecture/external-specialist-services-and-adapters.md`
+- `docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md`
 - `docs/MediaForge/architecture/engine-contracts.md`
-- `docs/MediaForge/architecture/target-monorepo.md`
+- `docs/MediaForge/architecture/postgresql-source-of-truth.md`
 - `docs/MediaForge/modules/audiobook-chapters-and-storage.md`
+- `docs/MediaForge/modules/books-ebooks-and-persistent-metadata.md`
+- `docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md`
 
 Inspect these source paths/symbol neighborhoods first:
-- `engines/audio`
+- `app/Connectors/Audiobookshelf`
+- `app/Connectors/Sdk`
 - `packages/contracts`
 - `apps/server/app/Domain/Audiobooks`
+- `platform/integrations`
+- `deploy/dev/docker-compose.yml`
 
 ### UI references for this prompt
 - `docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png`
@@ -37,17 +42,22 @@ Do **not** recursively open every document linked from the required reads. If a 
 
 ## Subsystem-specific rule
 
-Keep upstream Audiobookshelf-derived code recognizable and syncable. MediaForge UI remains the product UI; the engine is an internal specialist.
+Treat Audiobookshelf as an independently updateable external specialist service. Integrate through its supported/versioned API behind MediaForge contracts; never query/migrate the ABS internal database and do not copy the ABS source tree by default.
 
 
-## Mandatory target additions — 2026-08-17
+## Mandatory target architecture — 2026-09-27
 
-- Audiobookshelf source should already be pinned/imported from Track 02; this track completes/adapts the internal Audio Engine while MediaForge remains the product UI/source of truth.
+- Detect Audiobookshelf version/capabilities and maintain an explicit supported-version compatibility range.
+- Expand the existing Audiobookshelf adapter rather than creating a parallel integration stack.
+- Synchronize useful audiobook/book/podcast metadata into MediaForge source facts/projections so rename, move, ABS rescan or ABS-local-ID changes do not erase retained metadata.
+- When the prompt focus reaches it, integrate playback, chapters and listening progress through supported ABS APIs with explicit ownership/conflict semantics.
+- Keep MediaForge PostgreSQL canonical for MediaForge identity, Work/Edition/File, provenance, search/review and MediaForge-owned reading/listening state.
+- No Audiobookshelf source import, fork cutover or direct ABS DB access is required.
 
 ## Exact work for this prompt
 
-1. Inspect the existing implementation specifically for **Audiobookshelf-derived audio engine integration and fork boundary** and the current focus **docs**.
-2. Keep these subsystem deliverables in view: upstream import boundary, MediaForge adapter, chapter/progress bridge, upgrade/sync workflow.
+1. Inspect the existing implementation specifically for **Audiobookshelf external audio/book/playback adapter and compatibility** and the current focus **docs**.
+2. Keep these subsystem deliverables in view: Audiobookshelf API adapter boundary, persistent catalog/metadata projection, chapter/playback/progress bridge, compatibility/sync workflow.
 3. Update only the documentation/ADR sections made true by the implementation.
 4. Preserve already-working V1/V2 behavior unless this prompt explicitly replaces it with the documented target architecture.
 5. Do not implement the next focus or a later feature just because you notice it while editing.
@@ -55,10 +65,10 @@ Keep upstream Audiobookshelf-derived code recognizable and syncable. MediaForge 
 ## Expected deliverables
 
 The implementation/report for this prompt should address the relevant subset of:
-- upstream import boundary
-- MediaForge adapter
-- chapter/progress bridge
-- upgrade/sync workflow
+- Audiobookshelf API adapter boundary
+- MediaForge canonical mapping/source-fact projection
+- chapter/playback/progress bridge
+- compatibility/sync/offline workflow
 
 Do not create placeholder abstractions that have no immediate use in this prompt unless the target architecture explicitly requires the seam now.
 

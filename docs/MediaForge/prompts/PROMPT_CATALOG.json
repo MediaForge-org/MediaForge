@@ -510,22 +510,25 @@
     ],
     "required_reads": [
       "docs/MediaForge/architecture/target-monorepo.md",
-      "docs/MediaForge/adr/0014-target-polyglot-monorepo.md",
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/unified-application.md",
       "docs/MediaForge/architecture/artifact-store-and-derived-assets.md",
       "docs/MediaForge/modules/plugin-theme-sdk.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md"
     ],
     "source_paths": [
       "repository root",
       "composer.json",
       "package.json",
       "docker-compose.yml",
+      "app/Connectors",
+      "packages/contracts",
       "packages/plugin-sdk",
       "packages/theme-sdk",
-      "packages/contracts/domains",
       "services/ai/reconstruction",
+      "platform/integrations",
+      "platform/managed-upstreams",
       "platform/storage"
     ],
     "ui_refs": [
@@ -545,22 +548,25 @@
     ],
     "required_reads": [
       "docs/MediaForge/architecture/target-monorepo.md",
-      "docs/MediaForge/adr/0014-target-polyglot-monorepo.md",
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/unified-application.md",
       "docs/MediaForge/architecture/artifact-store-and-derived-assets.md",
       "docs/MediaForge/modules/plugin-theme-sdk.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md"
     ],
     "source_paths": [
       "repository root",
       "composer.json",
       "package.json",
       "docker-compose.yml",
+      "app/Connectors",
+      "packages/contracts",
       "packages/plugin-sdk",
       "packages/theme-sdk",
-      "packages/contracts/domains",
       "services/ai/reconstruction",
+      "platform/integrations",
+      "platform/managed-upstreams",
       "platform/storage"
     ],
     "ui_refs": [
@@ -580,22 +586,25 @@
     ],
     "required_reads": [
       "docs/MediaForge/architecture/target-monorepo.md",
-      "docs/MediaForge/adr/0014-target-polyglot-monorepo.md",
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/unified-application.md",
       "docs/MediaForge/architecture/artifact-store-and-derived-assets.md",
       "docs/MediaForge/modules/plugin-theme-sdk.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md"
     ],
     "source_paths": [
       "repository root",
       "composer.json",
       "package.json",
       "docker-compose.yml",
+      "app/Connectors",
+      "packages/contracts",
       "packages/plugin-sdk",
       "packages/theme-sdk",
-      "packages/contracts/domains",
       "services/ai/reconstruction",
+      "platform/integrations",
+      "platform/managed-upstreams",
       "platform/storage"
     ],
     "ui_refs": [
@@ -615,22 +624,25 @@
     ],
     "required_reads": [
       "docs/MediaForge/architecture/target-monorepo.md",
-      "docs/MediaForge/adr/0014-target-polyglot-monorepo.md",
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/unified-application.md",
       "docs/MediaForge/architecture/artifact-store-and-derived-assets.md",
       "docs/MediaForge/modules/plugin-theme-sdk.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md"
     ],
     "source_paths": [
       "repository root",
       "composer.json",
       "package.json",
       "docker-compose.yml",
+      "app/Connectors",
+      "packages/contracts",
       "packages/plugin-sdk",
       "packages/theme-sdk",
-      "packages/contracts/domains",
       "services/ai/reconstruction",
+      "platform/integrations",
+      "platform/managed-upstreams",
       "platform/storage"
     ],
     "ui_refs": [
@@ -650,22 +662,25 @@
     ],
     "required_reads": [
       "docs/MediaForge/architecture/target-monorepo.md",
-      "docs/MediaForge/adr/0014-target-polyglot-monorepo.md",
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/unified-application.md",
       "docs/MediaForge/architecture/artifact-store-and-derived-assets.md",
       "docs/MediaForge/modules/plugin-theme-sdk.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md"
     ],
     "source_paths": [
       "repository root",
       "composer.json",
       "package.json",
       "docker-compose.yml",
+      "app/Connectors",
+      "packages/contracts",
       "packages/plugin-sdk",
       "packages/theme-sdk",
-      "packages/contracts/domains",
       "services/ai/reconstruction",
+      "platform/integrations",
+      "platform/managed-upstreams",
       "platform/storage"
     ],
     "ui_refs": [
@@ -685,22 +700,25 @@
     ],
     "required_reads": [
       "docs/MediaForge/architecture/target-monorepo.md",
-      "docs/MediaForge/adr/0014-target-polyglot-monorepo.md",
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/unified-application.md",
       "docs/MediaForge/architecture/artifact-store-and-derived-assets.md",
       "docs/MediaForge/modules/plugin-theme-sdk.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md"
     ],
     "source_paths": [
       "repository root",
       "composer.json",
       "package.json",
       "docker-compose.yml",
+      "app/Connectors",
+      "packages/contracts",
       "packages/plugin-sdk",
       "packages/theme-sdk",
-      "packages/contracts/domains",
       "services/ai/reconstruction",
+      "platform/integrations",
+      "platform/managed-upstreams",
       "platform/storage"
     ],
     "ui_refs": [
@@ -720,22 +738,25 @@
     ],
     "required_reads": [
       "docs/MediaForge/architecture/target-monorepo.md",
-      "docs/MediaForge/adr/0014-target-polyglot-monorepo.md",
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/unified-application.md",
       "docs/MediaForge/architecture/artifact-store-and-derived-assets.md",
       "docs/MediaForge/modules/plugin-theme-sdk.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md"
     ],
     "source_paths": [
       "repository root",
       "composer.json",
       "package.json",
       "docker-compose.yml",
+      "app/Connectors",
+      "packages/contracts",
       "packages/plugin-sdk",
       "packages/theme-sdk",
-      "packages/contracts/domains",
       "services/ai/reconstruction",
+      "platform/integrations",
+      "platform/managed-upstreams",
       "platform/storage"
     ],
     "ui_refs": [
@@ -755,22 +776,25 @@
     ],
     "required_reads": [
       "docs/MediaForge/architecture/target-monorepo.md",
-      "docs/MediaForge/adr/0014-target-polyglot-monorepo.md",
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/unified-application.md",
       "docs/MediaForge/architecture/artifact-store-and-derived-assets.md",
       "docs/MediaForge/modules/plugin-theme-sdk.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md"
     ],
     "source_paths": [
       "repository root",
       "composer.json",
       "package.json",
       "docker-compose.yml",
+      "app/Connectors",
+      "packages/contracts",
       "packages/plugin-sdk",
       "packages/theme-sdk",
-      "packages/contracts/domains",
       "services/ai/reconstruction",
+      "platform/integrations",
+      "platform/managed-upstreams",
       "platform/storage"
     ],
     "ui_refs": [
@@ -790,22 +814,25 @@
     ],
     "required_reads": [
       "docs/MediaForge/architecture/target-monorepo.md",
-      "docs/MediaForge/adr/0014-target-polyglot-monorepo.md",
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/unified-application.md",
       "docs/MediaForge/architecture/artifact-store-and-derived-assets.md",
       "docs/MediaForge/modules/plugin-theme-sdk.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md"
     ],
     "source_paths": [
       "repository root",
       "composer.json",
       "package.json",
       "docker-compose.yml",
+      "app/Connectors",
+      "packages/contracts",
       "packages/plugin-sdk",
       "packages/theme-sdk",
-      "packages/contracts/domains",
       "services/ai/reconstruction",
+      "platform/integrations",
+      "platform/managed-upstreams",
       "platform/storage"
     ],
     "ui_refs": [
@@ -825,22 +852,25 @@
     ],
     "required_reads": [
       "docs/MediaForge/architecture/target-monorepo.md",
-      "docs/MediaForge/adr/0014-target-polyglot-monorepo.md",
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/unified-application.md",
       "docs/MediaForge/architecture/artifact-store-and-derived-assets.md",
       "docs/MediaForge/modules/plugin-theme-sdk.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md"
     ],
     "source_paths": [
       "repository root",
       "composer.json",
       "package.json",
       "docker-compose.yml",
+      "app/Connectors",
+      "packages/contracts",
       "packages/plugin-sdk",
       "packages/theme-sdk",
-      "packages/contracts/domains",
       "services/ai/reconstruction",
+      "platform/integrations",
+      "platform/managed-upstreams",
       "platform/storage"
     ],
     "ui_refs": [
@@ -860,22 +890,25 @@
     ],
     "required_reads": [
       "docs/MediaForge/architecture/target-monorepo.md",
-      "docs/MediaForge/adr/0014-target-polyglot-monorepo.md",
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/unified-application.md",
       "docs/MediaForge/architecture/artifact-store-and-derived-assets.md",
       "docs/MediaForge/modules/plugin-theme-sdk.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md"
     ],
     "source_paths": [
       "repository root",
       "composer.json",
       "package.json",
       "docker-compose.yml",
+      "app/Connectors",
+      "packages/contracts",
       "packages/plugin-sdk",
       "packages/theme-sdk",
-      "packages/contracts/domains",
       "services/ai/reconstruction",
+      "platform/integrations",
+      "platform/managed-upstreams",
       "platform/storage"
     ],
     "ui_refs": [
@@ -895,22 +928,25 @@
     ],
     "required_reads": [
       "docs/MediaForge/architecture/target-monorepo.md",
-      "docs/MediaForge/adr/0014-target-polyglot-monorepo.md",
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/unified-application.md",
       "docs/MediaForge/architecture/artifact-store-and-derived-assets.md",
       "docs/MediaForge/modules/plugin-theme-sdk.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md"
     ],
     "source_paths": [
       "repository root",
       "composer.json",
       "package.json",
       "docker-compose.yml",
+      "app/Connectors",
+      "packages/contracts",
       "packages/plugin-sdk",
       "packages/theme-sdk",
-      "packages/contracts/domains",
       "services/ai/reconstruction",
+      "platform/integrations",
+      "platform/managed-upstreams",
       "platform/storage"
     ],
     "ui_refs": [
@@ -930,22 +966,25 @@
     ],
     "required_reads": [
       "docs/MediaForge/architecture/target-monorepo.md",
-      "docs/MediaForge/adr/0014-target-polyglot-monorepo.md",
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/unified-application.md",
       "docs/MediaForge/architecture/artifact-store-and-derived-assets.md",
       "docs/MediaForge/modules/plugin-theme-sdk.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md"
     ],
     "source_paths": [
       "repository root",
       "composer.json",
       "package.json",
       "docker-compose.yml",
+      "app/Connectors",
+      "packages/contracts",
       "packages/plugin-sdk",
       "packages/theme-sdk",
-      "packages/contracts/domains",
       "services/ai/reconstruction",
+      "platform/integrations",
+      "platform/managed-upstreams",
       "platform/storage"
     ],
     "ui_refs": [
@@ -965,22 +1004,25 @@
     ],
     "required_reads": [
       "docs/MediaForge/architecture/target-monorepo.md",
-      "docs/MediaForge/adr/0014-target-polyglot-monorepo.md",
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/unified-application.md",
       "docs/MediaForge/architecture/artifact-store-and-derived-assets.md",
       "docs/MediaForge/modules/plugin-theme-sdk.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md"
     ],
     "source_paths": [
       "repository root",
       "composer.json",
       "package.json",
       "docker-compose.yml",
+      "app/Connectors",
+      "packages/contracts",
       "packages/plugin-sdk",
       "packages/theme-sdk",
-      "packages/contracts/domains",
       "services/ai/reconstruction",
+      "platform/integrations",
+      "platform/managed-upstreams",
       "platform/storage"
     ],
     "ui_refs": [
@@ -1000,22 +1042,25 @@
     ],
     "required_reads": [
       "docs/MediaForge/architecture/target-monorepo.md",
-      "docs/MediaForge/adr/0014-target-polyglot-monorepo.md",
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/unified-application.md",
       "docs/MediaForge/architecture/artifact-store-and-derived-assets.md",
       "docs/MediaForge/modules/plugin-theme-sdk.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md"
     ],
     "source_paths": [
       "repository root",
       "composer.json",
       "package.json",
       "docker-compose.yml",
+      "app/Connectors",
+      "packages/contracts",
       "packages/plugin-sdk",
       "packages/theme-sdk",
-      "packages/contracts/domains",
       "services/ai/reconstruction",
+      "platform/integrations",
+      "platform/managed-upstreams",
       "platform/storage"
     ],
     "ui_refs": [
@@ -1035,22 +1080,25 @@
     ],
     "required_reads": [
       "docs/MediaForge/architecture/target-monorepo.md",
-      "docs/MediaForge/adr/0014-target-polyglot-monorepo.md",
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/unified-application.md",
       "docs/MediaForge/architecture/artifact-store-and-derived-assets.md",
       "docs/MediaForge/modules/plugin-theme-sdk.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md"
     ],
     "source_paths": [
       "repository root",
       "composer.json",
       "package.json",
       "docker-compose.yml",
+      "app/Connectors",
+      "packages/contracts",
       "packages/plugin-sdk",
       "packages/theme-sdk",
-      "packages/contracts/domains",
       "services/ai/reconstruction",
+      "platform/integrations",
+      "platform/managed-upstreams",
       "platform/storage"
     ],
     "ui_refs": [
@@ -1070,22 +1118,25 @@
     ],
     "required_reads": [
       "docs/MediaForge/architecture/target-monorepo.md",
-      "docs/MediaForge/adr/0014-target-polyglot-monorepo.md",
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/unified-application.md",
       "docs/MediaForge/architecture/artifact-store-and-derived-assets.md",
       "docs/MediaForge/modules/plugin-theme-sdk.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md"
     ],
     "source_paths": [
       "repository root",
       "composer.json",
       "package.json",
       "docker-compose.yml",
+      "app/Connectors",
+      "packages/contracts",
       "packages/plugin-sdk",
       "packages/theme-sdk",
-      "packages/contracts/domains",
       "services/ai/reconstruction",
+      "platform/integrations",
+      "platform/managed-upstreams",
       "platform/storage"
     ],
     "ui_refs": [
@@ -1105,22 +1156,25 @@
     ],
     "required_reads": [
       "docs/MediaForge/architecture/target-monorepo.md",
-      "docs/MediaForge/adr/0014-target-polyglot-monorepo.md",
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/unified-application.md",
       "docs/MediaForge/architecture/artifact-store-and-derived-assets.md",
       "docs/MediaForge/modules/plugin-theme-sdk.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md"
     ],
     "source_paths": [
       "repository root",
       "composer.json",
       "package.json",
       "docker-compose.yml",
+      "app/Connectors",
+      "packages/contracts",
       "packages/plugin-sdk",
       "packages/theme-sdk",
-      "packages/contracts/domains",
       "services/ai/reconstruction",
+      "platform/integrations",
+      "platform/managed-upstreams",
       "platform/storage"
     ],
     "ui_refs": [
@@ -1140,22 +1194,25 @@
     ],
     "required_reads": [
       "docs/MediaForge/architecture/target-monorepo.md",
-      "docs/MediaForge/adr/0014-target-polyglot-monorepo.md",
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/unified-application.md",
       "docs/MediaForge/architecture/artifact-store-and-derived-assets.md",
       "docs/MediaForge/modules/plugin-theme-sdk.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md"
     ],
     "source_paths": [
       "repository root",
       "composer.json",
       "package.json",
       "docker-compose.yml",
+      "app/Connectors",
+      "packages/contracts",
       "packages/plugin-sdk",
       "packages/theme-sdk",
-      "packages/contracts/domains",
       "services/ai/reconstruction",
+      "platform/integrations",
+      "platform/managed-upstreams",
       "platform/storage"
     ],
     "ui_refs": [
@@ -1175,22 +1232,25 @@
     ],
     "required_reads": [
       "docs/MediaForge/architecture/target-monorepo.md",
-      "docs/MediaForge/adr/0014-target-polyglot-monorepo.md",
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/unified-application.md",
       "docs/MediaForge/architecture/artifact-store-and-derived-assets.md",
       "docs/MediaForge/modules/plugin-theme-sdk.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md"
     ],
     "source_paths": [
       "repository root",
       "composer.json",
       "package.json",
       "docker-compose.yml",
+      "app/Connectors",
+      "packages/contracts",
       "packages/plugin-sdk",
       "packages/theme-sdk",
-      "packages/contracts/domains",
       "services/ai/reconstruction",
+      "platform/integrations",
+      "platform/managed-upstreams",
       "platform/storage"
     ],
     "ui_refs": [
@@ -15633,7 +15693,7 @@
     "id": "P0501",
     "track": 26,
     "track_slug": "video-engine",
-    "track_title": "Jellyfin-derived video engine integration and fork boundary",
+    "track_title": "Jellyfin external video/playback adapter and compatibility",
     "priority": "P2",
     "focus": "audit",
     "file": "docs/MediaForge/prompts/26-video-engine/P0501_audit.md",
@@ -15643,16 +15703,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/architecture/unified-application.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md",
+      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md"
     ],
     "source_paths": [
-      "engines/video",
+      "app/Connectors/Jellyfin",
+      "app/Connectors/Sdk",
       "packages/contracts",
-      "platform/gateway"
+      "platform/integrations",
+      "platform/gateway",
+      "deploy/dev/docker-compose.yml"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -15662,7 +15727,7 @@
     "id": "P0502",
     "track": 26,
     "track_slug": "video-engine",
-    "track_title": "Jellyfin-derived video engine integration and fork boundary",
+    "track_title": "Jellyfin external video/playback adapter and compatibility",
     "priority": "P2",
     "focus": "model",
     "file": "docs/MediaForge/prompts/26-video-engine/P0502_model.md",
@@ -15672,16 +15737,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/architecture/unified-application.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md",
+      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md"
     ],
     "source_paths": [
-      "engines/video",
+      "app/Connectors/Jellyfin",
+      "app/Connectors/Sdk",
       "packages/contracts",
-      "platform/gateway"
+      "platform/integrations",
+      "platform/gateway",
+      "deploy/dev/docker-compose.yml"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -15691,7 +15761,7 @@
     "id": "P0503",
     "track": 26,
     "track_slug": "video-engine",
-    "track_title": "Jellyfin-derived video engine integration and fork boundary",
+    "track_title": "Jellyfin external video/playback adapter and compatibility",
     "priority": "P2",
     "focus": "boundaries",
     "file": "docs/MediaForge/prompts/26-video-engine/P0503_boundaries.md",
@@ -15701,16 +15771,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/architecture/unified-application.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md",
+      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md"
     ],
     "source_paths": [
-      "engines/video",
+      "app/Connectors/Jellyfin",
+      "app/Connectors/Sdk",
       "packages/contracts",
-      "platform/gateway"
+      "platform/integrations",
+      "platform/gateway",
+      "deploy/dev/docker-compose.yml"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -15720,7 +15795,7 @@
     "id": "P0504",
     "track": 26,
     "track_slug": "video-engine",
-    "track_title": "Jellyfin-derived video engine integration and fork boundary",
+    "track_title": "Jellyfin external video/playback adapter and compatibility",
     "priority": "P2",
     "focus": "persistence",
     "file": "docs/MediaForge/prompts/26-video-engine/P0504_persistence.md",
@@ -15730,16 +15805,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/architecture/unified-application.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md",
+      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md"
     ],
     "source_paths": [
-      "engines/video",
+      "app/Connectors/Jellyfin",
+      "app/Connectors/Sdk",
       "packages/contracts",
-      "platform/gateway"
+      "platform/integrations",
+      "platform/gateway",
+      "deploy/dev/docker-compose.yml"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -15749,7 +15829,7 @@
     "id": "P0505",
     "track": 26,
     "track_slug": "video-engine",
-    "track_title": "Jellyfin-derived video engine integration and fork boundary",
+    "track_title": "Jellyfin external video/playback adapter and compatibility",
     "priority": "P2",
     "focus": "application",
     "file": "docs/MediaForge/prompts/26-video-engine/P0505_application.md",
@@ -15759,16 +15839,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/architecture/unified-application.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md",
+      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md"
     ],
     "source_paths": [
-      "engines/video",
+      "app/Connectors/Jellyfin",
+      "app/Connectors/Sdk",
       "packages/contracts",
-      "platform/gateway"
+      "platform/integrations",
+      "platform/gateway",
+      "deploy/dev/docker-compose.yml"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -15778,7 +15863,7 @@
     "id": "P0506",
     "track": 26,
     "track_slug": "video-engine",
-    "track_title": "Jellyfin-derived video engine integration and fork boundary",
+    "track_title": "Jellyfin external video/playback adapter and compatibility",
     "priority": "P2",
     "focus": "api",
     "file": "docs/MediaForge/prompts/26-video-engine/P0506_api.md",
@@ -15788,16 +15873,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/architecture/unified-application.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md",
+      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md"
     ],
     "source_paths": [
-      "engines/video",
+      "app/Connectors/Jellyfin",
+      "app/Connectors/Sdk",
       "packages/contracts",
-      "platform/gateway"
+      "platform/integrations",
+      "platform/gateway",
+      "deploy/dev/docker-compose.yml"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -15807,7 +15897,7 @@
     "id": "P0507",
     "track": 26,
     "track_slug": "video-engine",
-    "track_title": "Jellyfin-derived video engine integration and fork boundary",
+    "track_title": "Jellyfin external video/playback adapter and compatibility",
     "priority": "P2",
     "focus": "frontend",
     "file": "docs/MediaForge/prompts/26-video-engine/P0507_frontend.md",
@@ -15817,16 +15907,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/architecture/unified-application.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md",
+      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md"
     ],
     "source_paths": [
-      "engines/video",
+      "app/Connectors/Jellyfin",
+      "app/Connectors/Sdk",
       "packages/contracts",
-      "platform/gateway"
+      "platform/integrations",
+      "platform/gateway",
+      "deploy/dev/docker-compose.yml"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -15836,7 +15931,7 @@
     "id": "P0508",
     "track": 26,
     "track_slug": "video-engine",
-    "track_title": "Jellyfin-derived video engine integration and fork boundary",
+    "track_title": "Jellyfin external video/playback adapter and compatibility",
     "priority": "P2",
     "focus": "validation",
     "file": "docs/MediaForge/prompts/26-video-engine/P0508_validation.md",
@@ -15846,16 +15941,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/architecture/unified-application.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md",
+      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md"
     ],
     "source_paths": [
-      "engines/video",
+      "app/Connectors/Jellyfin",
+      "app/Connectors/Sdk",
       "packages/contracts",
-      "platform/gateway"
+      "platform/integrations",
+      "platform/gateway",
+      "deploy/dev/docker-compose.yml"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -15865,7 +15965,7 @@
     "id": "P0509",
     "track": 26,
     "track_slug": "video-engine",
-    "track_title": "Jellyfin-derived video engine integration and fork boundary",
+    "track_title": "Jellyfin external video/playback adapter and compatibility",
     "priority": "P2",
     "focus": "security",
     "file": "docs/MediaForge/prompts/26-video-engine/P0509_security.md",
@@ -15875,16 +15975,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/architecture/unified-application.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md",
+      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md"
     ],
     "source_paths": [
-      "engines/video",
+      "app/Connectors/Jellyfin",
+      "app/Connectors/Sdk",
       "packages/contracts",
-      "platform/gateway"
+      "platform/integrations",
+      "platform/gateway",
+      "deploy/dev/docker-compose.yml"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -15894,7 +15999,7 @@
     "id": "P0510",
     "track": 26,
     "track_slug": "video-engine",
-    "track_title": "Jellyfin-derived video engine integration and fork boundary",
+    "track_title": "Jellyfin external video/playback adapter and compatibility",
     "priority": "P2",
     "focus": "jobs",
     "file": "docs/MediaForge/prompts/26-video-engine/P0510_jobs.md",
@@ -15904,16 +16009,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/architecture/unified-application.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md",
+      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md"
     ],
     "source_paths": [
-      "engines/video",
+      "app/Connectors/Jellyfin",
+      "app/Connectors/Sdk",
       "packages/contracts",
-      "platform/gateway"
+      "platform/integrations",
+      "platform/gateway",
+      "deploy/dev/docker-compose.yml"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -15923,7 +16033,7 @@
     "id": "P0511",
     "track": 26,
     "track_slug": "video-engine",
-    "track_title": "Jellyfin-derived video engine integration and fork boundary",
+    "track_title": "Jellyfin external video/playback adapter and compatibility",
     "priority": "P2",
     "focus": "realtime",
     "file": "docs/MediaForge/prompts/26-video-engine/P0511_realtime.md",
@@ -15933,16 +16043,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/architecture/unified-application.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md",
+      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md"
     ],
     "source_paths": [
-      "engines/video",
+      "app/Connectors/Jellyfin",
+      "app/Connectors/Sdk",
       "packages/contracts",
-      "platform/gateway"
+      "platform/integrations",
+      "platform/gateway",
+      "deploy/dev/docker-compose.yml"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -15952,7 +16067,7 @@
     "id": "P0512",
     "track": 26,
     "track_slug": "video-engine",
-    "track_title": "Jellyfin-derived video engine integration and fork boundary",
+    "track_title": "Jellyfin external video/playback adapter and compatibility",
     "priority": "P2",
     "focus": "observability",
     "file": "docs/MediaForge/prompts/26-video-engine/P0512_observability.md",
@@ -15962,16 +16077,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/architecture/unified-application.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md",
+      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md"
     ],
     "source_paths": [
-      "engines/video",
+      "app/Connectors/Jellyfin",
+      "app/Connectors/Sdk",
       "packages/contracts",
-      "platform/gateway"
+      "platform/integrations",
+      "platform/gateway",
+      "deploy/dev/docker-compose.yml"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -15981,7 +16101,7 @@
     "id": "P0513",
     "track": 26,
     "track_slug": "video-engine",
-    "track_title": "Jellyfin-derived video engine integration and fork boundary",
+    "track_title": "Jellyfin external video/playback adapter and compatibility",
     "priority": "P2",
     "focus": "migration",
     "file": "docs/MediaForge/prompts/26-video-engine/P0513_migration.md",
@@ -15991,16 +16111,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/architecture/unified-application.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md",
+      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md"
     ],
     "source_paths": [
-      "engines/video",
+      "app/Connectors/Jellyfin",
+      "app/Connectors/Sdk",
       "packages/contracts",
-      "platform/gateway"
+      "platform/integrations",
+      "platform/gateway",
+      "deploy/dev/docker-compose.yml"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -16010,7 +16135,7 @@
     "id": "P0514",
     "track": 26,
     "track_slug": "video-engine",
-    "track_title": "Jellyfin-derived video engine integration and fork boundary",
+    "track_title": "Jellyfin external video/playback adapter and compatibility",
     "priority": "P2",
     "focus": "fixtures",
     "file": "docs/MediaForge/prompts/26-video-engine/P0514_fixtures.md",
@@ -16020,16 +16145,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/architecture/unified-application.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md",
+      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md"
     ],
     "source_paths": [
-      "engines/video",
+      "app/Connectors/Jellyfin",
+      "app/Connectors/Sdk",
       "packages/contracts",
-      "platform/gateway"
+      "platform/integrations",
+      "platform/gateway",
+      "deploy/dev/docker-compose.yml"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -16039,7 +16169,7 @@
     "id": "P0515",
     "track": 26,
     "track_slug": "video-engine",
-    "track_title": "Jellyfin-derived video engine integration and fork boundary",
+    "track_title": "Jellyfin external video/playback adapter and compatibility",
     "priority": "P2",
     "focus": "unit-tests",
     "file": "docs/MediaForge/prompts/26-video-engine/P0515_unit-tests.md",
@@ -16049,16 +16179,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/architecture/unified-application.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md",
+      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md"
     ],
     "source_paths": [
-      "engines/video",
+      "app/Connectors/Jellyfin",
+      "app/Connectors/Sdk",
       "packages/contracts",
-      "platform/gateway"
+      "platform/integrations",
+      "platform/gateway",
+      "deploy/dev/docker-compose.yml"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -16068,7 +16203,7 @@
     "id": "P0516",
     "track": 26,
     "track_slug": "video-engine",
-    "track_title": "Jellyfin-derived video engine integration and fork boundary",
+    "track_title": "Jellyfin external video/playback adapter and compatibility",
     "priority": "P2",
     "focus": "integration-tests",
     "file": "docs/MediaForge/prompts/26-video-engine/P0516_integration-tests.md",
@@ -16078,16 +16213,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/architecture/unified-application.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md",
+      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md"
     ],
     "source_paths": [
-      "engines/video",
+      "app/Connectors/Jellyfin",
+      "app/Connectors/Sdk",
       "packages/contracts",
-      "platform/gateway"
+      "platform/integrations",
+      "platform/gateway",
+      "deploy/dev/docker-compose.yml"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -16097,7 +16237,7 @@
     "id": "P0517",
     "track": 26,
     "track_slug": "video-engine",
-    "track_title": "Jellyfin-derived video engine integration and fork boundary",
+    "track_title": "Jellyfin external video/playback adapter and compatibility",
     "priority": "P2",
     "focus": "e2e-tests",
     "file": "docs/MediaForge/prompts/26-video-engine/P0517_e2e-tests.md",
@@ -16107,16 +16247,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/architecture/unified-application.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md",
+      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md"
     ],
     "source_paths": [
-      "engines/video",
+      "app/Connectors/Jellyfin",
+      "app/Connectors/Sdk",
       "packages/contracts",
-      "platform/gateway"
+      "platform/integrations",
+      "platform/gateway",
+      "deploy/dev/docker-compose.yml"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -16126,7 +16271,7 @@
     "id": "P0518",
     "track": 26,
     "track_slug": "video-engine",
-    "track_title": "Jellyfin-derived video engine integration and fork boundary",
+    "track_title": "Jellyfin external video/playback adapter and compatibility",
     "priority": "P2",
     "focus": "performance",
     "file": "docs/MediaForge/prompts/26-video-engine/P0518_performance.md",
@@ -16136,16 +16281,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/architecture/unified-application.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md",
+      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md"
     ],
     "source_paths": [
-      "engines/video",
+      "app/Connectors/Jellyfin",
+      "app/Connectors/Sdk",
       "packages/contracts",
-      "platform/gateway"
+      "platform/integrations",
+      "platform/gateway",
+      "deploy/dev/docker-compose.yml"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -16155,7 +16305,7 @@
     "id": "P0519",
     "track": 26,
     "track_slug": "video-engine",
-    "track_title": "Jellyfin-derived video engine integration and fork boundary",
+    "track_title": "Jellyfin external video/playback adapter and compatibility",
     "priority": "P2",
     "focus": "docs",
     "file": "docs/MediaForge/prompts/26-video-engine/P0519_docs.md",
@@ -16165,16 +16315,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/architecture/unified-application.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md",
+      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md"
     ],
     "source_paths": [
-      "engines/video",
+      "app/Connectors/Jellyfin",
+      "app/Connectors/Sdk",
       "packages/contracts",
-      "platform/gateway"
+      "platform/integrations",
+      "platform/gateway",
+      "deploy/dev/docker-compose.yml"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -16184,7 +16339,7 @@
     "id": "P0520",
     "track": 26,
     "track_slug": "video-engine",
-    "track_title": "Jellyfin-derived video engine integration and fork boundary",
+    "track_title": "Jellyfin external video/playback adapter and compatibility",
     "priority": "P2",
     "focus": "gate",
     "file": "docs/MediaForge/prompts/26-video-engine/P0520_gate.md",
@@ -16194,16 +16349,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/architecture/unified-application.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md",
+      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md"
     ],
     "source_paths": [
-      "engines/video",
+      "app/Connectors/Jellyfin",
+      "app/Connectors/Sdk",
       "packages/contracts",
-      "platform/gateway"
+      "platform/integrations",
+      "platform/gateway",
+      "deploy/dev/docker-compose.yml"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -16213,7 +16373,7 @@
     "id": "P0521",
     "track": 27,
     "track_slug": "adult-engine",
-    "track_title": "Stash-derived adult engine integration and fork boundary",
+    "track_title": "Scene Tracker metadata integration, private scene domain and Jellyfin playback mapping",
     "priority": "P2",
     "focus": "audit",
     "file": "docs/MediaForge/prompts/27-adult-engine/P0521_audit.md",
@@ -16223,16 +16383,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/modules/adult-engine-target.md",
+      "docs/MediaForge/modules/adult-enhancement.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/unified-application.md"
     ],
     "source_paths": [
-      "engines/adult",
+      "app/Connectors/Sdk",
+      "app/Connectors/Jellyfin",
+      "app/Integrations/SceneTracker",
       "packages/contracts",
-      "services/media-tools"
+      "services/media-tools",
+      "docs/MediaForge/modules/adult-source-vault-and-local-provenance.md"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -16242,7 +16407,7 @@
     "id": "P0522",
     "track": 27,
     "track_slug": "adult-engine",
-    "track_title": "Stash-derived adult engine integration and fork boundary",
+    "track_title": "Scene Tracker metadata integration, private scene domain and Jellyfin playback mapping",
     "priority": "P2",
     "focus": "model",
     "file": "docs/MediaForge/prompts/27-adult-engine/P0522_model.md",
@@ -16252,16 +16417,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/modules/adult-engine-target.md",
+      "docs/MediaForge/modules/adult-enhancement.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/unified-application.md"
     ],
     "source_paths": [
-      "engines/adult",
+      "app/Connectors/Sdk",
+      "app/Connectors/Jellyfin",
+      "app/Integrations/SceneTracker",
       "packages/contracts",
-      "services/media-tools"
+      "services/media-tools",
+      "docs/MediaForge/modules/adult-source-vault-and-local-provenance.md"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -16271,7 +16441,7 @@
     "id": "P0523",
     "track": 27,
     "track_slug": "adult-engine",
-    "track_title": "Stash-derived adult engine integration and fork boundary",
+    "track_title": "Scene Tracker metadata integration, private scene domain and Jellyfin playback mapping",
     "priority": "P2",
     "focus": "boundaries",
     "file": "docs/MediaForge/prompts/27-adult-engine/P0523_boundaries.md",
@@ -16281,16 +16451,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/modules/adult-engine-target.md",
+      "docs/MediaForge/modules/adult-enhancement.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/unified-application.md"
     ],
     "source_paths": [
-      "engines/adult",
+      "app/Connectors/Sdk",
+      "app/Connectors/Jellyfin",
+      "app/Integrations/SceneTracker",
       "packages/contracts",
-      "services/media-tools"
+      "services/media-tools",
+      "docs/MediaForge/modules/adult-source-vault-and-local-provenance.md"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -16300,7 +16475,7 @@
     "id": "P0524",
     "track": 27,
     "track_slug": "adult-engine",
-    "track_title": "Stash-derived adult engine integration and fork boundary",
+    "track_title": "Scene Tracker metadata integration, private scene domain and Jellyfin playback mapping",
     "priority": "P2",
     "focus": "persistence",
     "file": "docs/MediaForge/prompts/27-adult-engine/P0524_persistence.md",
@@ -16310,16 +16485,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/modules/adult-engine-target.md",
+      "docs/MediaForge/modules/adult-enhancement.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/unified-application.md"
     ],
     "source_paths": [
-      "engines/adult",
+      "app/Connectors/Sdk",
+      "app/Connectors/Jellyfin",
+      "app/Integrations/SceneTracker",
       "packages/contracts",
-      "services/media-tools"
+      "services/media-tools",
+      "docs/MediaForge/modules/adult-source-vault-and-local-provenance.md"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -16329,7 +16509,7 @@
     "id": "P0525",
     "track": 27,
     "track_slug": "adult-engine",
-    "track_title": "Stash-derived adult engine integration and fork boundary",
+    "track_title": "Scene Tracker metadata integration, private scene domain and Jellyfin playback mapping",
     "priority": "P2",
     "focus": "application",
     "file": "docs/MediaForge/prompts/27-adult-engine/P0525_application.md",
@@ -16339,16 +16519,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/modules/adult-engine-target.md",
+      "docs/MediaForge/modules/adult-enhancement.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/unified-application.md"
     ],
     "source_paths": [
-      "engines/adult",
+      "app/Connectors/Sdk",
+      "app/Connectors/Jellyfin",
+      "app/Integrations/SceneTracker",
       "packages/contracts",
-      "services/media-tools"
+      "services/media-tools",
+      "docs/MediaForge/modules/adult-source-vault-and-local-provenance.md"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -16358,7 +16543,7 @@
     "id": "P0526",
     "track": 27,
     "track_slug": "adult-engine",
-    "track_title": "Stash-derived adult engine integration and fork boundary",
+    "track_title": "Scene Tracker metadata integration, private scene domain and Jellyfin playback mapping",
     "priority": "P2",
     "focus": "api",
     "file": "docs/MediaForge/prompts/27-adult-engine/P0526_api.md",
@@ -16368,16 +16553,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/modules/adult-engine-target.md",
+      "docs/MediaForge/modules/adult-enhancement.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/unified-application.md"
     ],
     "source_paths": [
-      "engines/adult",
+      "app/Connectors/Sdk",
+      "app/Connectors/Jellyfin",
+      "app/Integrations/SceneTracker",
       "packages/contracts",
-      "services/media-tools"
+      "services/media-tools",
+      "docs/MediaForge/modules/adult-source-vault-and-local-provenance.md"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -16387,7 +16577,7 @@
     "id": "P0527",
     "track": 27,
     "track_slug": "adult-engine",
-    "track_title": "Stash-derived adult engine integration and fork boundary",
+    "track_title": "Scene Tracker metadata integration, private scene domain and Jellyfin playback mapping",
     "priority": "P2",
     "focus": "frontend",
     "file": "docs/MediaForge/prompts/27-adult-engine/P0527_frontend.md",
@@ -16397,16 +16587,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/modules/adult-engine-target.md",
+      "docs/MediaForge/modules/adult-enhancement.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/unified-application.md"
     ],
     "source_paths": [
-      "engines/adult",
+      "app/Connectors/Sdk",
+      "app/Connectors/Jellyfin",
+      "app/Integrations/SceneTracker",
       "packages/contracts",
-      "services/media-tools"
+      "services/media-tools",
+      "docs/MediaForge/modules/adult-source-vault-and-local-provenance.md"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -16416,7 +16611,7 @@
     "id": "P0528",
     "track": 27,
     "track_slug": "adult-engine",
-    "track_title": "Stash-derived adult engine integration and fork boundary",
+    "track_title": "Scene Tracker metadata integration, private scene domain and Jellyfin playback mapping",
     "priority": "P2",
     "focus": "validation",
     "file": "docs/MediaForge/prompts/27-adult-engine/P0528_validation.md",
@@ -16426,16 +16621,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/modules/adult-engine-target.md",
+      "docs/MediaForge/modules/adult-enhancement.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/unified-application.md"
     ],
     "source_paths": [
-      "engines/adult",
+      "app/Connectors/Sdk",
+      "app/Connectors/Jellyfin",
+      "app/Integrations/SceneTracker",
       "packages/contracts",
-      "services/media-tools"
+      "services/media-tools",
+      "docs/MediaForge/modules/adult-source-vault-and-local-provenance.md"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -16445,7 +16645,7 @@
     "id": "P0529",
     "track": 27,
     "track_slug": "adult-engine",
-    "track_title": "Stash-derived adult engine integration and fork boundary",
+    "track_title": "Scene Tracker metadata integration, private scene domain and Jellyfin playback mapping",
     "priority": "P2",
     "focus": "security",
     "file": "docs/MediaForge/prompts/27-adult-engine/P0529_security.md",
@@ -16455,16 +16655,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/modules/adult-engine-target.md",
+      "docs/MediaForge/modules/adult-enhancement.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/unified-application.md"
     ],
     "source_paths": [
-      "engines/adult",
+      "app/Connectors/Sdk",
+      "app/Connectors/Jellyfin",
+      "app/Integrations/SceneTracker",
       "packages/contracts",
-      "services/media-tools"
+      "services/media-tools",
+      "docs/MediaForge/modules/adult-source-vault-and-local-provenance.md"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -16474,7 +16679,7 @@
     "id": "P0530",
     "track": 27,
     "track_slug": "adult-engine",
-    "track_title": "Stash-derived adult engine integration and fork boundary",
+    "track_title": "Scene Tracker metadata integration, private scene domain and Jellyfin playback mapping",
     "priority": "P2",
     "focus": "jobs",
     "file": "docs/MediaForge/prompts/27-adult-engine/P0530_jobs.md",
@@ -16484,16 +16689,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/modules/adult-engine-target.md",
+      "docs/MediaForge/modules/adult-enhancement.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/unified-application.md"
     ],
     "source_paths": [
-      "engines/adult",
+      "app/Connectors/Sdk",
+      "app/Connectors/Jellyfin",
+      "app/Integrations/SceneTracker",
       "packages/contracts",
-      "services/media-tools"
+      "services/media-tools",
+      "docs/MediaForge/modules/adult-source-vault-and-local-provenance.md"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -16503,7 +16713,7 @@
     "id": "P0531",
     "track": 27,
     "track_slug": "adult-engine",
-    "track_title": "Stash-derived adult engine integration and fork boundary",
+    "track_title": "Scene Tracker metadata integration, private scene domain and Jellyfin playback mapping",
     "priority": "P2",
     "focus": "realtime",
     "file": "docs/MediaForge/prompts/27-adult-engine/P0531_realtime.md",
@@ -16513,16 +16723,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/modules/adult-engine-target.md",
+      "docs/MediaForge/modules/adult-enhancement.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/unified-application.md"
     ],
     "source_paths": [
-      "engines/adult",
+      "app/Connectors/Sdk",
+      "app/Connectors/Jellyfin",
+      "app/Integrations/SceneTracker",
       "packages/contracts",
-      "services/media-tools"
+      "services/media-tools",
+      "docs/MediaForge/modules/adult-source-vault-and-local-provenance.md"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -16532,7 +16747,7 @@
     "id": "P0532",
     "track": 27,
     "track_slug": "adult-engine",
-    "track_title": "Stash-derived adult engine integration and fork boundary",
+    "track_title": "Scene Tracker metadata integration, private scene domain and Jellyfin playback mapping",
     "priority": "P2",
     "focus": "observability",
     "file": "docs/MediaForge/prompts/27-adult-engine/P0532_observability.md",
@@ -16542,16 +16757,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/modules/adult-engine-target.md",
+      "docs/MediaForge/modules/adult-enhancement.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/unified-application.md"
     ],
     "source_paths": [
-      "engines/adult",
+      "app/Connectors/Sdk",
+      "app/Connectors/Jellyfin",
+      "app/Integrations/SceneTracker",
       "packages/contracts",
-      "services/media-tools"
+      "services/media-tools",
+      "docs/MediaForge/modules/adult-source-vault-and-local-provenance.md"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -16561,7 +16781,7 @@
     "id": "P0533",
     "track": 27,
     "track_slug": "adult-engine",
-    "track_title": "Stash-derived adult engine integration and fork boundary",
+    "track_title": "Scene Tracker metadata integration, private scene domain and Jellyfin playback mapping",
     "priority": "P2",
     "focus": "migration",
     "file": "docs/MediaForge/prompts/27-adult-engine/P0533_migration.md",
@@ -16571,16 +16791,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/modules/adult-engine-target.md",
+      "docs/MediaForge/modules/adult-enhancement.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/unified-application.md"
     ],
     "source_paths": [
-      "engines/adult",
+      "app/Connectors/Sdk",
+      "app/Connectors/Jellyfin",
+      "app/Integrations/SceneTracker",
       "packages/contracts",
-      "services/media-tools"
+      "services/media-tools",
+      "docs/MediaForge/modules/adult-source-vault-and-local-provenance.md"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -16590,7 +16815,7 @@
     "id": "P0534",
     "track": 27,
     "track_slug": "adult-engine",
-    "track_title": "Stash-derived adult engine integration and fork boundary",
+    "track_title": "Scene Tracker metadata integration, private scene domain and Jellyfin playback mapping",
     "priority": "P2",
     "focus": "fixtures",
     "file": "docs/MediaForge/prompts/27-adult-engine/P0534_fixtures.md",
@@ -16600,16 +16825,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/modules/adult-engine-target.md",
+      "docs/MediaForge/modules/adult-enhancement.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/unified-application.md"
     ],
     "source_paths": [
-      "engines/adult",
+      "app/Connectors/Sdk",
+      "app/Connectors/Jellyfin",
+      "app/Integrations/SceneTracker",
       "packages/contracts",
-      "services/media-tools"
+      "services/media-tools",
+      "docs/MediaForge/modules/adult-source-vault-and-local-provenance.md"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -16619,7 +16849,7 @@
     "id": "P0535",
     "track": 27,
     "track_slug": "adult-engine",
-    "track_title": "Stash-derived adult engine integration and fork boundary",
+    "track_title": "Scene Tracker metadata integration, private scene domain and Jellyfin playback mapping",
     "priority": "P2",
     "focus": "unit-tests",
     "file": "docs/MediaForge/prompts/27-adult-engine/P0535_unit-tests.md",
@@ -16629,16 +16859,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/modules/adult-engine-target.md",
+      "docs/MediaForge/modules/adult-enhancement.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/unified-application.md"
     ],
     "source_paths": [
-      "engines/adult",
+      "app/Connectors/Sdk",
+      "app/Connectors/Jellyfin",
+      "app/Integrations/SceneTracker",
       "packages/contracts",
-      "services/media-tools"
+      "services/media-tools",
+      "docs/MediaForge/modules/adult-source-vault-and-local-provenance.md"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -16648,7 +16883,7 @@
     "id": "P0536",
     "track": 27,
     "track_slug": "adult-engine",
-    "track_title": "Stash-derived adult engine integration and fork boundary",
+    "track_title": "Scene Tracker metadata integration, private scene domain and Jellyfin playback mapping",
     "priority": "P2",
     "focus": "integration-tests",
     "file": "docs/MediaForge/prompts/27-adult-engine/P0536_integration-tests.md",
@@ -16658,16 +16893,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/modules/adult-engine-target.md",
+      "docs/MediaForge/modules/adult-enhancement.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/unified-application.md"
     ],
     "source_paths": [
-      "engines/adult",
+      "app/Connectors/Sdk",
+      "app/Connectors/Jellyfin",
+      "app/Integrations/SceneTracker",
       "packages/contracts",
-      "services/media-tools"
+      "services/media-tools",
+      "docs/MediaForge/modules/adult-source-vault-and-local-provenance.md"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -16677,7 +16917,7 @@
     "id": "P0537",
     "track": 27,
     "track_slug": "adult-engine",
-    "track_title": "Stash-derived adult engine integration and fork boundary",
+    "track_title": "Scene Tracker metadata integration, private scene domain and Jellyfin playback mapping",
     "priority": "P2",
     "focus": "e2e-tests",
     "file": "docs/MediaForge/prompts/27-adult-engine/P0537_e2e-tests.md",
@@ -16687,16 +16927,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/modules/adult-engine-target.md",
+      "docs/MediaForge/modules/adult-enhancement.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/unified-application.md"
     ],
     "source_paths": [
-      "engines/adult",
+      "app/Connectors/Sdk",
+      "app/Connectors/Jellyfin",
+      "app/Integrations/SceneTracker",
       "packages/contracts",
-      "services/media-tools"
+      "services/media-tools",
+      "docs/MediaForge/modules/adult-source-vault-and-local-provenance.md"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -16706,7 +16951,7 @@
     "id": "P0538",
     "track": 27,
     "track_slug": "adult-engine",
-    "track_title": "Stash-derived adult engine integration and fork boundary",
+    "track_title": "Scene Tracker metadata integration, private scene domain and Jellyfin playback mapping",
     "priority": "P2",
     "focus": "performance",
     "file": "docs/MediaForge/prompts/27-adult-engine/P0538_performance.md",
@@ -16716,16 +16961,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/modules/adult-engine-target.md",
+      "docs/MediaForge/modules/adult-enhancement.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/unified-application.md"
     ],
     "source_paths": [
-      "engines/adult",
+      "app/Connectors/Sdk",
+      "app/Connectors/Jellyfin",
+      "app/Integrations/SceneTracker",
       "packages/contracts",
-      "services/media-tools"
+      "services/media-tools",
+      "docs/MediaForge/modules/adult-source-vault-and-local-provenance.md"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -16735,7 +16985,7 @@
     "id": "P0539",
     "track": 27,
     "track_slug": "adult-engine",
-    "track_title": "Stash-derived adult engine integration and fork boundary",
+    "track_title": "Scene Tracker metadata integration, private scene domain and Jellyfin playback mapping",
     "priority": "P2",
     "focus": "docs",
     "file": "docs/MediaForge/prompts/27-adult-engine/P0539_docs.md",
@@ -16745,16 +16995,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/modules/adult-engine-target.md",
+      "docs/MediaForge/modules/adult-enhancement.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/unified-application.md"
     ],
     "source_paths": [
-      "engines/adult",
+      "app/Connectors/Sdk",
+      "app/Connectors/Jellyfin",
+      "app/Integrations/SceneTracker",
       "packages/contracts",
-      "services/media-tools"
+      "services/media-tools",
+      "docs/MediaForge/modules/adult-source-vault-and-local-provenance.md"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -16764,7 +17019,7 @@
     "id": "P0540",
     "track": 27,
     "track_slug": "adult-engine",
-    "track_title": "Stash-derived adult engine integration and fork boundary",
+    "track_title": "Scene Tracker metadata integration, private scene domain and Jellyfin playback mapping",
     "priority": "P2",
     "focus": "gate",
     "file": "docs/MediaForge/prompts/27-adult-engine/P0540_gate.md",
@@ -16774,16 +17029,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/modules/adult-engine-target.md",
+      "docs/MediaForge/modules/adult-enhancement.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/architecture/unified-application.md"
     ],
     "source_paths": [
-      "engines/adult",
+      "app/Connectors/Sdk",
+      "app/Connectors/Jellyfin",
+      "app/Integrations/SceneTracker",
       "packages/contracts",
-      "services/media-tools"
+      "services/media-tools",
+      "docs/MediaForge/modules/adult-source-vault-and-local-provenance.md"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -16793,7 +17053,7 @@
     "id": "P0541",
     "track": 28,
     "track_slug": "audio-engine",
-    "track_title": "Audiobookshelf-derived audio engine integration and fork boundary",
+    "track_title": "Audiobookshelf external audio/book/playback adapter and compatibility",
     "priority": "P2",
     "focus": "audit",
     "file": "docs/MediaForge/prompts/28-audio-engine/P0541_audit.md",
@@ -16803,16 +17063,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/modules/audiobook-chapters-and-storage.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/modules/books-ebooks-and-persistent-metadata.md",
+      "docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md"
     ],
     "source_paths": [
-      "engines/audio",
+      "app/Connectors/Audiobookshelf",
+      "app/Connectors/Sdk",
       "packages/contracts",
-      "apps/server/app/Domain/Audiobooks"
+      "apps/server/app/Domain/Audiobooks",
+      "platform/integrations",
+      "deploy/dev/docker-compose.yml"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -16822,7 +17087,7 @@
     "id": "P0542",
     "track": 28,
     "track_slug": "audio-engine",
-    "track_title": "Audiobookshelf-derived audio engine integration and fork boundary",
+    "track_title": "Audiobookshelf external audio/book/playback adapter and compatibility",
     "priority": "P2",
     "focus": "model",
     "file": "docs/MediaForge/prompts/28-audio-engine/P0542_model.md",
@@ -16832,16 +17097,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/modules/audiobook-chapters-and-storage.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/modules/books-ebooks-and-persistent-metadata.md",
+      "docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md"
     ],
     "source_paths": [
-      "engines/audio",
+      "app/Connectors/Audiobookshelf",
+      "app/Connectors/Sdk",
       "packages/contracts",
-      "apps/server/app/Domain/Audiobooks"
+      "apps/server/app/Domain/Audiobooks",
+      "platform/integrations",
+      "deploy/dev/docker-compose.yml"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -16851,7 +17121,7 @@
     "id": "P0543",
     "track": 28,
     "track_slug": "audio-engine",
-    "track_title": "Audiobookshelf-derived audio engine integration and fork boundary",
+    "track_title": "Audiobookshelf external audio/book/playback adapter and compatibility",
     "priority": "P2",
     "focus": "boundaries",
     "file": "docs/MediaForge/prompts/28-audio-engine/P0543_boundaries.md",
@@ -16861,16 +17131,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/modules/audiobook-chapters-and-storage.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/modules/books-ebooks-and-persistent-metadata.md",
+      "docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md"
     ],
     "source_paths": [
-      "engines/audio",
+      "app/Connectors/Audiobookshelf",
+      "app/Connectors/Sdk",
       "packages/contracts",
-      "apps/server/app/Domain/Audiobooks"
+      "apps/server/app/Domain/Audiobooks",
+      "platform/integrations",
+      "deploy/dev/docker-compose.yml"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -16880,7 +17155,7 @@
     "id": "P0544",
     "track": 28,
     "track_slug": "audio-engine",
-    "track_title": "Audiobookshelf-derived audio engine integration and fork boundary",
+    "track_title": "Audiobookshelf external audio/book/playback adapter and compatibility",
     "priority": "P2",
     "focus": "persistence",
     "file": "docs/MediaForge/prompts/28-audio-engine/P0544_persistence.md",
@@ -16890,16 +17165,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/modules/audiobook-chapters-and-storage.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/modules/books-ebooks-and-persistent-metadata.md",
+      "docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md"
     ],
     "source_paths": [
-      "engines/audio",
+      "app/Connectors/Audiobookshelf",
+      "app/Connectors/Sdk",
       "packages/contracts",
-      "apps/server/app/Domain/Audiobooks"
+      "apps/server/app/Domain/Audiobooks",
+      "platform/integrations",
+      "deploy/dev/docker-compose.yml"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -16909,7 +17189,7 @@
     "id": "P0545",
     "track": 28,
     "track_slug": "audio-engine",
-    "track_title": "Audiobookshelf-derived audio engine integration and fork boundary",
+    "track_title": "Audiobookshelf external audio/book/playback adapter and compatibility",
     "priority": "P2",
     "focus": "application",
     "file": "docs/MediaForge/prompts/28-audio-engine/P0545_application.md",
@@ -16919,16 +17199,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/modules/audiobook-chapters-and-storage.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/modules/books-ebooks-and-persistent-metadata.md",
+      "docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md"
     ],
     "source_paths": [
-      "engines/audio",
+      "app/Connectors/Audiobookshelf",
+      "app/Connectors/Sdk",
       "packages/contracts",
-      "apps/server/app/Domain/Audiobooks"
+      "apps/server/app/Domain/Audiobooks",
+      "platform/integrations",
+      "deploy/dev/docker-compose.yml"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -16938,7 +17223,7 @@
     "id": "P0546",
     "track": 28,
     "track_slug": "audio-engine",
-    "track_title": "Audiobookshelf-derived audio engine integration and fork boundary",
+    "track_title": "Audiobookshelf external audio/book/playback adapter and compatibility",
     "priority": "P2",
     "focus": "api",
     "file": "docs/MediaForge/prompts/28-audio-engine/P0546_api.md",
@@ -16948,16 +17233,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/modules/audiobook-chapters-and-storage.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/modules/books-ebooks-and-persistent-metadata.md",
+      "docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md"
     ],
     "source_paths": [
-      "engines/audio",
+      "app/Connectors/Audiobookshelf",
+      "app/Connectors/Sdk",
       "packages/contracts",
-      "apps/server/app/Domain/Audiobooks"
+      "apps/server/app/Domain/Audiobooks",
+      "platform/integrations",
+      "deploy/dev/docker-compose.yml"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -16967,7 +17257,7 @@
     "id": "P0547",
     "track": 28,
     "track_slug": "audio-engine",
-    "track_title": "Audiobookshelf-derived audio engine integration and fork boundary",
+    "track_title": "Audiobookshelf external audio/book/playback adapter and compatibility",
     "priority": "P2",
     "focus": "frontend",
     "file": "docs/MediaForge/prompts/28-audio-engine/P0547_frontend.md",
@@ -16977,16 +17267,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/modules/audiobook-chapters-and-storage.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/modules/books-ebooks-and-persistent-metadata.md",
+      "docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md"
     ],
     "source_paths": [
-      "engines/audio",
+      "app/Connectors/Audiobookshelf",
+      "app/Connectors/Sdk",
       "packages/contracts",
-      "apps/server/app/Domain/Audiobooks"
+      "apps/server/app/Domain/Audiobooks",
+      "platform/integrations",
+      "deploy/dev/docker-compose.yml"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -16996,7 +17291,7 @@
     "id": "P0548",
     "track": 28,
     "track_slug": "audio-engine",
-    "track_title": "Audiobookshelf-derived audio engine integration and fork boundary",
+    "track_title": "Audiobookshelf external audio/book/playback adapter and compatibility",
     "priority": "P2",
     "focus": "validation",
     "file": "docs/MediaForge/prompts/28-audio-engine/P0548_validation.md",
@@ -17006,16 +17301,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/modules/audiobook-chapters-and-storage.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/modules/books-ebooks-and-persistent-metadata.md",
+      "docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md"
     ],
     "source_paths": [
-      "engines/audio",
+      "app/Connectors/Audiobookshelf",
+      "app/Connectors/Sdk",
       "packages/contracts",
-      "apps/server/app/Domain/Audiobooks"
+      "apps/server/app/Domain/Audiobooks",
+      "platform/integrations",
+      "deploy/dev/docker-compose.yml"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -17025,7 +17325,7 @@
     "id": "P0549",
     "track": 28,
     "track_slug": "audio-engine",
-    "track_title": "Audiobookshelf-derived audio engine integration and fork boundary",
+    "track_title": "Audiobookshelf external audio/book/playback adapter and compatibility",
     "priority": "P2",
     "focus": "security",
     "file": "docs/MediaForge/prompts/28-audio-engine/P0549_security.md",
@@ -17035,16 +17335,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/modules/audiobook-chapters-and-storage.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/modules/books-ebooks-and-persistent-metadata.md",
+      "docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md"
     ],
     "source_paths": [
-      "engines/audio",
+      "app/Connectors/Audiobookshelf",
+      "app/Connectors/Sdk",
       "packages/contracts",
-      "apps/server/app/Domain/Audiobooks"
+      "apps/server/app/Domain/Audiobooks",
+      "platform/integrations",
+      "deploy/dev/docker-compose.yml"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -17054,7 +17359,7 @@
     "id": "P0550",
     "track": 28,
     "track_slug": "audio-engine",
-    "track_title": "Audiobookshelf-derived audio engine integration and fork boundary",
+    "track_title": "Audiobookshelf external audio/book/playback adapter and compatibility",
     "priority": "P2",
     "focus": "jobs",
     "file": "docs/MediaForge/prompts/28-audio-engine/P0550_jobs.md",
@@ -17064,16 +17369,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/modules/audiobook-chapters-and-storage.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/modules/books-ebooks-and-persistent-metadata.md",
+      "docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md"
     ],
     "source_paths": [
-      "engines/audio",
+      "app/Connectors/Audiobookshelf",
+      "app/Connectors/Sdk",
       "packages/contracts",
-      "apps/server/app/Domain/Audiobooks"
+      "apps/server/app/Domain/Audiobooks",
+      "platform/integrations",
+      "deploy/dev/docker-compose.yml"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -17083,7 +17393,7 @@
     "id": "P0551",
     "track": 28,
     "track_slug": "audio-engine",
-    "track_title": "Audiobookshelf-derived audio engine integration and fork boundary",
+    "track_title": "Audiobookshelf external audio/book/playback adapter and compatibility",
     "priority": "P2",
     "focus": "realtime",
     "file": "docs/MediaForge/prompts/28-audio-engine/P0551_realtime.md",
@@ -17093,16 +17403,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/modules/audiobook-chapters-and-storage.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/modules/books-ebooks-and-persistent-metadata.md",
+      "docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md"
     ],
     "source_paths": [
-      "engines/audio",
+      "app/Connectors/Audiobookshelf",
+      "app/Connectors/Sdk",
       "packages/contracts",
-      "apps/server/app/Domain/Audiobooks"
+      "apps/server/app/Domain/Audiobooks",
+      "platform/integrations",
+      "deploy/dev/docker-compose.yml"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -17112,7 +17427,7 @@
     "id": "P0552",
     "track": 28,
     "track_slug": "audio-engine",
-    "track_title": "Audiobookshelf-derived audio engine integration and fork boundary",
+    "track_title": "Audiobookshelf external audio/book/playback adapter and compatibility",
     "priority": "P2",
     "focus": "observability",
     "file": "docs/MediaForge/prompts/28-audio-engine/P0552_observability.md",
@@ -17122,16 +17437,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/modules/audiobook-chapters-and-storage.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/modules/books-ebooks-and-persistent-metadata.md",
+      "docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md"
     ],
     "source_paths": [
-      "engines/audio",
+      "app/Connectors/Audiobookshelf",
+      "app/Connectors/Sdk",
       "packages/contracts",
-      "apps/server/app/Domain/Audiobooks"
+      "apps/server/app/Domain/Audiobooks",
+      "platform/integrations",
+      "deploy/dev/docker-compose.yml"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -17141,7 +17461,7 @@
     "id": "P0553",
     "track": 28,
     "track_slug": "audio-engine",
-    "track_title": "Audiobookshelf-derived audio engine integration and fork boundary",
+    "track_title": "Audiobookshelf external audio/book/playback adapter and compatibility",
     "priority": "P2",
     "focus": "migration",
     "file": "docs/MediaForge/prompts/28-audio-engine/P0553_migration.md",
@@ -17151,16 +17471,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/modules/audiobook-chapters-and-storage.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/modules/books-ebooks-and-persistent-metadata.md",
+      "docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md"
     ],
     "source_paths": [
-      "engines/audio",
+      "app/Connectors/Audiobookshelf",
+      "app/Connectors/Sdk",
       "packages/contracts",
-      "apps/server/app/Domain/Audiobooks"
+      "apps/server/app/Domain/Audiobooks",
+      "platform/integrations",
+      "deploy/dev/docker-compose.yml"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -17170,7 +17495,7 @@
     "id": "P0554",
     "track": 28,
     "track_slug": "audio-engine",
-    "track_title": "Audiobookshelf-derived audio engine integration and fork boundary",
+    "track_title": "Audiobookshelf external audio/book/playback adapter and compatibility",
     "priority": "P2",
     "focus": "fixtures",
     "file": "docs/MediaForge/prompts/28-audio-engine/P0554_fixtures.md",
@@ -17180,16 +17505,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/modules/audiobook-chapters-and-storage.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/modules/books-ebooks-and-persistent-metadata.md",
+      "docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md"
     ],
     "source_paths": [
-      "engines/audio",
+      "app/Connectors/Audiobookshelf",
+      "app/Connectors/Sdk",
       "packages/contracts",
-      "apps/server/app/Domain/Audiobooks"
+      "apps/server/app/Domain/Audiobooks",
+      "platform/integrations",
+      "deploy/dev/docker-compose.yml"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -17199,7 +17529,7 @@
     "id": "P0555",
     "track": 28,
     "track_slug": "audio-engine",
-    "track_title": "Audiobookshelf-derived audio engine integration and fork boundary",
+    "track_title": "Audiobookshelf external audio/book/playback adapter and compatibility",
     "priority": "P2",
     "focus": "unit-tests",
     "file": "docs/MediaForge/prompts/28-audio-engine/P0555_unit-tests.md",
@@ -17209,16 +17539,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/modules/audiobook-chapters-and-storage.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/modules/books-ebooks-and-persistent-metadata.md",
+      "docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md"
     ],
     "source_paths": [
-      "engines/audio",
+      "app/Connectors/Audiobookshelf",
+      "app/Connectors/Sdk",
       "packages/contracts",
-      "apps/server/app/Domain/Audiobooks"
+      "apps/server/app/Domain/Audiobooks",
+      "platform/integrations",
+      "deploy/dev/docker-compose.yml"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -17228,7 +17563,7 @@
     "id": "P0556",
     "track": 28,
     "track_slug": "audio-engine",
-    "track_title": "Audiobookshelf-derived audio engine integration and fork boundary",
+    "track_title": "Audiobookshelf external audio/book/playback adapter and compatibility",
     "priority": "P2",
     "focus": "integration-tests",
     "file": "docs/MediaForge/prompts/28-audio-engine/P0556_integration-tests.md",
@@ -17238,16 +17573,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/modules/audiobook-chapters-and-storage.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/modules/books-ebooks-and-persistent-metadata.md",
+      "docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md"
     ],
     "source_paths": [
-      "engines/audio",
+      "app/Connectors/Audiobookshelf",
+      "app/Connectors/Sdk",
       "packages/contracts",
-      "apps/server/app/Domain/Audiobooks"
+      "apps/server/app/Domain/Audiobooks",
+      "platform/integrations",
+      "deploy/dev/docker-compose.yml"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -17257,7 +17597,7 @@
     "id": "P0557",
     "track": 28,
     "track_slug": "audio-engine",
-    "track_title": "Audiobookshelf-derived audio engine integration and fork boundary",
+    "track_title": "Audiobookshelf external audio/book/playback adapter and compatibility",
     "priority": "P2",
     "focus": "e2e-tests",
     "file": "docs/MediaForge/prompts/28-audio-engine/P0557_e2e-tests.md",
@@ -17267,16 +17607,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/modules/audiobook-chapters-and-storage.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/modules/books-ebooks-and-persistent-metadata.md",
+      "docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md"
     ],
     "source_paths": [
-      "engines/audio",
+      "app/Connectors/Audiobookshelf",
+      "app/Connectors/Sdk",
       "packages/contracts",
-      "apps/server/app/Domain/Audiobooks"
+      "apps/server/app/Domain/Audiobooks",
+      "platform/integrations",
+      "deploy/dev/docker-compose.yml"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -17286,7 +17631,7 @@
     "id": "P0558",
     "track": 28,
     "track_slug": "audio-engine",
-    "track_title": "Audiobookshelf-derived audio engine integration and fork boundary",
+    "track_title": "Audiobookshelf external audio/book/playback adapter and compatibility",
     "priority": "P2",
     "focus": "performance",
     "file": "docs/MediaForge/prompts/28-audio-engine/P0558_performance.md",
@@ -17296,16 +17641,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/modules/audiobook-chapters-and-storage.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/modules/books-ebooks-and-persistent-metadata.md",
+      "docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md"
     ],
     "source_paths": [
-      "engines/audio",
+      "app/Connectors/Audiobookshelf",
+      "app/Connectors/Sdk",
       "packages/contracts",
-      "apps/server/app/Domain/Audiobooks"
+      "apps/server/app/Domain/Audiobooks",
+      "platform/integrations",
+      "deploy/dev/docker-compose.yml"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -17315,7 +17665,7 @@
     "id": "P0559",
     "track": 28,
     "track_slug": "audio-engine",
-    "track_title": "Audiobookshelf-derived audio engine integration and fork boundary",
+    "track_title": "Audiobookshelf external audio/book/playback adapter and compatibility",
     "priority": "P2",
     "focus": "docs",
     "file": "docs/MediaForge/prompts/28-audio-engine/P0559_docs.md",
@@ -17325,16 +17675,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/modules/audiobook-chapters-and-storage.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/modules/books-ebooks-and-persistent-metadata.md",
+      "docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md"
     ],
     "source_paths": [
-      "engines/audio",
+      "app/Connectors/Audiobookshelf",
+      "app/Connectors/Sdk",
       "packages/contracts",
-      "apps/server/app/Domain/Audiobooks"
+      "apps/server/app/Domain/Audiobooks",
+      "platform/integrations",
+      "deploy/dev/docker-compose.yml"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
@@ -17344,7 +17699,7 @@
     "id": "P0560",
     "track": 28,
     "track_slug": "audio-engine",
-    "track_title": "Audiobookshelf-derived audio engine integration and fork boundary",
+    "track_title": "Audiobookshelf external audio/book/playback adapter and compatibility",
     "priority": "P2",
     "focus": "gate",
     "file": "docs/MediaForge/prompts/28-audio-engine/P0560_gate.md",
@@ -17354,16 +17709,21 @@
       "P0120"
     ],
     "required_reads": [
+      "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+      "docs/MediaForge/adr/0028-external-specialist-services-via-adapters.md",
       "docs/MediaForge/architecture/engine-contracts.md",
-      "docs/MediaForge/architecture/target-monorepo.md",
+      "docs/MediaForge/architecture/postgresql-source-of-truth.md",
       "docs/MediaForge/modules/audiobook-chapters-and-storage.md",
-      "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
-      "docs/MediaForge/adr/0025-managed-upstream-backends.md"
+      "docs/MediaForge/modules/books-ebooks-and-persistent-metadata.md",
+      "docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md"
     ],
     "source_paths": [
-      "engines/audio",
+      "app/Connectors/Audiobookshelf",
+      "app/Connectors/Sdk",
       "packages/contracts",
-      "apps/server/app/Domain/Audiobooks"
+      "apps/server/app/Domain/Audiobooks",
+      "platform/integrations",
+      "deploy/dev/docker-compose.yml"
     ],
     "ui_refs": [
       "docs/MediaForge/ui-ux/reference-expanded/68_backend_capabilities_acquisition_overview.png"
