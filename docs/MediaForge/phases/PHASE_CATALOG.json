@@ -1,0 +1,3069 @@
+{
+  "version": 1,
+  "system": "MediaForge milestone execution plan",
+  "active_from": "2026-09-27",
+  "current_unit": "M2.1",
+  "legacy_prompt_system": "docs/MediaForge/prompts/",
+  "rules": "docs/MediaForge/phases/EXECUTION_RULES.md",
+  "test_strategy": "docs/MediaForge/phases/TEST_STRATEGY.md",
+  "test_profiles": {
+    "docs": [
+      "Validate links/authority references and run git diff --check."
+    ],
+    "python": [
+      "Run focused Python unit tests plus malformed-input and deterministic-rerun cases."
+    ],
+    "php": [
+      "Run focused Pest tests, PHPStan at project max level, and Pint/check for touched PHP."
+    ],
+    "ts": [
+      "Run TypeScript type-check, relevant unit/component tests and build when shared frontend code changes."
+    ],
+    "db": [
+      "Test constraints/transactions against PostgreSQL, including representative invalid rows."
+    ],
+    "migration": [
+      "Prove fresh migration and upgrade from the previous real schema; rollback/forward-fix where practical."
+    ],
+    "api": [
+      "Test authenticated/unauthenticated/unauthorized, validation, not-found and failure responses."
+    ],
+    "ui": [
+      "Test loading, empty, error, disabled and responsive states; use real references when specified."
+    ],
+    "a11y": [
+      "Test keyboard/focus and relevant accessibility; include TV/remote focus where applicable."
+    ],
+    "e2e": [
+      "Run representative browser/client E2E through the real public boundary."
+    ],
+    "contract": [
+      "Run schema/contract compatibility checks and reject silent breaking changes."
+    ],
+    "integration": [
+      "Run the smallest real integration path across touched boundaries, including failure recovery."
+    ],
+    "security": [
+      "Add negative/adversarial tests for authorization, malformed input, secrets/privacy leakage and unsafe fallbacks."
+    ],
+    "adult": [
+      "Test locked/unlocked behavior and zero existence/data leakage through all relevant surfaces."
+    ],
+    "adapter": [
+      "Use versioned fixtures; test auth, pagination, malformed responses, unsupported capabilities, timeout/outage and resync."
+    ],
+    "files": [
+      "Use temp fixtures; test rename/move/retry/duplicate behavior and prove originals stay safe."
+    ],
+    "jobs": [
+      "Test idempotency, duplicate execution, retry/backoff, cancellation, crash/restart and checkpoints."
+    ],
+    "realtime": [
+      "Test reconnect, duplicate/out-of-order delivery, stale state and realtime authorization."
+    ],
+    "playback": [
+      "Test direct play/remux/transcode or equivalent decisions, sessions, tracks, progress and degraded states."
+    ],
+    "perf": [
+      "Measure relevant query count/latency/memory/throughput on representative bounded fixtures."
+    ],
+    "rust": [
+      "Run cargo test plus clippy/format and native failure-boundary tests when applicable."
+    ],
+    "ai": [
+      "Test provider absence, model/version/provenance, resource limits and privacy boundaries."
+    ],
+    "release": [
+      "Test clean install, upgrade, rollback/forward-fix, artifact integrity and compatibility metadata."
+    ]
+  },
+  "milestones": [
+    {
+      "id": "M1",
+      "title": "Governance, architecture and execution foundation",
+      "status": "done",
+      "legacy_tracks": [
+        1
+      ],
+      "required_reads": [
+        "docs/MediaForge/CURRENT_PHASE.md",
+        "docs/MediaForge/architecture/external-specialist-services-and-adapters.md",
+        "docs/MediaForge/architecture/green-commit-workflow.md"
+      ],
+      "source_hints": [
+        "tools/phases",
+        "tools/prompts",
+        "docs/MediaForge/phases"
+      ],
+      "units": [
+        {
+          "id": "M1.1",
+          "title": "Repository baseline and governance contracts",
+          "goal": "Establish repository authority, deterministic governance checks and execution discipline without product-scope creep.",
+          "status": "done",
+          "complexity": "medium",
+          "recommended_bundle_max": 2,
+          "gate": false,
+          "depends_on": [],
+          "test_profiles": [
+            "python",
+            "contract"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M1.2",
+          "title": "Governance security, runtime and observability hardening",
+          "goal": "Fail closed on malformed governance input, keep reruns idempotent and expose deterministic health/runtime semantics.",
+          "status": "done",
+          "complexity": "hard",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M1.1"
+          ],
+          "test_profiles": [
+            "python",
+            "security",
+            "contract"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M1.3",
+          "title": "Adapter-first architecture and milestone execution migration",
+          "goal": "Adopt versioned external-service adapters and replace the active 720-prompt workflow with the milestone/subphase system while preserving legacy requirements.",
+          "status": "done",
+          "complexity": "hard",
+          "recommended_bundle_max": 1,
+          "gate": true,
+          "depends_on": [
+            "M1.2"
+          ],
+          "test_profiles": [
+            "docs",
+            "contract",
+            "python"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M2",
+      "title": "Platform, monorepo, API and frontend transition",
+      "status": "current",
+      "legacy_tracks": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "required_reads": [
+        "docs/MediaForge/architecture/target-monorepo.md",
+        "docs/MediaForge/architecture/frontend-framework.md",
+        "docs/MediaForge/architecture/external-specialist-services-and-adapters.md"
+      ],
+      "source_hints": [
+        "composer.json",
+        "package.json",
+        "routes",
+        "app",
+        "resources/js",
+        "deploy/dev",
+        "packages/contracts"
+      ],
+      "units": [
+        {
+          "id": "M2.1",
+          "title": "Target root layout and compatibility scaffolding",
+          "goal": "Introduce target workspace seams and developer commands incrementally while the current app continues to build and run.",
+          "status": "current",
+          "complexity": "medium",
+          "recommended_bundle_max": 2,
+          "gate": false,
+          "depends_on": [
+            "M1.3"
+          ],
+          "test_profiles": [
+            "php",
+            "ts",
+            "contract"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M2.2",
+          "title": "Laravel server relocation",
+          "goal": "Relocate Laravel toward apps/server with path/config/build compatibility and no behavior regression.",
+          "status": "planned",
+          "complexity": "hard",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M2.1"
+          ],
+          "test_profiles": [
+            "php",
+            "db",
+            "integration"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M2.3",
+          "title": "React web relocation",
+          "goal": "Relocate React/TypeScript toward apps/web while preserving UI, assets and build behavior.",
+          "status": "planned",
+          "complexity": "hard",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M2.2"
+          ],
+          "test_profiles": [
+            "ts",
+            "ui",
+            "integration"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M2.4",
+          "title": "MediaForge API v1 boundary",
+          "goal": "Create the stable API/BFF boundary over existing domain services with versioning, auth, errors and pagination.",
+          "status": "planned",
+          "complexity": "hard",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M2.3"
+          ],
+          "test_profiles": [
+            "php",
+            "api",
+            "security",
+            "contract"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M2.5",
+          "title": "React Router migration and Inertia retirement",
+          "goal": "Move visible routing/data loading to React Router Framework Mode + API without deleting working Inertia flows until replacements are proven.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M2.4"
+          ],
+          "test_profiles": [
+            "ts",
+            "ui",
+            "api",
+            "e2e"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M2.6",
+          "title": "OpenAPI, schemas and generated client contracts",
+          "goal": "Make API/event contracts machine-readable, generated and drift-tested across server/clients.",
+          "status": "planned",
+          "complexity": "hard",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M2.5"
+          ],
+          "test_profiles": [
+            "contract",
+            "php",
+            "ts",
+            "api"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M2.7",
+          "title": "Platform transition gate",
+          "goal": "Prove clean install, builds, route/API parity, architecture boundaries and V1/V2 regression safety.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": true,
+          "depends_on": [
+            "M2.6"
+          ],
+          "test_profiles": [
+            "php",
+            "ts",
+            "api",
+            "ui",
+            "e2e",
+            "perf"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M3",
+      "title": "Canonical PostgreSQL media model",
+      "status": "planned",
+      "legacy_tracks": [
+        8,
+        12,
+        32
+      ],
+      "required_reads": [
+        "docs/MediaForge/architecture/postgresql-source-of-truth.md",
+        "docs/MediaForge/database/core-schema.md",
+        "docs/MediaForge/modules/media-editions-and-lineage.md"
+      ],
+      "source_hints": [
+        "database/migrations",
+        "app/Models",
+        "app/Domain"
+      ],
+      "units": [
+        {
+          "id": "M3.1",
+          "title": "Canonical identity and ownership boundaries",
+          "goal": "Formalize MediaForge-owned state versus upstream-owned runtime state; external IDs remain mappings.",
+          "status": "planned",
+          "complexity": "medium",
+          "recommended_bundle_max": 2,
+          "gate": false,
+          "depends_on": [
+            "M2.7"
+          ],
+          "test_profiles": [
+            "db",
+            "contract"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M3.2",
+          "title": "Work and MediaItem semantics",
+          "goal": "Define and implement Work versus MediaItem semantics without duplicating existing V2 records.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M3.1"
+          ],
+          "test_profiles": [
+            "db",
+            "php",
+            "migration"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M3.3",
+          "title": "Edition, File and FileLocation model",
+          "goal": "Separate work/edition identity from physical file identity and mutable locations so rename/move preserves state.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M3.2"
+          ],
+          "test_profiles": [
+            "db",
+            "php",
+            "files",
+            "migration"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M3.4",
+          "title": "External mappings and source facts",
+          "goal": "Unify mappings, source facts, provenance, manual locks and availability history around canonical IDs.",
+          "status": "planned",
+          "complexity": "hard",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M3.3"
+          ],
+          "test_profiles": [
+            "db",
+            "php",
+            "contract"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M3.5",
+          "title": "Migration and backfill of existing V1/V2 data",
+          "goal": "Backfill target structures from the real alpha schema with deterministic restart-safe migrations.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M3.4"
+          ],
+          "test_profiles": [
+            "db",
+            "migration",
+            "php"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M3.6",
+          "title": "Constraints, indexes and query budgets",
+          "goal": "Enforce invariants in PostgreSQL and prove bounded indexed behavior on representative data.",
+          "status": "planned",
+          "complexity": "hard",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M3.5"
+          ],
+          "test_profiles": [
+            "db",
+            "perf",
+            "php"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M3.7",
+          "title": "Canonical model gate",
+          "goal": "Run fresh/upgrade/constraint/concurrency/backfill/query tests before higher-level domains depend on the model.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": true,
+          "depends_on": [
+            "M3.6"
+          ],
+          "test_profiles": [
+            "db",
+            "migration",
+            "integration",
+            "perf",
+            "contract"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M4",
+      "title": "Security, authentication and privacy foundation",
+      "status": "planned",
+      "legacy_tracks": [
+        9
+      ],
+      "required_reads": [
+        "docs/MediaForge/architecture/security.md",
+        "docs/MediaForge/architecture/postgresql-source-of-truth.md"
+      ],
+      "source_hints": [
+        "app/Policies",
+        "app/Http",
+        "app/Services",
+        "routes"
+      ],
+      "units": [
+        {
+          "id": "M4.1",
+          "title": "Authentication, roles and policy boundaries",
+          "goal": "Harden sessions, roles, policies and API authentication so every protected operation has a server-side decision.",
+          "status": "planned",
+          "complexity": "hard",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M3.7"
+          ],
+          "test_profiles": [
+            "php",
+            "api",
+            "security"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M4.2",
+          "title": "Secrets, request hardening and privacy isolation",
+          "goal": "Harden secret storage, validation, redaction, abuse boundaries and privacy isolation including the Adult Zero Leak foundation.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M4.1"
+          ],
+          "test_profiles": [
+            "security",
+            "php",
+            "api",
+            "adult"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M4.3",
+          "title": "Security regression gate",
+          "goal": "Prove auth-bypass resistance, object authorization, malformed-input handling, redaction and privacy behavior.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": true,
+          "depends_on": [
+            "M4.2"
+          ],
+          "test_profiles": [
+            "security",
+            "api",
+            "integration",
+            "e2e"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M5",
+      "title": "Design system, application shell and global discovery",
+      "status": "planned",
+      "legacy_tracks": [
+        10,
+        11
+      ],
+      "required_reads": [
+        "docs/MediaForge/ui-ux/design-system.md",
+        "docs/MediaForge/ui-ux/FEATURE_SCREEN_SPECIFICATIONS.md"
+      ],
+      "source_hints": [
+        "resources/js",
+        "packages/ui-web"
+      ],
+      "units": [
+        {
+          "id": "M5.1",
+          "title": "Design tokens and reusable UI primitives",
+          "goal": "Consolidate authored MediaForge visual tokens and reusable media/product primitives without generic generated-dashboard styling.",
+          "status": "planned",
+          "complexity": "medium",
+          "recommended_bundle_max": 2,
+          "gate": false,
+          "depends_on": [
+            "M4.3"
+          ],
+          "test_profiles": [
+            "ts",
+            "ui"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M5.2",
+          "title": "App shell, navigation and responsive behavior",
+          "goal": "Implement durable shell/navigation for desktop, touch and future 10-foot interaction with consistent system states.",
+          "status": "planned",
+          "complexity": "hard",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M5.1"
+          ],
+          "test_profiles": [
+            "ts",
+            "ui",
+            "a11y"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M5.3",
+          "title": "Home, unified search and collections foundation",
+          "goal": "Create home/search/collection experiences against canonical MediaForge APIs and IDs.",
+          "status": "planned",
+          "complexity": "hard",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M5.2"
+          ],
+          "test_profiles": [
+            "ts",
+            "ui",
+            "api",
+            "e2e"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M5.4",
+          "title": "Visual, accessibility and interaction gate",
+          "goal": "Run reference, responsive, keyboard/focus, empty/loading/error and browser E2E checks.",
+          "status": "planned",
+          "complexity": "hard",
+          "recommended_bundle_max": 1,
+          "gate": true,
+          "depends_on": [
+            "M5.3"
+          ],
+          "test_profiles": [
+            "ui",
+            "a11y",
+            "e2e",
+            "perf"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M6",
+      "title": "Library, files, metadata vault and review",
+      "status": "planned",
+      "legacy_tracks": [
+        12,
+        13
+      ],
+      "required_reads": [
+        "docs/MediaForge/modules/media-editions-and-lineage.md",
+        "docs/MediaForge/modules/review-system.md",
+        "docs/MediaForge/architecture/postgresql-source-of-truth.md"
+      ],
+      "source_hints": [
+        "app/Domain",
+        "app/Actions",
+        "database/migrations"
+      ],
+      "units": [
+        {
+          "id": "M6.1",
+          "title": "Library roots, discovery and non-destructive inventory",
+          "goal": "Model storage roots and inventory files without destructive mutation while preserving existing connector catalog behavior.",
+          "status": "planned",
+          "complexity": "hard",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M5.4"
+          ],
+          "test_profiles": [
+            "php",
+            "db",
+            "files"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M6.2",
+          "title": "Stable file identity and relocation reconciliation",
+          "goal": "Reconcile rename/move/root changes using controlled identity, hashes/fingerprints and Review for ambiguity.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M6.1"
+          ],
+          "test_profiles": [
+            "files",
+            "db",
+            "php",
+            "migration"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M6.3",
+          "title": "Metadata source facts, provenance and manual locks",
+          "goal": "Persist field-level source facts/history and canonical choices so refresh cannot erase curated data.",
+          "status": "planned",
+          "complexity": "hard",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M6.2"
+          ],
+          "test_profiles": [
+            "db",
+            "php",
+            "contract"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M6.4",
+          "title": "Matching, duplicate detection and Review workflows",
+          "goal": "Improve deterministic matching/deduplication while routing ambiguous identity/merge cases to human review.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M6.3"
+          ],
+          "test_profiles": [
+            "php",
+            "db",
+            "integration"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M6.5",
+          "title": "Library health, repair and safe mutation previews",
+          "goal": "Surface missing files/broken mappings and preview authorized rename/move/repair operations.",
+          "status": "planned",
+          "complexity": "hard",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M6.4"
+          ],
+          "test_profiles": [
+            "php",
+            "files",
+            "ui",
+            "security"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M6.6",
+          "title": "Library and metadata gate",
+          "goal": "Prove move/rename survival, idempotent rescans, source disappearance, ambiguity handling and large-library behavior.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": true,
+          "depends_on": [
+            "M6.5"
+          ],
+          "test_profiles": [
+            "files",
+            "db",
+            "integration",
+            "e2e",
+            "perf"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M7",
+      "title": "Acquisition, downloads and safe import",
+      "status": "planned",
+      "legacy_tracks": [
+        14,
+        15
+      ],
+      "required_reads": [
+        "docs/MediaForge/modules/acquisition-center.md",
+        "docs/MediaForge/modules/acquisition-automation-and-postprocessing.md",
+        "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md"
+      ],
+      "source_hints": [
+        "app/Acquisition",
+        "app/Connectors",
+        "platform/managed-upstreams"
+      ],
+      "units": [
+        {
+          "id": "M7.1",
+          "title": "Acquisition domain and provider abstraction",
+          "goal": "Model requests, wanted state, candidates, releases, provenance and provider capabilities without hard-coded site lists.",
+          "status": "planned",
+          "complexity": "hard",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M6.6"
+          ],
+          "test_profiles": [
+            "php",
+            "db",
+            "contract"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M7.2",
+          "title": "Prowlarr and provider integration",
+          "goal": "Integrate permitted provider/indexer discovery behind bounded capability contracts and sanitized failures.",
+          "status": "planned",
+          "complexity": "hard",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M7.1"
+          ],
+          "test_profiles": [
+            "adapter",
+            "api",
+            "security"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M7.3",
+          "title": "NZBGet download adapter and authored UI",
+          "goal": "Integrate NZBGet as target Usenet backend while MediaForge owns queue state/actions/normal UX.",
+          "status": "planned",
+          "complexity": "hard",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M7.2"
+          ],
+          "test_profiles": [
+            "adapter",
+            "api",
+            "ui",
+            "jobs"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M7.4",
+          "title": "qBittorrent adapter and seeding-safe lifecycle",
+          "goal": "Integrate torrent/magnet intake with explicit seeding and safe pause/remove semantics.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M7.3"
+          ],
+          "test_profiles": [
+            "adapter",
+            "api",
+            "security",
+            "jobs"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M7.5",
+          "title": "Staging, import sandbox and filesystem plan",
+          "goal": "Validate payloads in staging and create previewable naming/move/hardlink/import plans before touching libraries.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M7.4"
+          ],
+          "test_profiles": [
+            "files",
+            "db",
+            "security",
+            "php"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M7.6",
+          "title": "Post-processing, provenance and resumability",
+          "goal": "Execute approved imports/post-processing as restartable idempotent steps with lineage and checkpoints.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M7.5"
+          ],
+          "test_profiles": [
+            "jobs",
+            "files",
+            "db",
+            "integration"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M7.7",
+          "title": "Acquisition end-to-end gate",
+          "goal": "Exercise provider-to-download-to-staging-to-import failures, retries, seeding, dedupe and security.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": true,
+          "depends_on": [
+            "M7.6"
+          ],
+          "test_profiles": [
+            "integration",
+            "e2e",
+            "jobs",
+            "files",
+            "security",
+            "perf"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M8",
+      "title": "Unified playback and Jellyfin integration",
+      "status": "planned",
+      "legacy_tracks": [
+        16,
+        26
+      ],
+      "required_reads": [
+        "docs/MediaForge/architecture/engine-contracts.md",
+        "docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md",
+        "docs/MediaForge/architecture/external-specialist-services-and-adapters.md"
+      ],
+      "source_hints": [
+        "app/Connectors/Jellyfin",
+        "app/Connectors/Sdk",
+        "packages/contracts",
+        "resources/js"
+      ],
+      "units": [
+        {
+          "id": "M8.1",
+          "title": "Playback session and stream-routing domain",
+          "goal": "Define MediaForge playback/session/device/resume contracts without proxying bulk media through Laravel.",
+          "status": "planned",
+          "complexity": "hard",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M7.7"
+          ],
+          "test_profiles": [
+            "php",
+            "api",
+            "contract",
+            "playback"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M8.2",
+          "title": "Jellyfin version, health and capability negotiation",
+          "goal": "Detect Jellyfin version/capabilities with explicit compatibility state and fixtures.",
+          "status": "planned",
+          "complexity": "hard",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M8.1"
+          ],
+          "test_profiles": [
+            "adapter",
+            "contract",
+            "security"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M8.3",
+          "title": "Richer Jellyfin catalog and technical-media mirror",
+          "goal": "Synchronize artwork/codec/stream/edition/technical facts into bounded local projections.",
+          "status": "planned",
+          "complexity": "hard",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M8.2"
+          ],
+          "test_profiles": [
+            "adapter",
+            "db",
+            "integration",
+            "perf"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M8.4",
+          "title": "Direct play, remux and transcode preparation",
+          "goal": "Translate MediaForge/client intent into Jellyfin playback decisions with explicit degraded states.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M8.3"
+          ],
+          "test_profiles": [
+            "adapter",
+            "playback",
+            "api",
+            "contract"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M8.5",
+          "title": "Tracks, subtitles, device profiles and audio policy",
+          "goal": "Integrate track/subtitle/device capabilities and MediaForge audio policy without leaking Jellyfin DTOs into UI.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M8.4"
+          ],
+          "test_profiles": [
+            "playback",
+            "adapter",
+            "api",
+            "ui"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M8.6",
+          "title": "Progress and session reconciliation",
+          "goal": "Reconcile canonical watch/resume state with Jellyfin runtime events/writes under explicit ownership rules.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M8.5"
+          ],
+          "test_profiles": [
+            "playback",
+            "jobs",
+            "db",
+            "realtime"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M8.7",
+          "title": "Unified player UI",
+          "goal": "Implement authored player loading/reconnect/error/track/volume/fullscreen states with accessibility.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M8.6"
+          ],
+          "test_profiles": [
+            "ts",
+            "ui",
+            "playback",
+            "e2e",
+            "a11y"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M8.8",
+          "title": "Jellyfin playback compatibility gate",
+          "goal": "Run supported-version fixtures plus play/remux/transcode/outage/progress/track/player E2E and performance tests.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": true,
+          "depends_on": [
+            "M8.7"
+          ],
+          "test_profiles": [
+            "adapter",
+            "playback",
+            "integration",
+            "e2e",
+            "perf",
+            "security"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M9",
+      "title": "Series and movies",
+      "status": "planned",
+      "legacy_tracks": [
+        17,
+        18
+      ],
+      "required_reads": [
+        "docs/MediaForge/modules/series-advanced-model.md",
+        "docs/MediaForge/modules/movies-advanced-model.md",
+        "docs/MediaForge/modules/media-editions-and-lineage.md"
+      ],
+      "source_hints": [
+        "app/Domain",
+        "database/migrations",
+        "resources/js"
+      ],
+      "units": [
+        {
+          "id": "M9.1",
+          "title": "Series, seasons, episodes and alternate orders",
+          "goal": "Implement series hierarchy, episode orders, specials and timeline relationships without equating episodes with files.",
+          "status": "planned",
+          "complexity": "hard",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M8.8"
+          ],
+          "test_profiles": [
+            "db",
+            "php",
+            "api"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M9.2",
+          "title": "Movies, cuts, extras and technical editions",
+          "goal": "Separate film work/cut identity from technical editions/files and model extras with provenance.",
+          "status": "planned",
+          "complexity": "hard",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M9.1"
+          ],
+          "test_profiles": [
+            "db",
+            "php",
+            "files"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M9.3",
+          "title": "Series/movie product surfaces",
+          "goal": "Implement authored browse/detail/season/episode/movie/edition/extras UI against canonical APIs.",
+          "status": "planned",
+          "complexity": "hard",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M9.2"
+          ],
+          "test_profiles": [
+            "ts",
+            "ui",
+            "api",
+            "e2e"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M9.4",
+          "title": "Series/movie regression gate",
+          "goal": "Prove ordering, lineage, cut/edition selection, playback handoff, search and large-library behavior.",
+          "status": "planned",
+          "complexity": "hard",
+          "recommended_bundle_max": 1,
+          "gate": true,
+          "depends_on": [
+            "M9.3"
+          ],
+          "test_profiles": [
+            "db",
+            "integration",
+            "e2e",
+            "perf"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M10",
+      "title": "Audiobooks, books and Audiobookshelf integration",
+      "status": "planned",
+      "legacy_tracks": [
+        19,
+        28
+      ],
+      "required_reads": [
+        "docs/MediaForge/modules/books-ebooks-and-persistent-metadata.md",
+        "docs/MediaForge/modules/audiobook-chapters-and-storage.md",
+        "docs/MediaForge/architecture/external-specialist-services-and-adapters.md"
+      ],
+      "source_hints": [
+        "app/Connectors/Audiobookshelf",
+        "app/Domain/Audiobooks",
+        "database/migrations",
+        "resources/js"
+      ],
+      "units": [
+        {
+          "id": "M10.1",
+          "title": "Literary Work, book edition and audiobook edition model",
+          "goal": "Implement cross-format literary identity while keeping text reading and audio listening state distinct.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M9.4"
+          ],
+          "test_profiles": [
+            "db",
+            "php",
+            "migration"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M10.2",
+          "title": "Audiobookshelf version/capability and rich sync",
+          "goal": "Expand ABS adapter with compatibility, metadata, covers, chapters and bounded incremental sync.",
+          "status": "planned",
+          "complexity": "hard",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M10.1"
+          ],
+          "test_profiles": [
+            "adapter",
+            "db",
+            "contract",
+            "integration"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M10.3",
+          "title": "Persistent metadata across rename/move/rescan",
+          "goal": "Guarantee useful ABS/file/provider metadata survives path, root, rescan, ID and source-availability changes.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M10.2"
+          ],
+          "test_profiles": [
+            "files",
+            "db",
+            "adapter",
+            "integration"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M10.4",
+          "title": "Audiobook chapters and storage strategies",
+          "goal": "Build canonical chapter sources/assembly and user-controlled storage/export without surprising source changes.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M10.3"
+          ],
+          "test_profiles": [
+            "php",
+            "files",
+            "db",
+            "jobs"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M10.5",
+          "title": "EPUB/PDF reader and reading state",
+          "goal": "Implement first-class Books UI/reader foundations, stable locators, progress, bookmarks, highlights and notes.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M10.4"
+          ],
+          "test_profiles": [
+            "ts",
+            "ui",
+            "db",
+            "files",
+            "e2e"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M10.6",
+          "title": "Audiobookshelf playback and listening progress bridge",
+          "goal": "Integrate ABS playback/chapter/session APIs and reconcile progress with MediaForge ownership policy.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M10.5"
+          ],
+          "test_profiles": [
+            "adapter",
+            "playback",
+            "jobs",
+            "realtime"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M10.7",
+          "title": "Books/audiobooks compatibility gate",
+          "goal": "Prove rename retention, ABS variants, chapters, EPUB/PDF reading, progress and outage behavior.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": true,
+          "depends_on": [
+            "M10.6"
+          ],
+          "test_profiles": [
+            "adapter",
+            "files",
+            "db",
+            "integration",
+            "e2e",
+            "perf"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M11",
+      "title": "Private scene domain and Scene Tracker integration",
+      "status": "planned",
+      "legacy_tracks": [
+        20,
+        21,
+        27
+      ],
+      "required_reads": [
+        "docs/MediaForge/modules/adult-engine-target.md",
+        "docs/MediaForge/modules/adult-enhancement.md",
+        "docs/MediaForge/architecture/external-specialist-services-and-adapters.md"
+      ],
+      "source_hints": [
+        "app/Connectors",
+        "app/Integrations",
+        "database/migrations",
+        "resources/js"
+      ],
+      "units": [
+        {
+          "id": "M11.1",
+          "title": "Private mode and Adult Zero Leak enforcement",
+          "goal": "Enforce private-domain isolation across routes/APIs/search/artwork/events/cache/activity/notifications.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M10.7"
+          ],
+          "test_profiles": [
+            "adult",
+            "security",
+            "api",
+            "e2e"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M11.2",
+          "title": "Scene Tracker adapter and compatibility",
+          "goal": "Integrate Scene Tracker through versioned API for scenes/performers/studios/tags/source provenance; never query its DB.",
+          "status": "planned",
+          "complexity": "hard",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M11.1"
+          ],
+          "test_profiles": [
+            "adapter",
+            "api",
+            "contract",
+            "security"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M11.3",
+          "title": "Scene, performer and studio canonical model",
+          "goal": "Implement private canonical entities/mappings, scene-file separation, credits and availability.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M11.2"
+          ],
+          "test_profiles": [
+            "db",
+            "php",
+            "adult"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M11.4",
+          "title": "Adult source vault and historical provenance",
+          "goal": "Persist local filename/curated/historical source facts and availability so vanished/reuploaded data cannot erase identity.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M11.3"
+          ],
+          "test_profiles": [
+            "db",
+            "adult",
+            "files"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M11.5",
+          "title": "Jellyfin scene playback mapping",
+          "goal": "Map local playable scenes to Jellyfin while MediaForge owns private identity/privacy.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M11.4"
+          ],
+          "test_profiles": [
+            "adapter",
+            "playback",
+            "adult",
+            "security"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M11.6",
+          "title": "Private matching, coverage and Review",
+          "goal": "Combine filename/source/performer/studio/date/runtime/fingerprint evidence conservatively and route ambiguity to Review.",
+          "status": "planned",
+          "complexity": "hard",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M11.5"
+          ],
+          "test_profiles": [
+            "adult",
+            "php",
+            "db",
+            "integration"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M11.7",
+          "title": "Private authored product surfaces",
+          "goal": "Implement scene/performer/studio/coverage/source UI only inside unlocked context.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M11.6"
+          ],
+          "test_profiles": [
+            "adult",
+            "ui",
+            "security",
+            "e2e",
+            "a11y"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M11.8",
+          "title": "Private-domain privacy and compatibility gate",
+          "goal": "Run zero-leak tests plus Scene Tracker/Jellyfin/source-history E2E compatibility coverage.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": true,
+          "depends_on": [
+            "M11.7"
+          ],
+          "test_profiles": [
+            "adult",
+            "security",
+            "adapter",
+            "integration",
+            "e2e"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M12",
+      "title": "Adult taxonomy, event timeline and multimodal analysis",
+      "status": "planned",
+      "legacy_tracks": [
+        22,
+        23
+      ],
+      "required_reads": [
+        "docs/MediaForge/modules/adult-analysis-and-taxonomy.md",
+        "docs/MediaForge/architecture/ai-capabilities-model-registry.md",
+        "docs/MediaForge/architecture/artifact-store-and-derived-assets.md"
+      ],
+      "source_hints": [
+        "services/ai",
+        "services/media-tools",
+        "app/Domain",
+        "database/migrations"
+      ],
+      "units": [
+        {
+          "id": "M12.1",
+          "title": "Hierarchical taxonomy and typed attributes",
+          "goal": "Implement hierarchical tags/events with typed attributes, provenance and human verification.",
+          "status": "planned",
+          "complexity": "hard",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M11.8"
+          ],
+          "test_profiles": [
+            "adult",
+            "db",
+            "contract"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M12.2",
+          "title": "Timeline event and evidence model",
+          "goal": "Represent timestamped events, evidence, checked-absent, confidence and verification without flattening into scene labels.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M12.1"
+          ],
+          "test_profiles": [
+            "adult",
+            "db",
+            "contract"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M12.3",
+          "title": "Optional multimodal analysis pipeline",
+          "goal": "Build restartable optional analysis jobs with model/version/license provenance and no core AI dependency.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M12.2"
+          ],
+          "test_profiles": [
+            "ai",
+            "jobs",
+            "adult",
+            "security"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M12.4",
+          "title": "Audio events and temporal boundary refinement",
+          "goal": "Treat audio events as first-class evidence and refine boundaries without confusing inference with verified facts.",
+          "status": "planned",
+          "complexity": "hard",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M12.3"
+          ],
+          "test_profiles": [
+            "ai",
+            "adult",
+            "jobs",
+            "integration"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M12.5",
+          "title": "Verification, review and coverage UX",
+          "goal": "Expose evidence/confidence/coverage and efficient human correction while preserving zero-leak privacy.",
+          "status": "planned",
+          "complexity": "hard",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M12.4"
+          ],
+          "test_profiles": [
+            "adult",
+            "ui",
+            "security",
+            "e2e"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M12.6",
+          "title": "Analysis quality/performance/privacy gate",
+          "goal": "Test model absence, retries, provenance, ambiguous cases, privacy, resource caps and timeline performance.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": true,
+          "depends_on": [
+            "M12.5"
+          ],
+          "test_profiles": [
+            "ai",
+            "adult",
+            "jobs",
+            "security",
+            "perf",
+            "e2e"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M13",
+      "title": "Disc, ISO, BDMV and VIDEO_TS",
+      "status": "planned",
+      "legacy_tracks": [
+        24
+      ],
+      "required_reads": [
+        "docs/MediaForge/modules/disc-engine.md",
+        "docs/MediaForge/modules/disc-verification-policy.md"
+      ],
+      "source_hints": [
+        "services/media-tools",
+        "app/Domain",
+        "database/migrations"
+      ],
+      "units": [
+        {
+          "id": "M13.1",
+          "title": "Disc identity, structure and immutable source model",
+          "goal": "Model DiscImage/DiscSet/playlist/clip/segment structures and lineage independently of canonical episodes/movies.",
+          "status": "planned",
+          "complexity": "hard",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M12.6"
+          ],
+          "test_profiles": [
+            "db",
+            "files",
+            "contract"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M13.2",
+          "title": "Disc probing and structural extraction",
+          "goal": "Use mature libbluray/DVD/FFmpeg/native tooling to inspect structures/tracks without DRM bypass.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M13.1"
+          ],
+          "test_profiles": [
+            "rust",
+            "files",
+            "integration"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M13.3",
+          "title": "Verified-only movie/episode mapping",
+          "goal": "Implement evidence-based suggestions and verified/manual mapping; confidence alone never authorizes watch mapping.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M13.2"
+          ],
+          "test_profiles": [
+            "php",
+            "db",
+            "security",
+            "integration"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M13.4",
+          "title": "Playback/remux handoff",
+          "goal": "Integrate mapped disc structures with playback/external-player/remux while episode-level watch state remains canonical.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M13.3"
+          ],
+          "test_profiles": [
+            "playback",
+            "rust",
+            "files",
+            "e2e"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M13.5",
+          "title": "Disc verification gate",
+          "goal": "Test ambiguity, multi-episode discs, playlists, watch-state invariants, immutability and representative fixtures.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": true,
+          "depends_on": [
+            "M13.4"
+          ],
+          "test_profiles": [
+            "files",
+            "integration",
+            "e2e",
+            "perf",
+            "security"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M14",
+      "title": "Rust MediaTools and audio enhancement",
+      "status": "planned",
+      "legacy_tracks": [
+        25,
+        29
+      ],
+      "required_reads": [
+        "docs/MediaForge/modules/audio-upscaler.md",
+        "docs/MediaForge/architecture/player-audio-loudness-and-device-policy.md",
+        "docs/MediaForge/architecture/artifact-store-and-derived-assets.md"
+      ],
+      "source_hints": [
+        "services/media-tools",
+        "services/ai",
+        "app/Domain"
+      ],
+      "units": [
+        {
+          "id": "M14.1",
+          "title": "Rust MediaTools service/contracts",
+          "goal": "Establish versioned native-service boundaries, process contracts, diagnostics and resource limits.",
+          "status": "planned",
+          "complexity": "hard",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M13.5"
+          ],
+          "test_profiles": [
+            "rust",
+            "contract",
+            "integration"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M14.2",
+          "title": "Probe, hash and fingerprint primitives",
+          "goal": "Implement/test fast probing, hashing, fingerprints and reusable FFmpeg/native helpers.",
+          "status": "planned",
+          "complexity": "hard",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M14.1"
+          ],
+          "test_profiles": [
+            "rust",
+            "files",
+            "perf"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M14.3",
+          "title": "Loudness, true-peak and playback-audio analysis",
+          "goal": "Provide deterministic EBU-R128/true-peak/channel analysis and filter-plan helpers with versioned results.",
+          "status": "planned",
+          "complexity": "hard",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M14.2"
+          ],
+          "test_profiles": [
+            "rust",
+            "playback",
+            "perf"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M14.4",
+          "title": "Audio restoration/upscale derived editions",
+          "goal": "Create optional enhancement workflows that produce traceable derived editions/artifacts and never replace originals silently.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M14.3"
+          ],
+          "test_profiles": [
+            "jobs",
+            "files",
+            "ai",
+            "rust"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M14.5",
+          "title": "Native media tooling gate",
+          "goal": "Run Rust unit/integration/clippy plus determinism, crash, resource, container and source-immutability tests.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": true,
+          "depends_on": [
+            "M14.4"
+          ],
+          "test_profiles": [
+            "rust",
+            "integration",
+            "perf",
+            "files"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M15",
+      "title": "Jobs, events, realtime, observability and resilience",
+      "status": "planned",
+      "legacy_tracks": [
+        30,
+        35
+      ],
+      "required_reads": [
+        "docs/MediaForge/architecture/jobs-reference.md",
+        "docs/MediaForge/architecture/events-reference.md",
+        "docs/MediaForge/modules/backup-restore.md"
+      ],
+      "source_hints": [
+        "app/Jobs",
+        "app/Events",
+        "app/Services",
+        "database/migrations",
+        "deploy"
+      ],
+      "units": [
+        {
+          "id": "M15.1",
+          "title": "Durable job model and idempotency",
+          "goal": "Standardize queued work, persistent progress/checkpoints, idempotency and ownership so retries/crashes cannot duplicate effects.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M14.5"
+          ],
+          "test_profiles": [
+            "jobs",
+            "db",
+            "php"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M15.2",
+          "title": "Events and realtime progress contracts",
+          "goal": "Normalize domain events/client progress with duplicate/out-of-order/reconnect behavior explicit.",
+          "status": "planned",
+          "complexity": "hard",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M15.1"
+          ],
+          "test_profiles": [
+            "realtime",
+            "contract",
+            "jobs",
+            "ts"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M15.3",
+          "title": "Scheduler, retry, cancellation and recovery",
+          "goal": "Implement bounded retry/backoff, cancellation, resumability and restart-safe orchestration.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M15.2"
+          ],
+          "test_profiles": [
+            "jobs",
+            "integration",
+            "security"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M15.4",
+          "title": "Observability, health and performance budgets",
+          "goal": "Expose useful logs/metrics/health/traces where justified without secrets/private-content leakage.",
+          "status": "planned",
+          "complexity": "hard",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M15.3"
+          ],
+          "test_profiles": [
+            "perf",
+            "security",
+            "php",
+            "jobs"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M15.5",
+          "title": "Backup, restore and disaster recovery",
+          "goal": "Back up/restore MediaForge-owned DB/config/artifact metadata; coordinate but do not merge upstream backups.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M15.4"
+          ],
+          "test_profiles": [
+            "db",
+            "security",
+            "integration"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M15.6",
+          "title": "Chaos, restart and resilience gate",
+          "goal": "Exercise worker crashes, duplicate delivery, upstream outages, DB/Redis restarts, restore and degraded mode.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": true,
+          "depends_on": [
+            "M15.5"
+          ],
+          "test_profiles": [
+            "jobs",
+            "realtime",
+            "integration",
+            "perf",
+            "security"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M16",
+      "title": "Music, podcasts and cross-media Work graph",
+      "status": "planned",
+      "legacy_tracks": [
+        31,
+        32
+      ],
+      "required_reads": [
+        "docs/MediaForge/modules/work-graph-and-cross-media.md",
+        "docs/MediaForge/architecture/postgresql-source-of-truth.md"
+      ],
+      "source_hints": [
+        "app/Domain",
+        "database/migrations",
+        "resources/js"
+      ],
+      "units": [
+        {
+          "id": "M16.1",
+          "title": "Music and podcast canonical models",
+          "goal": "Model artists/albums/tracks/podcasts/episodes with mappings, editions/files and provenance without silo schemas.",
+          "status": "planned",
+          "complexity": "hard",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M15.6"
+          ],
+          "test_profiles": [
+            "db",
+            "php",
+            "migration"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M16.2",
+          "title": "General audio browse and playback",
+          "goal": "Build MediaForge music/podcast browse, queues and playback handoff using existing playback capabilities.",
+          "status": "planned",
+          "complexity": "hard",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M16.1"
+          ],
+          "test_profiles": [
+            "api",
+            "ui",
+            "playback",
+            "e2e"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M16.3",
+          "title": "Work graph, collections and recommendations",
+          "goal": "Implement typed cross-media relationships, collections and explainable recommendation foundations in PostgreSQL.",
+          "status": "planned",
+          "complexity": "hard",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M16.2"
+          ],
+          "test_profiles": [
+            "db",
+            "php",
+            "perf"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M16.4",
+          "title": "Cross-media gate",
+          "goal": "Prove identity, search, collections, graph traversal, playback and large-library query performance.",
+          "status": "planned",
+          "complexity": "hard",
+          "recommended_bundle_max": 1,
+          "gate": true,
+          "depends_on": [
+            "M16.3"
+          ],
+          "test_profiles": [
+            "db",
+            "integration",
+            "e2e",
+            "perf"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M17",
+      "title": "Clients, extensions and optional AI",
+      "status": "planned",
+      "legacy_tracks": [
+        33,
+        34
+      ],
+      "required_reads": [
+        "docs/MediaForge/modules/plugin-theme-sdk.md",
+        "docs/MediaForge/architecture/ai-capabilities-model-registry.md",
+        "docs/MediaForge/architecture/frontend-framework.md"
+      ],
+      "source_hints": [
+        "packages",
+        "services/ai",
+        "resources/js"
+      ],
+      "units": [
+        {
+          "id": "M17.1",
+          "title": "Shared client SDKs and capability surface",
+          "goal": "Provide stable client contracts so web/TV/desktop/mobile share auth/catalog/playback/realtime semantics.",
+          "status": "planned",
+          "complexity": "hard",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M16.4"
+          ],
+          "test_profiles": [
+            "contract",
+            "ts",
+            "api"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M17.2",
+          "title": "PWA, TV and 10-foot interaction",
+          "goal": "Harden installable PWA, remote/focus navigation, fullscreen playback and large-screen performance.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M17.1"
+          ],
+          "test_profiles": [
+            "ui",
+            "e2e",
+            "a11y",
+            "perf"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M17.3",
+          "title": "Desktop/mobile packaging where justified",
+          "goal": "Add thin platform clients only for capabilities the web cannot provide well, reusing shared APIs.",
+          "status": "planned",
+          "complexity": "hard",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M17.2"
+          ],
+          "test_profiles": [
+            "integration",
+            "e2e",
+            "security"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M17.4",
+          "title": "Plugin, provider and theme SDK",
+          "goal": "Expose permissioned extension contracts while protecting canonical invariants and secrets.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M17.3"
+          ],
+          "test_profiles": [
+            "contract",
+            "security",
+            "php",
+            "ts"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M17.5",
+          "title": "Optional AI/model registry and semantic capabilities",
+          "goal": "Integrate optional models/embeddings/semantic/advanced analysis with licenses, provenance, quotas and graceful absence.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M17.4"
+          ],
+          "test_profiles": [
+            "ai",
+            "security",
+            "db",
+            "jobs"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M17.6",
+          "title": "Client/extension compatibility gate",
+          "goal": "Run SDK compatibility, plugin trust, theme isolation, PWA/TV accessibility, AI-absent and cross-client E2E tests.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": true,
+          "depends_on": [
+            "M17.5"
+          ],
+          "test_profiles": [
+            "contract",
+            "security",
+            "e2e",
+            "a11y",
+            "ai"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "M18",
+      "title": "Distribution, upgrades and final integration",
+      "status": "planned",
+      "legacy_tracks": [
+        36
+      ],
+      "required_reads": [
+        "docs/MediaForge/architecture/docker-release-distribution.md",
+        "docs/MediaForge/architecture/managed-upstreams-and-product-surface.md",
+        "docs/MediaForge/architecture/green-commit-workflow.md"
+      ],
+      "source_hints": [
+        "deploy",
+        ".github/workflows",
+        "platform",
+        "tests"
+      ],
+      "units": [
+        {
+          "id": "M18.1",
+          "title": "Docker/release topology and optional service profiles",
+          "goal": "Finalize MediaForge images/Compose profiles with separate Jellyfin/ABS services when bundled.",
+          "status": "planned",
+          "complexity": "hard",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M17.6"
+          ],
+          "test_profiles": [
+            "release",
+            "integration",
+            "security"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M18.2",
+          "title": "CI matrix, security QA, SBOM and signing",
+          "goal": "Make critical unit/integration/E2E/static/security checks reproducible in CI and produce auditable artifacts.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M18.1"
+          ],
+          "test_profiles": [
+            "release",
+            "security",
+            "contract"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M18.3",
+          "title": "Upgrade, compatibility and rollback",
+          "goal": "Test MediaForge migrations plus external-service compatibility ranges, image upgrades and rollback/forward-fix.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M18.2"
+          ],
+          "test_profiles": [
+            "release",
+            "migration",
+            "adapter",
+            "integration"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M18.4",
+          "title": "Full-system E2E, performance and restore validation",
+          "goal": "Run representative fresh install, populated upgrade, playback, acquisition, private mode, backup/restore and performance scenarios.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": false,
+          "depends_on": [
+            "M18.3"
+          ],
+          "test_profiles": [
+            "release",
+            "e2e",
+            "perf",
+            "security",
+            "integration"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        },
+        {
+          "id": "M18.5",
+          "title": "Release-candidate gate",
+          "goal": "Resolve release blockers, verify docs/runbooks/limits and produce a green release candidate without overstating readiness.",
+          "status": "planned",
+          "complexity": "critical",
+          "recommended_bundle_max": 1,
+          "gate": true,
+          "depends_on": [
+            "M18.4"
+          ],
+          "test_profiles": [
+            "release",
+            "contract",
+            "security",
+            "e2e"
+          ],
+          "done_criteria": [
+            "Required behavior is implemented or the decision is explicit and internally consistent.",
+            "Focused automated tests pass, including meaningful negative/failure cases where risk exists.",
+            "Relevant broader gates from TEST_STRATEGY.md pass; no result is claimed without execution.",
+            "Contracts, migrations and authoritative docs change together when semantics change.",
+            "Existing V1/V2 behavior outside authorized scope remains working.",
+            "No commit/push/tag/release without explicit user authorization."
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,3 +1,6 @@
+> **LEGACY EXECUTION MATERIAL — 2026-09-27**
+> The active execution system is `docs/MediaForge/phases/`. Do not continue work by taking the next `Pxxxx` file. This file is retained for traceability and requirement recovery only.
+
 # MediaForge Claude Prompt System — 720 detailed prompts
 
 This directory is the **execution layer** for Claude. The rest of `docs/MediaForge/` is the complete product specification and long-term source of truth.

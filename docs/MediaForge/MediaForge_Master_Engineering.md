@@ -676,7 +676,7 @@ Die ausführlichen verbindlichen Ergänzungen liegen in:
 - `modules/plugin-theme-sdk.md`
 - `modules/derived-assets-and-storage-manager.md`
 
-Die 720-Prompt-Struktur bleibt bestehen; betroffene Prompts werden aktualisiert statt neue IDs anzuhängen.
+Die frühere 720-Prompt-Struktur bleibt nur als historisches Requirements-Archiv bestehen. Aktive Umsetzung erfolgt über das variable Milestone-System unter `docs/MediaForge/phases/` (`M1`, `M2`, ... mit risikogerecht großen `Mx.y`-Arbeitspaketen und Tests in jedem Paket).
 
 ## 2026-08-17 — Acquisition, managed backends and localization consolidation
 

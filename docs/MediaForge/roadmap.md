@@ -6,6 +6,12 @@ Updated target architecture: **2026-09-27 — external specialist services throu
 
 The old mandatory deep-fork/cutover destination is superseded by ADR-0028.
 
+## Milestone execution overlay
+
+Implementation is executed through `docs/MediaForge/phases/PHASE_INDEX.md` and `PHASE_CATALOG.json`. The alphabetic roadmap sections below remain product-planning guidance; they are grouped into variable-size `Mx.y` work packages rather than the legacy 720 fixed lifecycle prompts.
+
+Current execution unit: **M2.1**.
+
 ## Current status
 
 V1 complete. V2 A–E implemented according to `CURRENT_PHASE.md`.

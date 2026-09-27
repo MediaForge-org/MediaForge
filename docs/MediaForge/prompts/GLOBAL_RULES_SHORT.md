@@ -1,3 +1,6 @@
+> **LEGACY EXECUTION MATERIAL — 2026-09-27**
+> The active execution system is `docs/MediaForge/phases/`. Do not continue work by taking the next `Pxxxx` file. This file is retained for traceability and requirement recovery only.
+
 # Global rules — short context loaded for every numbered prompt
 
 These rules are intentionally short. Do not replace them by rereading the whole master specification every time.

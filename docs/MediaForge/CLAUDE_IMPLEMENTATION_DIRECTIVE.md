@@ -14,7 +14,7 @@ Diese Datei ergänzt die Master-Spezifikation für Claude Code.
 
 - Nie behaupten, ein späteres Ziel sei bereits implementiert.
 - `CURRENT_PHASE.md` nur ändern, wenn Code + Tests den neuen Stand tatsächlich beweisen.
-- Keine Fork-/ISO-/AI-Audio-Arbeit vor dem dafür vorgesehenen Gate.
+- Keine Deep-Fork-/ISO-/AI-Audio-Arbeit vor dem dafür vorgesehenen Gate; ein Deep Fork braucht zusätzlich einen neuen evidenzbasierten ADR.
 - Keine sichtbare Weiterleitung auf Jellyfin/Stash/ABS als endgültige UX.
 - PostgreSQL-Identität nicht durch Engine-IDs ersetzen.
 - Adult Zero Leak serverseitig erzwingen.
@@ -50,9 +50,11 @@ Alle neuen Feature-Screens 30–41 müssen vor dem jeweiligen Modul implementier
 
 P0 bedeutet: Datenmodell/Contract früh vorbereiten; es bedeutet **nicht**, dass aufwendige AI-Funktion sofort implementiert werden soll.
 
-## Granular prompt execution system
+## Milestone / phase execution system
 
-For normal implementation work, use `docs/MediaForge/prompts/` instead of rereading the full specification on every turn. Start with `prompts/README_START_HERE.md`. Each numbered prompt defines its own minimal context budget. Do not preload unrelated documentation or images.
+For normal implementation work, use `docs/MediaForge/phases/`. Read `phases/CURRENT_PHASE.md` and `phases/EXECUTION_RULES.md`, then run `python3 tools/phases/show_phase.py <Mx.y>` for the authorized unit. Use Graphify first for code navigation when available and apply `phases/TEST_STRATEGY.md`.
+
+The old `docs/MediaForge/prompts/P0001..P0720` tree is retained only as a historical requirements archive. Do not continue at the next legacy P-number.
 
 ## Green-Commit- und Capability-Regeln 2026-08-16
 
@@ -66,7 +68,7 @@ For normal implementation work, use `docs/MediaForge/prompts/` instead of reread
 ## Product-surface, acquisition and localisation rules — 2026-08-17
 
 - Do not implement MediaForge as a launcher for external Web UIs. MediaForge owns normal UX; upstream native UIs are advanced/admin fallbacks.
-- During Track 02 import/pin Jellyfin, Stash and Audiobookshelf baselines without prematurely deleting their ability to build/run as references. Later tracks progressively adapt/cut over capabilities.
+- Jellyfin and Audiobookshelf remain separate specialist services behind versioned adapters; Scene Tracker remains a separate metadata/community service. Do not import/pin their source trees as a normal milestone requirement and never access their internal databases directly.
 - Treat NZBGet/qBittorrent/Prowlarr/Sonarr/Radarr/Whisparr as unmodified managed upstreams unless a later explicit ADR changes that rule.
 - Acquisition logic must respect torrent seeding, staging/quarantine and deterministic naming/provenance. Do not hide destructive filesystem operations behind generic helpers.
 - User-visible strings must use localisation keys. Launch locale completeness is de/en-GB/it/es/fr.

@@ -1,3 +1,6 @@
+> **LEGACY EXECUTION MATERIAL — 2026-09-27**
+> The active execution system is `docs/MediaForge/phases/`. Do not continue work by taking the next `Pxxxx` file. This file is retained for traceability and requirement recovery only.
+
 # Prompt order — 720 prompts
 
 **2026-08-16 dependency correction:** count remains 720. Tracks 23–25 no longer depend on `P0580`; Track 29 is a later optimization/implementation track behind versioned contracts. This removes the P0441–P0580 cycle without renumbering prompts.

@@ -1,3 +1,6 @@
+> **LEGACY EXECUTION MATERIAL — 2026-09-27**
+> The active execution system is `docs/MediaForge/phases/`. Do not continue work by taking the next `Pxxxx` file. This file is retained for traceability and requirement recovery only.
+
 # Context routing for Claude
 
 Use this before reading extra docs.

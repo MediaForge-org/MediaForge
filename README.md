@@ -4,7 +4,7 @@ MediaForge is an open-source, local-first **unified media application**.
 
 The long-term product has **one MediaForge interface** for movies, series, music, audiobooks, books, podcasts, discs and private media. MediaForge integrates mature specialist services through versioned adapters instead of deep-forking them by default. Jellyfin and Audiobookshelf keep their own runtimes/databases; Scene Tracker remains a separate metadata/community product. MediaForge owns the unified UX, canonical PostgreSQL catalog, cross-service identity, search, provenance, review and orchestration.
 
-The current alpha is intentionally much smaller than that target: it is still building the canonical catalog, connector and safety foundations before playback engines, fork integration, Disc/ISO, enhancement engines and Adult are activated.
+The current alpha is intentionally much smaller than that target: it is still building the canonical catalog, connector and safety foundations before richer playback integrations, Disc/ISO, enhancement systems and private-domain features are activated.
 
 
 MediaForge is an open-source, **local-first** enhancement suite that runs *beside* your existing
@@ -48,7 +48,7 @@ V2 is under way on top of that foundation: a read-only external catalog, normali
 preview, a reviewable import plan, and — since V2 E — a **database-only internal import** that
 turns an approved plan into MediaForge records. It still performs **no file operations** (nothing
 is copied, moved, deleted or renamed) and writes **nothing** back to Jellyfin or Audiobookshelf.
-See [docs/MediaForge/CURRENT_PHASE.md](docs/MediaForge/CURRENT_PHASE.md) for the active phase.
+See [docs/MediaForge/CURRENT_PHASE.md](docs/MediaForge/CURRENT_PHASE.md) and [docs/MediaForge/phases/PHASE_INDEX.md](docs/MediaForge/phases/PHASE_INDEX.md) for the active milestone plan.
 
 The delivered V1 packages are tracked in
 [docs/MediaForge/V1_READINESS.md](docs/MediaForge/V1_READINESS.md) and
